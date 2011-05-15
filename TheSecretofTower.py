@@ -26,9 +26,11 @@ from element import *
 import const
 
 from menu import *
+from jeu import *
 
 app = App()
 
-menu(app)
+if menu(app) == 1:
+    jeu(app)
 
 pygame.quit()

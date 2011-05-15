@@ -11,10 +11,11 @@ class Element:
         self.x = 0
         self.y = 0
 
-    def changer_image(self, path):
-            self.image = path
+    def changer_image(self, src):
+        self.image = src
 
     def changer_text(self, text, font):
         if isinstance(text, str):
             self.image = font.render(text, 1, (0,0,0))
+            
         

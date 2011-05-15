@@ -30,7 +30,7 @@ class App:
     def blit(self, element):
         """Ajoute Element à l'écran"""
         if isinstance(element, Element):
-            self.fenetre.blit(element.image, (element.x, element.y))
+            self.fenetre.blit(element.image, (element.x,element.y))
             
 
     def flip(self):
