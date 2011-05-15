@@ -23,8 +23,10 @@ def jeu(app):
             if event.type == KEYDOWN:
                 if event.key == K_LEFT:
                     perso.x = perso.x - 10
+                    perso.changer_image(perso.perso_g)
                 if event.key == K_RIGHT:
                     perso.x = perso.x + 10
+                    perso.changer_image(perso.perso_d)
             if event.type == QUIT:
                 cmd = 0
                 return cmd
