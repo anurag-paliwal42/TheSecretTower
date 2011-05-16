@@ -27,11 +27,17 @@ def jeu(app):
                 if event.key == K_RIGHT:
                     perso.x = perso.x + 10
                     perso.changer_image(perso.perso_d)
+                if event.key == K_SPACE:
+                    perso.sauter()
             if event.type == QUIT:
                 cmd = 0
                 return cmd
+        
+        perso.tomber()
+
         app.blit(fond_menu)
         app.blit(perso)
             
         app.flip()
+        
     
