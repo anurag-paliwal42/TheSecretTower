@@ -6,12 +6,31 @@ from element import *
 import pygame
 from pygame.locals import *
 
+from time import *
+
 class Bloc(Element):
     
     def __init__(self, picture):
         Element.__init__(self)
         if picture == 1:
             self.changer_image(pygame.image.load("img/bloc1.png").convert())
+
+class BlocDisp(Bloc):
+    
+    def __init__(self, picture, begin = 0):
+        Bloc.__init__(self, picture)
+        self.last_change = time()+begin
+        self.etat = True
+
+    def disp(self):
+        if (time() - self.last_change > 3):
+            self.last_change = time()
+            if (self.etat == True):
+                self.etat = False
+            elif (self.etat == False):
+                self.etat = True
+        
+        
 
 class BlocMouvant(Bloc):
     

@@ -30,7 +30,15 @@ from jeu import *
 
 app = App()
 
-if menu(app) == 1:
-    jeu(app)
+cmd = 1
+while cmd:
+    print "Welcome"
+    cmd =  menu(app, "Menu principal", ["Nouvelle Partie", "Charger Partie", "Quitter"])
+
+    if cmd == 1:
+        cmd = jeu(app)
+
+    if cmd == 2:
+        cmd = menu(app, "Game Over", ["Rejouer", "Quitter"])
 
 pygame.quit()

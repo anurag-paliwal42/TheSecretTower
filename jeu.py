@@ -21,6 +21,8 @@ def jeu(app):
     fond_menu = Element()
     fond_menu.changer_image(pygame.image.load(const.path_fond_menu).convert())
 
+
+    # Map
     map = []
 
     bloc = Bloc(1)
@@ -55,8 +57,16 @@ def jeu(app):
     bloc6 = BlocMouvant(1, 60, 200, 0, 350)
     map.append(bloc6)
 
-    bloc8 = BlocMouvant(1, 500, 200, 100, 0)
+    bloc8 = BlocMouvant(1, 450, 200, 100, 0)
     map.append(bloc8)
+
+    bloc9 = BlocDisp(1)
+    bloc9.move_el(450,500)
+    map.append(bloc9)
+    
+    bloc10 = BlocDisp(1, 5)
+    bloc10.move_el(500,500)
+    map.append(bloc10)
 
     
 
@@ -66,21 +76,26 @@ def jeu(app):
         # Traitement events
         cmd = update_event(input)
   
-        if input[K_SPACE] and input[K_LEFT]:
+        if (input[K_SPACE] or input[K_UP]) and input[K_LEFT]:
             perso.sauter(-5, -15)
             input[K_SPACE] = 0
+            input[K_UP] = 0
 
-        if input[K_SPACE] and input[K_RIGHT]:
+        if (input[K_SPACE] or input[K_UP]) and input[K_RIGHT]:
             perso.sauter(5, -15)
             input[K_SPACE] = 0
+            input[K_UP]
 
-        if input[K_SPACE]:
+        if (input[K_SPACE] or input[K_UP]):
             perso.sauter(0, -15)
             input[K_SPACE] = 0
+            input[K_UP] = 0
         if input[K_LEFT]:
             perso.move(-5,0, map)
         if input[K_RIGHT]:
             perso.move(5,0, map)
+        if input[K_RETURN]:
+            perso.subir_degats(1)
 
         
         perso.tomber(map)
@@ -90,8 +105,20 @@ def jeu(app):
         for i in map:
             if isinstance(i, BlocMouvant):
                 i.move()
-            app.blit(i)
+                app.blit(i)
+            elif isinstance(i, BlocDisp):
+                i.disp()
+                if (i.etat):
+                    app.blit(i)
+            else:
+                app.blit(i)
         app.blit(perso)
         app.flip()
+
+
+        if perso.vie <= 0:
+            return 2
+
+    return 0
         
     

@@ -10,8 +10,8 @@ def update_event(input):
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             input[event.key] = 1;
-        elif event.type == KEYUP:
+        if event.type == KEYUP:
             input[event.key] = 0;
-        elif event.type == QUIT:
-            return 0
-        return 1
+        if event.type == QUIT:
+            return False
+    return True

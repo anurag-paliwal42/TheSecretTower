@@ -6,7 +6,15 @@ from pygame.locals import *
 
 from app import *
 
-def menu(app):
+from event import *
+
+def menu(app, title, pmenu):
+
+    input = range(0, 1000, 1)
+
+    for i in range(len(input)):
+        input[i] = 0
+
     fond_menu = Element()
     fond_menu.changer_image(pygame.image.load(const.path_fond_menu).convert())
 
@@ -15,36 +23,36 @@ def menu(app):
     img_choix.x = 30
     img_choix.y = 300
     
-    entry = Element()
-    entry.changer_text("Nouvelle Partie", app.font)
 
     menu = []
-    menu.append(entry)
 
-    entry = Element()
-    entry.changer_text("Charger Partie", app.font)
-    menu.append(entry)
+    for i in pmenu:
+        entry = Element()
+        entry.changer_text(i, app.font)
+        menu.append(entry)
 
 
     cmd = 1
 
-    while cmd<>0:
+    while update_event(input):
         # Evenement
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_DOWN:
-                    img_choix.y = 350
-                    cmd = 2
-                if event.key == K_UP:
-                    img_choix.y = 300
-                    cmd = 1
-                if event.key == K_RETURN or event.key == K_SPACE:
-                    return cmd
-            if event.type == QUIT:
-                cmd = 0
-                return cmd
+
+        if input[K_UP]:
+            if cmd-1 > 0:
+                cmd = cmd - 1
+            input[K_UP] = 0
+        if input[K_DOWN]:
+            if cmd+1 <= len(menu):
+                cmd = cmd + 1
+            input[K_DOWN] = 0
+        if input[K_SPACE] or input[K_RETURN]:
+            if pmenu[cmd-1] == "Quitter":
+                return 0
+            return cmd
         
         # Affichage
+
+        img_choix.y = 250 + (cmd*50)
         app.blit(fond_menu)
                 
         x = 100
@@ -58,3 +66,6 @@ def menu(app):
         app.blit(img_choix)
             
         app.flip()
+
+    return 0
+

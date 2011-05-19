@@ -5,6 +5,8 @@ from element import *
 from bloc import *
 import const
 
+from time import *
+
 # Pygame
 import pygame
 from pygame.locals import *
@@ -23,11 +25,27 @@ class Perso(Element):
         # changer_image
         self.changer_image(self.perso_d)
 
+        # Propriétés
+        self.vie = 3
+        self.last_dommage = time()
+
         # Gravité
         self.v_y = 0
         self.v_x = 0
         self.isingrav = True
     
+
+    def subir_degats(self, degat):
+        if (self.vie > 0 and time()-self.last_dommage > 1):
+            self.last_dommage = time()
+            self.vie = self.vie - 1
+            self.sauter(2, -5)
+            return True
+        if (self.vie <= 0):
+            return False
+
+
+    ################### Moteur Physique ###################
 
     # Faire subir au perso les lois de gravitations
     # map : liste contenant les elements de la map
@@ -44,7 +62,7 @@ class Perso(Element):
                self.v_y = 0
                self.v_x = 0
 
-        else:
+        else: 
             self.isingrav = False
     
     # Fait sauter notre personnage
@@ -103,17 +121,28 @@ class Perso(Element):
         for i in map:
             if future_rect.colliderect(i.rect):
  
+                # Vérif bloc mouvant
                 if isinstance(i, BlocMouvant):
-                    if i.aller:
-                        if i.x < i.dep_x+i.debut_x:
-                            self.move(1,0, map)
+                    # Vérif position
+                    if (self.y-dep_y) <= i.y-50:
+                        if i.aller:
+                            if i.x < i.dep_x+i.debut_x:
+                                self.move(1,0, map)
            
+                        else:
+                            if i.x > i.debut_x:
+                                self.move(-1,0, map)
+                            if i.y > i.debut_y:
+                                self.move(0,-1, map)
+                        return True
                     else:
-                        if i.x > i.debut_x:
-                            self.move(-1,0, map)
-                        if i.y > i.debut_y:
-                            self.move(0,-1, map)
-                return True
+                        return False
+                if isinstance(i, BlocDisp):
+                    if (i.etat):
+                        return True
+                    return False
+                else:
+                    return True
             
         return False
 
