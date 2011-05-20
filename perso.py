@@ -39,7 +39,7 @@ class Perso(Element):
         if (self.vie > 0 and time()-self.last_dommage > 1):
             self.last_dommage = time()
             self.vie = self.vie - 1
-            self.sauter(2, -5)
+            self.sauter(3, -10, True)
             return True
         if (self.vie <= 0):
             return False
@@ -68,8 +68,8 @@ class Perso(Element):
     # Fait sauter notre personnage
     # x : vitesse en x
     # y : vitesse en y
-    def sauter(self, x, y):
-        if self.isingrav == False:
+    def sauter(self, x, y, force = False):
+        if self.isingrav == False or force:
             self.v_y = y
             self.v_x = x
             self.isingrav = True
@@ -137,10 +137,13 @@ class Perso(Element):
                         return True
                     else:
                         return False
-                if isinstance(i, BlocDisp):
+                elif isinstance(i, BlocDisp):
                     if (i.etat):
                         return True
                     return False
+                elif isinstance(i, BlocDanger):
+                    self.subir_degats(i.atk)
+                    return True
                 else:
                     return True
             

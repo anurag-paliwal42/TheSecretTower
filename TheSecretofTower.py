@@ -27,16 +27,16 @@ import const
 
 from menu import *
 from jeu import *
+from map import *
 
 app = App()
 
 cmd = 1
 while cmd:
-    print "Welcome"
     cmd =  menu(app, "Menu principal", ["Nouvelle Partie", "Charger Partie", "Quitter"])
 
     if cmd == 1:
-        cmd = jeu(app)
+        cmd = jeu(app, open_map(0))
 
     if cmd == 2:
         cmd = menu(app, "Game Over", ["Rejouer", "Quitter"])

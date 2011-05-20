@@ -8,6 +8,8 @@ from pygame.locals import *
 
 from time import *
 
+
+# Bloc
 class Bloc(Element):
     
     def __init__(self, picture):
@@ -59,6 +61,17 @@ class BlocMouvant(Bloc):
                 self.move_el(-1,0)
             if self.y > self.debut_y:
                 self.move_el(0,-1)
+
+
+
+class BlocDanger(Bloc):
+    
+    def __init__(self, picture, atk):
+        Bloc.__init__(self, picture)
+        self.atk = atk
+
+        
+    
             
         
 

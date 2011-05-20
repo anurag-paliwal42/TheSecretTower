@@ -8,7 +8,7 @@ from app import *
 
 from event import *
 
-def menu(app, title, pmenu):
+def menu(app, ptitle, pmenu):
 
     input = range(0, 1000, 1)
 
@@ -22,8 +22,11 @@ def menu(app, title, pmenu):
     img_choix.changer_image(pygame.image.load(const.path_choix).convert_alpha())
     img_choix.x = 30
     img_choix.y = 300
-    
 
+    title = Element()
+    title.changer_text(ptitle, app.font)
+    title.move_el(80,250)
+    
     menu = []
 
     for i in pmenu:
@@ -54,6 +57,7 @@ def menu(app, title, pmenu):
 
         img_choix.y = 250 + (cmd*50)
         app.blit(fond_menu)
+        app.blit(title)
                 
         x = 100
         y = 300
