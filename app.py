@@ -40,9 +40,11 @@ class App:
             cmd =  menu(self, "Menu principal", ["Nouvelle Partie", "Charger Partie", "Editeur de map", "Quitter"])
             
             if cmd == 1:
-                cmd = jeu(self, open_map("map0"))
-                if cmd == 2:
-                    cmd = menu(self, "Game Over", ["Rejouer", "Quitter"])
+                i = 0
+                while open_map("map{0}".format(i)) != [] and cmd == 1:
+                    cmd = jeu(self, open_map("map{0}".format(i)))
+                    i = i+1
+                
             elif cmd == 2:
                 cmd = jeu(self, open_map(ask(self, "Entrez le nom de la map :")))
                 if cmd == 2:

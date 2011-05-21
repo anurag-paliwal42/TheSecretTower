@@ -67,6 +67,8 @@ def jeu(app, map):
                         if i.etat == 0:
                             perso.move_el(i.x-perso.x,i.y-perso.y)
                 cmd = 1
+            if cmd == 0:
+                return 5
                 
 
         

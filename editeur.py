@@ -129,6 +129,8 @@ def editeur(app, map):
                 cmd =1
             elif cmd == 3:
                 jeu(app, map)
+            elif cmd == 0:
+                return 5
             
         coord.changer_text("("+str(select.x)+";"+str(select.y)+")", app.font)
         app.blit(fond)
