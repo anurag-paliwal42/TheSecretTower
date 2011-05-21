@@ -6,6 +6,7 @@ from bloc import *
 from element import *
 from event import *
 from map import *
+from menu import *
 
 import pygame
 from pygame.locals import *
@@ -24,6 +25,10 @@ def jeu(app, map):
 
     fond = Element()
     fond.changer_image(pygame.image.load(const.path_fond1).convert())
+
+    coeur = Element()
+    coeur.changer_image(pygame.image.load("img/coeur.png").convert_alpha())
+    coeur.y = 10
 
 
     cmd = 1
@@ -53,12 +58,24 @@ def jeu(app, map):
             perso.move(5,0, map)
         if input[K_RETURN]:
             perso.subir_degats(1)
+        if input[K_ESCAPE]:
+            input[K_ESCAPE] = 0
+            cmd = menu(app, "Pause", ["Reprendre", "Recommencer", "Quitter"])
+            if cmd == 2:
+                for i in map:
+                    if isinstance(i, Porte):
+                        if i.etat == 0:
+                            perso.move_el(i.x-perso.x,i.y-perso.y)
+                cmd = 1
+                
 
         
         perso.tomber(map)
 
         # Affichage
         app.blit(fond)
+
+
         for i in map:
             if isinstance(i, BlocMouvant):
                 i.move()
@@ -70,11 +87,20 @@ def jeu(app, map):
             else:
                 app.blit(i)
         app.blit(perso)
+        for i in range(perso.vie):
+            coeur.x = 10 + i*30
+            app.blit(coeur)
         app.flip()
 
 
         if perso.vie <= 0:
-            return 2
+            perso.vie = 3
+            for i in map:
+                if isinstance(i, Porte):
+                    if i.etat == 0:
+                        perso.move_el(i.x - perso.x,i.y-perso.y)
+        if perso.win:
+            return 1
 
     return 0
         

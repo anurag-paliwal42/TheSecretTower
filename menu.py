@@ -204,6 +204,36 @@ def ask(app, ptitle):
         elif input[K_KP9]:
             preponse = preponse+"9"
             input[K_KP9] = 0
+        elif input[K_0]:
+            preponse = preponse+"0"
+            input[K_0] = 0
+        elif input[K_1]:
+            preponse = preponse+"1"
+            input[K_1] = 0
+        elif input[K_2]:
+            preponse = preponse+"2"
+            input[K_2] = 0
+        elif input[K_3]:
+            preponse = preponse+"3"
+            input[K_3] = 0
+        elif input[K_4]:
+            preponse = preponse+"4"
+            input[K_4] = 0
+        elif input[K_5]:
+            preponse = preponse+"5"
+            input[K_5] = 0
+        elif input[K_6]:
+            preponse = preponse+"6"
+            input[K_6] = 0
+        elif input[K_7]:
+            preponse = preponse+"7"
+            input[K_7] = 0
+        elif input[K_8]:
+            preponse = preponse+"8"
+            input[K_8] = 0
+        elif input[K_9]:
+            preponse = preponse+"9"
+            input[K_9] = 0
         elif input[K_BACKSPACE]:
             preponse = preponse[0:-1]
             input[K_BACKSPACE] = 0

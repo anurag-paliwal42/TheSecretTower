@@ -26,6 +26,7 @@ class Perso(Element):
         self.changer_image(self.perso_d)
 
         # Propriétés
+        self.win = False
         self.vie = 3
         self.last_dommage = time()
 
@@ -38,8 +39,7 @@ class Perso(Element):
     def subir_degats(self, degat):
         if (self.vie > 0 and time()-self.last_dommage > 1):
             self.last_dommage = time()
-            self.vie = self.vie - 1
-            self.sauter(3, -10, True)
+            self.vie = self.vie - degat
             return True
         if (self.vie <= 0):
             return False
@@ -145,7 +145,8 @@ class Perso(Element):
                     self.subir_degats(i.atk)
                     return True
                 elif isinstance(i, Porte):
-                    return False
+                    if i.etat == 1:
+                        self.win = True
                 else:
                     return True
             
