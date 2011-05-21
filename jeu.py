@@ -17,15 +17,17 @@ def jeu(app, map):
     for i in range(len(input)):
         input[i] = 0
     perso = Perso()
-    perso.move_el(100,100)
+    for i in map:
+        if isinstance(i, Porte):
+            if i.etat == 0:
+                perso.move_el(i.x,i.y)
 
-    fond_menu = Element()
-    fond_menu.changer_image(pygame.image.load(const.path_fond_menu).convert())
+    fond = Element()
+    fond.changer_image(pygame.image.load(const.path_fond1).convert())
 
 
     cmd = 1
 
-    #save_map(map)
     while cmd<>0:
         
         # Traitement events
@@ -56,7 +58,7 @@ def jeu(app, map):
         perso.tomber(map)
 
         # Affichage
-        app.blit(fond_menu)
+        app.blit(fond)
         for i in map:
             if isinstance(i, BlocMouvant):
                 i.move()

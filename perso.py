@@ -144,6 +144,8 @@ class Perso(Element):
                 elif isinstance(i, BlocDanger):
                     self.subir_degats(i.atk)
                     return True
+                elif isinstance(i, Porte):
+                    return False
                 else:
                     return True
             

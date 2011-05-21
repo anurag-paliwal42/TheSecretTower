@@ -14,13 +14,14 @@ class Bloc(Element):
     
     def __init__(self, picture):
         Element.__init__(self)
-        if picture == 1:
-            self.changer_image(pygame.image.load("img/bloc1.png").convert())
+        self.picture = picture
+        self.changer_image(pygame.image.load("img/bloc{0}.png".format(self.picture)).convert_alpha())
 
 class BlocDisp(Bloc):
     
     def __init__(self, picture, begin = 0):
         Bloc.__init__(self, picture)
+        self.begin = begin
         self.last_change = time()+begin
         self.etat = True
 
@@ -69,6 +70,12 @@ class BlocDanger(Bloc):
     def __init__(self, picture, atk):
         Bloc.__init__(self, picture)
         self.atk = atk
+
+class Porte(Bloc):
+    
+    def __init__(self, picture, etat):
+        Bloc.__init__(self, picture)
+        self.etat = etat
 
         
     

@@ -5,10 +5,17 @@
 import pygame
 from pygame.locals import *
 
+
+# Element
+from element import *
+
+from menu import *
+from jeu import *
+from map import *
+from editeur import *
+
 # Constantes
 import const
-
-from element import *
 
 class App:
     """ Classe définissant l'application The Secret of Tower"""
@@ -26,6 +33,28 @@ class App:
         # font
         self.font = pygame.font.Font(None, 30)
         
+        
+    def main(self):
+        cmd = 1
+        while cmd:
+            cmd =  menu(self, "Menu principal", ["Nouvelle Partie", "Charger Partie", "Editeur de map", "Quitter"])
+            
+            if cmd == 1:
+                cmd = jeu(self, open_map("map0"))
+                if cmd == 2:
+                    cmd = menu(self, "Game Over", ["Rejouer", "Quitter"])
+            elif cmd == 2:
+                cmd = jeu(self, open_map(ask(self, "Entrez le nom de la map :")))
+                if cmd == 2:
+                    cmd = menu(self, "Game Over", ["Rejouer", "Quitter"])
+            elif cmd == 3:
+                cmd = menu(self, "Editeur de map", ["Nouvelle map", "Charger map"])
+                if cmd == 1:
+                    cmd = editeur(self, [])
+                elif cmd == 2:
+                    cmd = editeur(self, open_map(ask(self, "Entrez le nom de la map :")))
+
+        pygame.quit()
         
     def blit(self, element):
         """Ajoute Element à l'écran"""
