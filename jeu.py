@@ -46,7 +46,7 @@ def jeu(app, map):
         # controle fps
         fps = int(1/(time() - prev))
         while fps > const.fps: 
-            fps = 1/(time() - prev)
+            fps = int(1/(time() - prev))
 
         imgfps.changer_text("FPS : " +str(fps), app.font)
         prev = time()
