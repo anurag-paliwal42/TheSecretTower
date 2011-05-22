@@ -135,12 +135,9 @@ class Perso(Element):
                             if i.y > i.debut_y:
                                 self.move(0,-1, map)
                         return True
-                    else:
-                        return False
                 elif isinstance(i, BlocDisp):
                     if (i.etat):
                         return True
-                    return False
                 elif isinstance(i, BlocDanger):
                     self.subir_degats(i.atk)
                     return True

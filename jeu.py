@@ -8,6 +8,8 @@ from event import *
 from map import *
 from menu import *
 
+from time import *
+
 import pygame
 from pygame.locals import *
 
@@ -29,12 +31,25 @@ def jeu(app, map):
     coeur = Element()
     coeur.changer_image(pygame.image.load("img/coeur.png").convert_alpha())
     coeur.y = 10
-
-
+    
+    fps= 0
+    imgfps = Element()
+    imgfps.changer_text("FPS : " + str(fps), app.font)
+    imgfps.move_el(10, 25)
+    
     cmd = 1
+    prev = time()+1
 
     while cmd<>0:
         
+
+        # controle fps
+        fps = int(1/(time() - prev))
+        while fps > const.fps: 
+            fps = 1/(time() - prev)
+
+        imgfps.changer_text("FPS : " +str(fps), app.font)
+        prev = time()
         # Traitement events
         cmd = update_event(input)
   
@@ -92,6 +107,7 @@ def jeu(app, map):
         for i in range(perso.vie):
             coeur.x = 10 + i*30
             app.blit(coeur)
+            app.blit(imgfps)
         app.flip()
 
 

@@ -7,6 +7,10 @@ from pygame.locals import *
 
 """Constantes du jeu The Scret of Tower"""
 
+
+# Constante de fps
+fps = 40
+
 fenetre_size_x = 800
 fenetre_size_y = 600
 fenetre_titre = "The Secret of Tower"
