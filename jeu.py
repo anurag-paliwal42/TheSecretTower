@@ -35,7 +35,7 @@ def jeu(app, map):
     fps= 0
     imgfps = Element()
     imgfps.changer_text("FPS : " + str(fps), app.font)
-    imgfps.move_el(10, 25)
+    imgfps.move_el(10, 30)
     
     cmd = 1
     prev = time()+1
