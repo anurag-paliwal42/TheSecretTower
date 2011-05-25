@@ -24,6 +24,9 @@ class Perso(Element):
         
         # changer_image
         self.changer_image(self.perso_d)
+        self.rect.width = 20
+        self.rect.height = 40
+        self.rect = self.rect.move(15, 10)
 
         # Propriétés
         self.win = False
@@ -117,6 +120,7 @@ class Perso(Element):
     def collided_map(self, dep_x, dep_y, map):
         future_rect = pygame.Rect(self.rect)
         future_rect = future_rect.move(dep_x, dep_y)
+        collided = False
         # Vérification pour chaques éléments de la map
         for i in map:
             if future_rect.colliderect(i.rect):
@@ -134,20 +138,20 @@ class Perso(Element):
                                 self.move(-1,0, map)
                             if i.y > i.debut_y:
                                 self.move(0,-1, map)
-                        return True
+                        collided=True
                 elif isinstance(i, BlocDisp):
                     if (i.etat):
-                        return True
+                        collided=True
                 elif isinstance(i, BlocDanger):
                     self.subir_degats(i.atk)
-                    return True
+                    collided=True
                 elif isinstance(i, Porte):
                     if i.etat == 1:
                         self.win = True
                 else:
-                    return True
+                    collided=True
             
-        return False
+        return collided
 
 
 
