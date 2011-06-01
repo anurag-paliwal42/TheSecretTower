@@ -123,9 +123,9 @@ def editeur(app, map):
             input[K_ESCAPE] = 0
             cmd = menu(app, "Editeur de map", ["Sauvegarder", "Charger","Tester", "Quitter"])
             if cmd == 1:
-                save_map(ask(app, "Sauvegarder la map :"), map)
+                save_map("map/custom/"+ask(app, "Sauvegarder la map :"), map)
             elif cmd == 2:
-                map = open_map(ask(app,"Entrez le nom de la map : "))
+                map = open_map("map/custom/"+ask(app,"Entrez le nom de la map : "))
                 cmd =1
             elif cmd == 3:
                 jeu(app, map)

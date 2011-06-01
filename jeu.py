@@ -14,17 +14,20 @@ import pygame
 from pygame.locals import *
 
             
-def jeu(app, map):
+def jeu(app, map, x = -1, y = -1):
     input = range(0, 1000, 1)
 
     for i in range(len(input)):
         input[i] = 0
     perso = Perso()
-    for i in map:
-        if isinstance(i, Porte):
-            if i.etat == 0:
-                perso.move_el(i.x,i.y)
-
+    if x == -1:
+        for i in map:
+            if isinstance(i, Porte):
+                if i.etat == 0:
+                    perso.move_el(i.x,i.y)
+    else:
+        perso.move_el(x, y)
+    
     fond = Element()
     fond.changer_image(pygame.image.load(const.path_fond1).convert())
 

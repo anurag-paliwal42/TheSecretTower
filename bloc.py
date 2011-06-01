@@ -77,6 +77,10 @@ class Porte(Bloc):
         Bloc.__init__(self, picture)
         self.etat = etat
 
+class Terre(Bloc):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
         
     
             

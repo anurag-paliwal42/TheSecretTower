@@ -8,7 +8,7 @@ def open_map(path):
     pmap = [] 
     map = []
     try:
-        file = open("data/map/"+ path, 'r')
+        file = open("data/"+ path, 'r')
         elements = []
         tampon = file.read()
         
@@ -52,7 +52,7 @@ def open_map(path):
         return map
 
 def save_map(nom, map):
-    file = open("data/map/"+nom, "w")
+    file = open("data/"+nom, "w")
     tampon = ""
     for i in map:
         if isinstance(i, BlocMouvant):
