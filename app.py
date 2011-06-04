@@ -3,6 +3,8 @@
 
 
 import os
+import random
+import math
 
 # Pygame
 import pygame
@@ -36,6 +38,7 @@ class App:
         # font
         self.font = pygame.font.Font(None, 30)
 
+        self.perso = Perso()
         self.partie = []
         
         
@@ -46,26 +49,31 @@ class App:
             
             if cmd == 1 or cmd == 2:
                 if cmd == 1:
+                    self.perso = Perso()
+                    self.partie = []
                     self.partie = self.nouvelle_partie(ask(self, "Nom de la partie : "))
                 elif cmd == 2:
                     self.partie = self.charger_partie(ask(self, "Nom de la partie : "))
                 
-                i = self.partie[1]
+                self.perso.map = self.partie[1]
+                self.perso.id = self.partie[2]
                 cmd = 1
-                while open_map("save/{0}/map{1}".format(self.partie[0], i)) != [] and cmd == 1:
-                    cmd = jeu(self, open_map("save/{0}/map{1}".format(self.partie[0], i)), self.partie[2], self.partie[3])
-                    i = i+1
+                while open_map("save/{0}/map{1}".format(self.partie[0], self.partie[1])) != [] and cmd == 1:
+                    cmd = jeu(self, open_map("save/{0}/map{1}".format(self.partie[0], self.partie[1])), self.perso)
+                    self.partie[1] = self.perso.map
 
             elif cmd == 3:
-                cmd = jeu(self, open_map("map/custom/" + ask(self, "Entrez le nom de la map :")))
-                if cmd == 2:
-                    cmd = menu(self, "Game Over", ["Rejouer", "Quitter"])
+                self.partie = ["Gen", 0]
+                self.perso.map = 0
+                cmd = jeu(self, open_map("map/custom/" + ask(self, "Entrez le nom de la map :")), self.perso)
             elif cmd == 4:
+                self.partie = ["Gen", 0]
+                self.perso.map = 0
                 cmd = menu(self, "Editeur de map", ["Nouvelle map", "Charger map"])
                 if cmd == 1:
                     cmd = editeur(self, [])
                 elif cmd == 2:
-                    cmd = editeur(self, open_map(ask(self, "Entrez le nom de la map :")))
+                    cmd = editeur(self, open_map("map/custom/"+ask(self, "Entrez le nom de la map :")))
 
         pygame.quit()
         
@@ -80,7 +88,8 @@ class App:
         pygame.display.flip()
 
     def nouvelle_partie(self, nom):
-        partie = [nom, 1, -1, -1]
+        partie = [nom, 0, 0]
+        # Copie map std
         i = 0
         if not os.path.isdir("data/save/{0}/".format(nom)):
             os.mkdir("data/save/{0}/".format(nom))
@@ -89,8 +98,38 @@ class App:
             save_map("save/{0}/map{1}".format(nom,i),open_map("map/std/map{0}".format(i)))
             i = i+1
 
+        # Génération sous-sol
+        map = []
+        bloc = Porte(0, 2, 2, 0)
+        bloc.move_el(0,50)
+        map.append(bloc)
+        xd = random.randint(0, 16)
+        yd = random.randint(0, 12)
+        size = random.randint(2,5)
+        for x in range(16):
+            bloc = Bloc(5)
+            bloc.move_el(x*50, 0)
+            map.append(bloc)
+
+        for x in range(12):
+            bloc = Terre(6)
+            bloc.move_el(x*50+4*50, 50)
+            map.append(bloc)
+        for x in range(16):
+            for y in range(10):
+                if (random.randint(0, 10)) < 2:
+                    bloc = Bloc(1)
+                    bloc.move_el(x*50, y*50+100)
+                    map.append(bloc)
+                elif math.fabs(xd-x)+math.fabs(yd-y) > size:
+                    bloc = Terre(6)
+                    bloc.move_el(x*50, y*50+100)
+                    map.append(bloc)
+
+        save_map("save/{0}/map-1".format(nom), map)
+        # Fichier global
         file = open("data/save/{0}/{0}".format(nom), "w")
-        file.write("map=0\nposx=-1\nposy=-1\n")
+        file.write("map=0\nid=0\n")
         file.close()
         return partie
 
@@ -108,10 +147,7 @@ class App:
                     if prop[0] == "map" and i == 1:
                         partie.append(int(prop[1]))
                         i = i+1
-                    elif prop[0] == "posx" and i == 2:
-                        partie.append(int(prop[1]))
-                        i = i+1
-                    elif prop[0] == "posy" and i == 3:
+                    elif prop[0] == "id" and i == 2:
                         partie.append(int(prop[1]))
                         i = i +1
             file.close()
@@ -123,24 +159,10 @@ class App:
 
 
     def save_partie(self):
-        file = open("data/save/{0}/{0}".format(self.partie[0], "w"))
+        file = open("data/save/{0}/{0}".format(self.partie[0]), "w")
         
         tampon = "map={0}\n".format(self.partie[1])
-        tampon = "posx={0}\n".format(self.partie[2])
-        tampon = "posy={0}\n".format(self.partie[3])
+        tampon = tampon +"id={0}\n".format(self.partie[2])
         
         file.write(tampon)
         file.close()
-
-        
-            
-        
-        
-        
-        
-
-
-        
-        
-        
-        

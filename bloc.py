@@ -33,8 +33,6 @@ class BlocDisp(Bloc):
             elif (self.etat == False):
                 self.etat = True
         
-        
-
 class BlocMouvant(Bloc):
     
     def __init__(self, picture, debut_x, debut_y, dep_x, dep_y):
@@ -73,18 +71,16 @@ class BlocDanger(Bloc):
 
 class Porte(Bloc):
     
-    def __init__(self, picture, etat):
+    def __init__(self, picture, etat, id=0, target=0):
         Bloc.__init__(self, picture)
         self.etat = etat
+        self.id = id
+        self.target = target
 
 class Terre(Bloc):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
-        
-    
-            
-        
-
-            
-        
+class Echelle(Bloc):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)

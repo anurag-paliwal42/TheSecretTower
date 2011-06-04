@@ -4,6 +4,7 @@
 from element import *
 from bloc import *
 import const
+from item import *
 
 from time import *
 
@@ -23,15 +24,20 @@ class Perso(Element):
         self.perso_g = pygame.image.load("img/perso_g.png").convert_alpha()
         
         # changer_image
+        self.sens = True
         self.changer_image(self.perso_d)
         self.rect.width = 20
         self.rect.height = 40
         self.rect = self.rect.move(15, 10)
 
         # Propriétés
-        self.win = False
+        self.map = 0
+        self.id_porte = 0
         self.vie = 3
         self.last_dommage = time()
+        self.inv = Inventaire()
+        item = Item(1, 1)
+        self.inv.add(item)
 
         # Gravité
         self.v_y = 0
@@ -95,8 +101,10 @@ class Perso(Element):
                 self.move_el(x,0)
                 if x > 0:
                     self.changer_image(self.perso_d)
+                    self.sens = True
                 elif x < 0:
                     self.changer_image(self.perso_g)
+                    self.sens = False
             return True
         
         elif self.collided_map(0, y, map) == False:
@@ -107,7 +115,14 @@ class Perso(Element):
             return True
         else:
             return False
-             
+
+    def monter_echelle(self, map):
+        if self.collided_type(0,0, map, Echelle):
+                self.move(0,-5, map)
+                self.isingrav = False
+                self.v_y = 0
+                self.v_x = 0
+
 
     # Test la collision du perso avec la map (avant deplacement)
     # dep_x : deplacement en x
@@ -132,7 +147,6 @@ class Perso(Element):
                         if i.aller:
                             if i.x < i.dep_x+i.debut_x:
                                 self.move(1,0, map)
-           
                         else:
                             if i.x > i.debut_x:
                                 self.move(-1,0, map)
@@ -145,14 +159,41 @@ class Perso(Element):
                 elif isinstance(i, BlocDanger):
                     self.subir_degats(i.atk)
                     collided=True
-                elif isinstance(i, Porte):
-                    if i.etat == 1:
-                        self.win = True
-                else:
+                elif not isinstance(i, Porte) and not isinstance(i, Echelle):
                     collided=True
             
         return collided
 
+
+    def collided_type(self, dep_x, dep_y, map, type):
+        future_rect = pygame.Rect(self.rect)
+        future_rect = future_rect.move(dep_x, dep_y)
+        # Vérification pour chaques éléments de la map
+        for i in map:
+            if future_rect.colliderect(i.rect):
+                if isinstance(i, type):
+                    if type == Porte:
+                        if i.etat == 1:
+                            self.map = self.map+1
+                        elif i.etat == 0:
+                            self.map = self.map-1
+                        elif i.etat == 2:
+                            self.map = i.target 
+                        self.id_porte = i.id
+                    elif type == Terre:
+                        self.inv.add(i)
+                        map.remove(i)
+                    return True
+
+        return False
+
+
+    def collided_bloc(self, dep_x, dep_y, element):
+        future_rect = pygame.Rect(self.rect)
+        future_rect = future_rect.move(dep_x, dep_y)
+        if future_rect.colliderect(element.rect):
+            return True
+        return False
 
 
             

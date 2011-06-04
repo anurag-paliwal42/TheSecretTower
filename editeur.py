@@ -128,7 +128,7 @@ def editeur(app, map):
                 map = open_map("map/custom/"+ask(app,"Entrez le nom de la map : "))
                 cmd =1
             elif cmd == 3:
-                jeu(app, map)
+                jeu(app, map, app.perso)
             elif cmd == 0:
                 return 5
             
