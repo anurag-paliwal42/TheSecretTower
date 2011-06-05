@@ -81,6 +81,28 @@ class Terre(Bloc):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
-class Echelle(Bloc):
+
+
+class Stone(Bloc):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Wood(Bloc):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Echelle(Wood):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Atelier(Wood):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Coffre(Wood):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Forge(Stone):
     def __init__(self, picture):
         Bloc.__init__(self, picture)

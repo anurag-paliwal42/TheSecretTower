@@ -27,7 +27,12 @@ def open_map(path):
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
             elif pbloc[0] == 1:
-                bloc = Bloc(pbloc[1])
+                if pbloc[1] == 1:
+                    bloc = Stone(pbloc[1])
+                elif pbloc[1] == 6:
+                    bloc = Wood(pbloc[1])
+                else:
+                    bloc = Bloc(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
             elif pbloc[0] == 2:

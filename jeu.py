@@ -27,8 +27,10 @@ def jeu(app, map, perso):
                 perso.move_el(i.x,i.y)
     
     fond = Element()
-    fond.changer_image(pygame.image.load(const.path_fond1).convert())
-
+    if app.partie[1] >= 0:
+        fond.changer_image(pygame.image.load(const.path_fond1).convert())
+    else:
+        fond.changer_image(pygame.image.load(const.path_fond2).convert())
 
     # interface 
     coeur = Element()
@@ -37,17 +39,24 @@ def jeu(app, map, perso):
 
     interface = Element()
     interface.changer_image(pygame.image.load("img/interface.png").convert())
-    interface.image.set_alpha(75)
+    interface.image.set_alpha(150)
     interface.move_el(310, 530)
     
     text_item = Element()
-    text_item.changer_text(perso.inv.get_item().nom + " (x" + str(perso.inv.get_item().nbr)+")" , app.font)
-    text_item.move_el(380, 560)
-
+    text_item.changer_text(perso.inv.get_item().nom , app.font_petit)
+    text_item.move_el(380, 565)
+    text_item2 = Element()
+    text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
+    text_item2.move_el(380, 580)
+  
+    imgversion = Element()
+    imgversion.changer_text(str(const.version), app.font)
+    imgversion.move_el(0, 0)
+    
     fps= 0
     imgfps = Element()
     imgfps.changer_text("FPS : " + str(fps), app.font)
-    imgfps.move_el(0, 0)
+    imgfps.move_el(0, 30)
     
     cmd = 1
     prev = time()+1
@@ -63,10 +72,12 @@ def jeu(app, map, perso):
         imgfps.changer_text("FPS : " +str(fps), app.font)
         prev = time()
 
+        text_item.changer_text(perso.inv.get_item().nom, app.font_petit)
         if perso.inv.get_item().nbr > 1:
-            text_item.changer_text(perso.inv.get_item().nom + " (x" + str(perso.inv.get_item().nbr)+")" , app.font)
+            text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
         else : 
-            text_item.changer_text(perso.inv.get_item().nom , app.font)
+            text_item2.changer_text("" , app.font_petit)
+
         
         # Traitement events
         cmd = update_event(input)
@@ -90,7 +101,7 @@ def jeu(app, map, perso):
             input[K_q] = 0
 
         if (input[K_z] or input[K_w]) and input[K_DOWN]:
-            if not perso.collided_type(0,10,map,Terre):
+            if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone) or perso.collided_type(0,10,map,Wood)):
                 if isinstance(perso.inv.get_item(), Item_Bloc):
                     bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
                     bloc.move_el(-bloc.x+50*int((perso.x+10)/50), -bloc.y+50*int((perso.y+75)/50))
@@ -106,15 +117,21 @@ def jeu(app, map, perso):
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]) and input[K_UP]:
-            perso.collided_type(0,-50,map,Terre)
+            if not perso.collided_type(0,-50,map,Terre):
+                if not perso.collided_type(0,-50,map,Stone):
+                    perso.collided_type(0,-50,map,Wood)
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]) and input[K_LEFT]:
-            perso.collided_type(-10,0,map,Terre)
+            if not perso.collided_type(-10,0,map,Terre):
+                if not perso.collided_type(-10,0,map,Stone):
+                    perso.collided_type(-10,0,map,Wood)
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]) and input[K_RIGHT]:
-            perso.collided_type(10,0,map,Terre)
+            if not (perso.collided_type(10,0,map,Terre)):
+                if not perso.collided_type(10,0,map,Stone):
+                    perso.collided_type(10,0,map,Wood)
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]):
@@ -185,6 +202,8 @@ def jeu(app, map, perso):
             app.blit(coeur)
         app.blit(perso.inv.get_element())
         app.blit(text_item)
+        app.blit(text_item2)
+        app.blit(imgversion)
         app.blit(imgfps)
         app.flip()
 

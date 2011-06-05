@@ -7,6 +7,7 @@ from pygame.locals import *
 
 """Constantes du jeu The Scret of Tower"""
 
+version = "Alpha"
 
 # Constante de fps
 fps = 40
@@ -17,5 +18,6 @@ fenetre_titre = "The Secret of Tower"
 title = "The Secret of Tower"
 path_fond_menu = "img/fond_menu.png"
 path_fond1 = "img/fond1.png"
+path_fond2 = "img/fond2.png"
 path_choix = "img/choix.png"
 

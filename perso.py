@@ -38,6 +38,21 @@ class Perso(Element):
         self.inv = Inventaire()
         item = Item(1, 1)
         self.inv.add(item)
+        item = Item(2, 1)
+        self.inv.add(item)
+        item = Item(3, 1)
+        self.inv.add(item)
+        item = Item(4, 1)
+        self.inv.add(item)
+        for i in range(10):
+            item = Echelle(8)
+            self.inv.add(item)
+        item = Atelier(9)
+        self.inv.add(item)
+        item = Coffre(11)
+        self.inv.add(item)
+        item = Forge(10)
+        self.inv.add(item)
 
         # Gravité
         self.v_y = 0
@@ -181,8 +196,23 @@ class Perso(Element):
                             self.map = i.target 
                         self.id_porte = i.id
                     elif type == Terre:
-                        self.inv.add(i)
-                        map.remove(i)
+                        if self.inv.get_item().id == 2:
+                            self.inv.add(i)
+                            map.remove(i)
+                    elif type == Stone:
+                        if self.inv.get_item().id == 3:
+                            self.inv.add(i)
+                            map.remove(i)
+                        elif isinstance(i, Forge):
+                            print "Forge"
+                    elif type == Wood:
+                        if self.inv.get_item().id == 4:
+                            self.inv.add(i)
+                            map.remove(i)
+                        elif isinstance(i, Atelier):
+                            print "Atelier"
+                        elif isinstance(i, Coffre):
+                            print "Coffre"
                     return True
 
         return False

@@ -36,7 +36,8 @@ class App:
         pygame.display.set_caption(const.fenetre_titre)
 
         # font
-        self.font = pygame.font.Font(None, 30)
+        self.font = pygame.font.Font("img/font.ttf", 20)
+        self.font_petit = pygame.font.Font("img/font.ttf", 15)
 
         self.perso = Perso()
         self.partie = []
@@ -112,7 +113,7 @@ class App:
             map.append(bloc)
 
         for x in range(12):
-            bloc = Terre(6)
+            bloc = Terre(7)
             bloc.move_el(x*50+4*50, 50)
             map.append(bloc)
         for x in range(16):
@@ -122,7 +123,7 @@ class App:
                     bloc.move_el(x*50, y*50+100)
                     map.append(bloc)
                 elif math.fabs(xd-x)+math.fabs(yd-y) > size:
-                    bloc = Terre(6)
+                    bloc = Terre(7)
                     bloc.move_el(x*50, y*50+100)
                     map.append(bloc)
 

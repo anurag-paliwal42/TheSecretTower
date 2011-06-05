@@ -54,8 +54,7 @@ class Item():
         self.id = id
         self.element = Element()
         if (id != 0):
-            self.element.changer_image(pygame.image.load("img/bloc{0}.png".format(id)).convert())
-            self.element.image.set_alpha(200)
+            self.element.changer_image(pygame.image.load("img/item{0}.png".format(id)).convert_alpha())
             self.element.move_el(320,540)
         if id == 1:
             self.nom = "Epee"
@@ -63,16 +62,29 @@ class Item():
             self.nom = "Pelle"
         elif id == 3:
             self.nom = "Pioche"
+        elif id == 4:
+            self.nom = "Hache"
         self.nbr = nbr
         
 class Item_Bloc(Item):
     
     def __init__(self, bloc):
         Item.__init__(self,0, 1)
-        self.element.changer_image(pygame.image.load("img/bloc{0}.png".format(bloc.picture)).convert())
-        self.element.image.set_alpha(200)
+        self.element.changer_image(pygame.image.load("img/bloc{0}.png".format(bloc.picture)).convert_alpha())
         self.bloc = bloc
         self.type = bloc.__class__
         self.element.move_el(320,540)
         if self.type == Terre:
             self.nom = "Terre"
+        elif self.type == Stone:
+            self.nom = "Pierre"
+        elif self.type == Echelle:
+            self.nom = "Echelle"
+        elif self.type == Wood:
+            self.nom = "Bois"
+        elif self.type == Atelier:
+            self.nom = "Atelier"
+        elif self.type == Forge:
+            self.nom = "Forge"
+        elif self.type == Coffre:
+            self.nom = "Coffre"
