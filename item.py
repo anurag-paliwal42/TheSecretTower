@@ -3,6 +3,8 @@
 
 from bloc import *
 
+import copy
+
 # Pygame
 import pygame
 from pygame.locals import *
@@ -13,13 +15,22 @@ class Inventaire():
         self.item_sel = 0
 
     def add(self,objet):
-        if isinstance(objet, Item):
+        if isinstance(objet, Item_Bloc):
+            for i in self.data:
+                if isinstance(i, Item_Bloc):
+                    if i.type == objet.type:
+                        i.nbr = i.nbr + objet.nbr
+                        return True
+            item = objet
+
+        elif isinstance(objet, Item):
             item = Item(1,1)
             item = objet
             for i in self.data:
                 if i.id == item.id:
                     i.nbr = i.nbr + item.nbr
                     return True
+
         elif isinstance(objet, Bloc):
             item = Item_Bloc(objet)
             for i in self.data:
@@ -27,6 +38,8 @@ class Inventaire():
                     if i.type == item.type:
                         i.nbr = i.nbr + item.nbr
                         return True
+
+
         self.data.append(item)
         return True
     def delete(self):
@@ -37,16 +50,37 @@ class Inventaire():
             self.item_sel = 0
 
     def get_element(self):
+        self.data[self.item_sel].element.move_el(-self.data[self.item_sel].element.x+320,-self.data[self.item_sel].element.y+540)
         return self.data[self.item_sel].element
 
     def get_item(self):
         return self.data[self.item_sel]
 
     def changer_select(self, step):
-        if self.item_sel +1 < len(self.data): 
-            self.item_sel = self.item_sel + 1
-        else:
+        if self.item_sel + step < len(self.data) and step > 0: 
+            self.item_sel = self.item_sel + step
+        elif self.item_sel + step > 0 and step < 0:
+            self.item_sel = self.item_sel + step
+        elif step > 0:
             self.item_sel = 0
+        else:
+            self.item_sel = len(self.data)-1
+
+    def search(self, item):
+        for i in range(len(self.data)):
+            if self.data[i].id == item.id:
+                if item.id == 0:
+                    if item.type == self.data[i].type:
+                        return i
+                else:
+                    return i
+        return -1
+
+    def isempty(self):
+        if self.data == []:
+            return True
+        else:
+            return False
   
 class Item():
     
@@ -65,6 +99,36 @@ class Item():
         elif id == 4:
             self.nom = "Hache"
         self.nbr = nbr
+        self.prix = Inventaire()
+
+    def set_prix(self, bloc):
+        self.prix.add(bloc)
+
+    def achat(self, inv):
+
+        prix = Inventaire()
+        prix = copy.copy(self.prix)
+        item_sel = inv.item_sel
+        item_del = []
+
+        while prix.isempty() == False:
+            id_prix = inv.search(prix.get_item())
+            inv.item_sel = 0
+            if id_prix >= 0:
+                inv.changer_select(id_prix)
+                item_del.append(inv.get_item())
+                inv.delete()
+                self.prix.delete()
+            else:
+                inv.item_sel = item_sel
+                for i in item_del:
+                    inv.add(i)
+                return False
+                
+            prix.changer_select(1)
+
+        inv.item_sel = item_sel
+        return True
         
 class Item_Bloc(Item):
     

@@ -3,6 +3,7 @@
 
 from element import *
 from bloc import *
+from atelier import *
 import const
 from item import *
 
@@ -48,10 +49,6 @@ class Perso(Element):
             item = Echelle(8)
             self.inv.add(item)
         item = Atelier(9)
-        self.inv.add(item)
-        item = Coffre(11)
-        self.inv.add(item)
-        item = Forge(10)
         self.inv.add(item)
 
         # Gravité
@@ -180,7 +177,7 @@ class Perso(Element):
         return collided
 
 
-    def collided_type(self, dep_x, dep_y, map, type):
+    def collided_type(self, dep_x, dep_y, map, type, app=0):
         future_rect = pygame.Rect(self.rect)
         future_rect = future_rect.move(dep_x, dep_y)
         # Vérification pour chaques éléments de la map
@@ -204,13 +201,13 @@ class Perso(Element):
                             self.inv.add(i)
                             map.remove(i)
                         elif isinstance(i, Forge):
-                            print "Forge"
+                            atelier(app, self, "Forge")
                     elif type == Wood:
                         if self.inv.get_item().id == 4:
                             self.inv.add(i)
                             map.remove(i)
                         elif isinstance(i, Atelier):
-                            print "Atelier"
+                            atelier(app, self, "Atelier")
                         elif isinstance(i, Coffre):
                             print "Coffre"
                     return True

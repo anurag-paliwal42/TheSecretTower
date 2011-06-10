@@ -101,7 +101,7 @@ def jeu(app, map, perso):
             input[K_q] = 0
 
         if (input[K_z] or input[K_w]) and input[K_DOWN]:
-            if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone) or perso.collided_type(0,10,map,Wood)):
+            if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone, app) or perso.collided_type(0,10,map,Wood, app)):
                 if isinstance(perso.inv.get_item(), Item_Bloc):
                     bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
                     bloc.move_el(-bloc.x+50*int((perso.x+10)/50), -bloc.y+50*int((perso.y+75)/50))
@@ -118,20 +118,20 @@ def jeu(app, map, perso):
             input[K_w] = 0
         if (input[K_z] or  input[K_w]) and input[K_UP]:
             if not perso.collided_type(0,-50,map,Terre):
-                if not perso.collided_type(0,-50,map,Stone):
-                    perso.collided_type(0,-50,map,Wood)
+                if not perso.collided_type(0,-50,map,Stone, app):
+                    perso.collided_type(0,-50,map,Wood, app)
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]) and input[K_LEFT]:
             if not perso.collided_type(-10,0,map,Terre):
-                if not perso.collided_type(-10,0,map,Stone):
-                    perso.collided_type(-10,0,map,Wood)
+                if not perso.collided_type(-10,0,map,Stone, app):
+                    perso.collided_type(-10,0,map,Wood, app)
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]) and input[K_RIGHT]:
             if not (perso.collided_type(10,0,map,Terre)):
-                if not perso.collided_type(10,0,map,Stone):
-                    perso.collided_type(10,0,map,Wood)
+                if not perso.collided_type(10,0,map,Stone, app):
+                    perso.collided_type(10,0,map,Wood, app)
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]):
@@ -155,8 +155,11 @@ def jeu(app, map, perso):
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_e]):
-            perso.inv.changer_select(1)
+            perso.inv.changer_select(-1)
             input[K_e] = 0
+        if (input[K_r]):
+            perso.inv.changer_select(1)
+            input[K_r] = 0
         if input[K_UP]:
             perso.monter_echelle(map)
         if input[K_LEFT]:
@@ -200,6 +203,8 @@ def jeu(app, map, perso):
         for i in range(perso.vie):
             coeur.x = 380 + i*30
             app.blit(coeur)
+
+
         app.blit(perso.inv.get_element())
         app.blit(text_item)
         app.blit(text_item2)
