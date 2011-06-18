@@ -101,6 +101,7 @@ def jeu(app, map, perso):
             input[K_q] = 0
 
         if (input[K_z] or input[K_w]) and input[K_DOWN]:
+            perso.hit()
             if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone, app) or perso.collided_type(0,10,map,Wood, app)):
                 if isinstance(perso.inv.get_item(), Item_Bloc):
                     bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
@@ -117,24 +118,28 @@ def jeu(app, map, perso):
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]) and input[K_UP]:
+            perso.hit()
             if not perso.collided_type(0,-50,map,Terre):
                 if not perso.collided_type(0,-50,map,Stone, app):
                     perso.collided_type(0,-50,map,Wood, app)
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]) and input[K_LEFT]:
+            perso.hit()
             if not perso.collided_type(-10,0,map,Terre):
                 if not perso.collided_type(-10,0,map,Stone, app):
                     perso.collided_type(-10,0,map,Wood, app)
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]) and input[K_RIGHT]:
+            perso.hit()
             if not (perso.collided_type(10,0,map,Terre)):
                 if not perso.collided_type(10,0,map,Stone, app):
                     perso.collided_type(10,0,map,Wood, app)
             input[K_z] = 0
             input[K_w] = 0
         if (input[K_z] or  input[K_w]):
+            perso.hit()
             if not perso.collided_type(0,0,map,Porte):
                 if isinstance(perso.inv.get_item(), Item_Bloc):
                     bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
@@ -164,8 +169,14 @@ def jeu(app, map, perso):
             perso.monter_echelle(map)
         if input[K_LEFT]:
             perso.move(-5,0, map)
+            perso.sens = False
+            perso.anim(True)
         if input[K_RIGHT]:
             perso.move(5,0, map)
+            perso.sens = True
+            perso.anim(True)
+        if not input[K_RIGHT] and not input[K_LEFT]:
+            perso.anim(False)
         if input[K_RETURN]:
             perso.subir_degats(1)
         if input[K_ESCAPE]:
@@ -197,6 +208,7 @@ def jeu(app, map, perso):
                 if (i.etat):
                     app.blit(i)
             else:
+                i.anim()
                 app.blit(i)
         app.blit(perso)
         app.blit(interface)

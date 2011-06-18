@@ -19,7 +19,7 @@ from jeu import *
 from map import *
 from editeur import *
 
-# Constantes
+# Constante
 import const
 
 class App:
@@ -38,6 +38,13 @@ class App:
         # font
         self.font = pygame.font.Font("img/font.ttf", 20)
         self.font_petit = pygame.font.Font("img/font.ttf", 15)
+
+        const.sprite_bloc = pygame.image.load("img/bloc.png").convert_alpha()
+        const.sprite_lave = pygame.image.load("img/lave.png").convert_alpha()
+        const.sprite_perso = pygame.image.load("img/perso.png").convert_alpha()
+        const.sprite_arm = pygame.image.load("img/arm_perso.png").convert_alpha()
+        const.sprite_item = pygame.image.load("img/item.png").convert_alpha()
+        const.vide = pygame.image.load("img/vide.png").convert_alpha()
 
         self.perso = Perso()
         self.partie = []

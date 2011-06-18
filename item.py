@@ -4,6 +4,7 @@
 from bloc import *
 
 import copy
+import const
 
 # Pygame
 import pygame
@@ -59,7 +60,7 @@ class Inventaire():
     def changer_select(self, step):
         if self.item_sel + step < len(self.data) and step > 0: 
             self.item_sel = self.item_sel + step
-        elif self.item_sel + step > 0 and step < 0:
+        elif self.item_sel + step >= 0 and step < 0:
             self.item_sel = self.item_sel + step
         elif step > 0:
             self.item_sel = 0
@@ -88,7 +89,10 @@ class Item():
         self.id = id
         self.element = Element()
         if (id != 0):
-            self.element.changer_image(pygame.image.load("img/item{0}.png".format(id)).convert_alpha())
+            image = copy.copy(const.vide)
+            rect = pygame.Rect(id*50-50,0, 50,50)
+            image.blit(const.sprite_item, (0,0), rect)
+            self.element.changer_image(image)
             self.element.move_el(320,540)
         if id == 1:
             self.nom = "Epee"
@@ -134,7 +138,7 @@ class Item_Bloc(Item):
     
     def __init__(self, bloc):
         Item.__init__(self,0, 1)
-        self.element.changer_image(pygame.image.load("img/bloc{0}.png".format(bloc.picture)).convert_alpha())
+        self.element.changer_image(bloc.image)
         self.bloc = bloc
         self.type = bloc.__class__
         self.element.move_el(320,540)

@@ -20,4 +20,10 @@ path_fond_menu = "img/fond_menu.png"
 path_fond1 = "img/fond1.png"
 path_fond2 = "img/fond2.png"
 path_choix = "img/choix.png"
+global sprite_bloc
+global sprite_lave
+global sprite_perso
+global sprite_arm
+global sprite_item
+global vide
 

@@ -64,6 +64,21 @@ def open_map(path):
                 bloc = Echelle(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
+            # Atelier
+            elif pbloc[0] == 10:
+                bloc = Atelier(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Coffre
+            elif pbloc[0] == 11:
+                bloc = Echelle(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Forge
+            elif pbloc[0] == 12:
+                bloc = Echelle(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
     except IOError:
         print(path + " : Map introuvable !")
 
@@ -91,6 +106,12 @@ def save_map(nom, map):
             tampon = tampon + "8," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Echelle):
             tampon = tampon + "9," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Atelier):
+            tampon = tampon + "10," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Coffre):
+            tampon = tampon + "11," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Forge):
+            tampon = tampon + "12," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Bloc):
             tampon = tampon + "1," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
 

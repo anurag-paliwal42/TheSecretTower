@@ -8,7 +8,7 @@ import const
 from item import *
 
 from time import *
-
+import copy
 # Pygame
 import pygame
 from pygame.locals import *
@@ -20,16 +20,7 @@ class Perso(Element):
     def __init__(self):
         Element.__init__(self)
 
-        # images perso
-        self.perso_d = pygame.image.load("img/perso_d.png").convert_alpha()
-        self.perso_g = pygame.image.load("img/perso_g.png").convert_alpha()
         
-        # changer_image
-        self.sens = True
-        self.changer_image(self.perso_d)
-        self.rect.width = 20
-        self.rect.height = 40
-        self.rect = self.rect.move(15, 10)
 
         # Propriétés
         self.map = 0
@@ -51,6 +42,18 @@ class Perso(Element):
         item = Atelier(9)
         self.inv.add(item)
 
+        # changer_image
+        self.sens = True
+        self.changement = 0
+        self.angle_arm = 0
+        self.changement_angle = 0
+        self.rang_image = 0
+        self.anim(False)
+        self.rect.width = 20
+        self.rect.height = 40
+        self.rect = self.rect.move(15, 10)
+
+
         # Gravité
         self.v_y = 0
         self.v_x = 0
@@ -64,6 +67,71 @@ class Perso(Element):
             return True
         if (self.vie <= 0):
             return False
+
+    def anim(self, etat):
+
+        image = copy.copy(const.vide)
+        # Bras
+        rect = pygame.Rect(0,0, 50,50)
+        if self.inv.get_item().id == 1:
+            rect = pygame.Rect(50,0, 50,50)
+        elif self.inv.get_item().id == 2:
+            rect = pygame.Rect(100,0, 50,50)
+        elif self.inv.get_item().id == 3:
+            rect = pygame.Rect(150,0, 50,50)
+        elif self.inv.get_item().id == 4:
+            rect = pygame.Rect(0,50, 50,50)
+        image.blit(const.sprite_arm, (0,0), rect)
+
+        if self.angle_arm != 0:
+
+            image = pygame.transform.rotate(image, self.angle_arm)
+            if time() - self.changement_angle > 0.1:
+                if self.angle_arm == 70:
+                    self.angle_arm = -70
+                else:
+                    self.angle_arm = 0
+                self.changement_angle = time()
+        if not self.sens:
+            image = pygame.transform.flip(image, True, False)
+
+
+            
+            
+
+        
+        # corps
+        if self.sens:
+            y =0
+        else:
+            y=50
+        rect = pygame.Rect(self.rang_image*50,y, 50,50)
+
+        if time() - self.changement > 0.1 and etat and not self.isingrav:
+            self.changement = time()
+            if self.rang_image < 2:
+                self.rang_image += 1
+            else:
+                self.rang_image = 0
+            rect = pygame.Rect(self.rang_image*50,y, 50,50)
+ 
+        elif not etat:
+            rect = pygame.Rect(0,y, 50,50)
+        elif self.isingrav:
+            rect = pygame.Rect(100,y, 50,50)
+            
+
+        image.blit(const.sprite_perso, (0,0), rect)
+        self.changer_image(image)
+        
+    def hit(self):
+        if self.angle_arm == 0:
+            if self.sens:
+                self.angle_arm = 70
+            else:
+                self.angle_arm = 70
+            self.changement_angle = time()
+            
 
 
     ################### Moteur Physique ###################
@@ -111,12 +179,6 @@ class Perso(Element):
                 
             if self.x + x > 0 and self.x +x < 750:
                 self.move_el(x,0)
-                if x > 0:
-                    self.changer_image(self.perso_d)
-                    self.sens = True
-                elif x < 0:
-                    self.changer_image(self.perso_g)
-                    self.sens = False
             return True
         
         elif self.collided_map(0, y, map) == False:
@@ -221,6 +283,8 @@ class Perso(Element):
         if future_rect.colliderect(element.rect):
             return True
         return False
+
+
 
 
             

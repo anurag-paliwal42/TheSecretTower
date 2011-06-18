@@ -19,4 +19,3 @@ from app import *
 app = App()
 app.main()
 
-
