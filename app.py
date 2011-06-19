@@ -48,7 +48,7 @@ class App:
 
         self.perso = Perso()
         self.partie = []
-        self.coef = 1
+        self.coef = 2
         
         
     def main(self):

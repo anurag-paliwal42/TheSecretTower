@@ -13,7 +13,14 @@ from time import *
 import pygame
 from pygame.locals import *
 
-            
+
+def set_dark(shadow, src_x, src_y, intens):
+    for dark in shadow:
+        if math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < (intens-2)*50:
+            dark.image.set_alpha(0)
+        elif math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < intens*50 and dark.image.get_alpha() > 75:
+            dark.image.set_alpha(75)
+
 def jeu(app, map, perso):
     input = range(0, 1000, 1)
 
@@ -31,6 +38,15 @@ def jeu(app, map, perso):
         fond.changer_image(pygame.image.load(const.path_fond1).convert())
     else:
         fond.changer_image(pygame.image.load(const.path_fond2).convert())
+
+    # Noir
+    shadow = []
+    for x in range(16):
+        for y in range(12):
+            dark = Element()
+            dark.changer_image(pygame.Surface((50, 50)))
+            dark.move_el(x*50,y*50)
+            shadow.append(dark)
 
     # interface 
     coeur = Element()
@@ -77,6 +93,9 @@ def jeu(app, map, perso):
             text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
         else : 
             text_item2.changer_text("" , app.font_petit)
+
+        for i in shadow:
+            i.image.set_alpha(255)
 
         
         # Traitement events
@@ -168,7 +187,7 @@ def jeu(app, map, perso):
         # Zoom
         if (input[K_v]):
             app.coef+=1
-            if app.coef > 3:
+            if app.coef > 2:
                 app.coef = 1
             input[K_v] = 0
         if input[K_UP]:
@@ -215,11 +234,25 @@ def jeu(app, map, perso):
                     app.blit(i)
             else:
                 i.anim()
+                if i.picture == 2:
+                    set_dark(shadow, i.x, i.y, 8)
+
                 app.blit(i)
         app.blit(perso)
 
+        src_x = app.perso.x
+        src_y = app.perso.y
+        intens = 5
+        for dark in shadow:
+            if math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < (intens-2)*50:
+                dark.image.set_alpha(0)
+            elif math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < intens*50 and dark.image.get_alpha() > 75:
+                dark.image.set_alpha(75)
+            app.blit(dark)
+
         if app.coef > 1:
             app.scale(app.coef)
+
         app.blit(interface)
         for i in range(perso.vie):
             coeur.x = 380 + i*30
@@ -231,6 +264,7 @@ def jeu(app, map, perso):
         app.blit(text_item2)
         app.blit(imgversion)
         app.blit(imgfps)
+
         app.flip()
 
 
