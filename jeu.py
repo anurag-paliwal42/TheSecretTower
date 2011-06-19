@@ -165,6 +165,12 @@ def jeu(app, map, perso):
         if (input[K_r]):
             perso.inv.changer_select(1)
             input[K_r] = 0
+        # Zoom
+        if (input[K_v]):
+            app.coef+=1
+            if app.coef > 3:
+                app.coef = 1
+            input[K_v] = 0
         if input[K_UP]:
             perso.monter_echelle(map)
         if input[K_LEFT]:
@@ -211,6 +217,9 @@ def jeu(app, map, perso):
                 i.anim()
                 app.blit(i)
         app.blit(perso)
+
+        if app.coef > 1:
+            app.scale(app.coef)
         app.blit(interface)
         for i in range(perso.vie):
             coeur.x = 380 + i*30

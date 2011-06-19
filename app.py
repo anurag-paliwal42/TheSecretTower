@@ -48,6 +48,7 @@ class App:
 
         self.perso = Perso()
         self.partie = []
+        self.coef = 1
         
         
     def main(self):
@@ -89,6 +90,20 @@ class App:
         """Ajoute Element à l'écran"""
         if isinstance(element, Element):
             self.fenetre.blit(element.image, (element.x,element.y))
+    
+    def scale(self, coef):
+        x = self.perso.x*coef-((800-50*coef)/2)
+        y = self.perso.y*coef-((600-50*coef)/2)
+        if x < 0:
+            x=0
+        if x+800 >800*coef:
+            x = 800*coef-800
+        if y < 0:
+            y = 0
+        if y+600 >600*coef:
+            y = 600*coef-600
+
+        self.fenetre.blit(pygame.transform.scale(self.fenetre, (800*coef, 600*coef)), (0,0), (x,y, 800, 600))
             
 
     def flip(self):
