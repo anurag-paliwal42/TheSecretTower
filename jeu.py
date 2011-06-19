@@ -14,13 +14,6 @@ import pygame
 from pygame.locals import *
 
 
-def set_dark(shadow, src_x, src_y, intens):
-    for dark in shadow:
-        if math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < (intens-2)*50:
-            dark.image.set_alpha(0)
-        elif math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < intens*50 and dark.image.get_alpha() > 75:
-            dark.image.set_alpha(75)
-
 def jeu(app, map, perso):
     input = range(0, 1000, 1)
 
@@ -46,7 +39,18 @@ def jeu(app, map, perso):
             dark = Element()
             dark.changer_image(pygame.Surface((50, 50)))
             dark.move_el(x*50,y*50)
-            shadow.append(dark)
+            delete = False
+            for i in map:
+                intens = 0
+                if i.picture == 2:
+                    intens = 5
+                if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
+                    delete = True
+                elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
+                    dark.image.set_alpha(75)
+            if delete == False:
+                shadow.append(dark)
+
 
     # interface 
     coeur = Element()
@@ -95,7 +99,8 @@ def jeu(app, map, perso):
             text_item2.changer_text("" , app.font_petit)
 
         for i in shadow:
-            i.image.set_alpha(255)
+            if i.image.get_alpha() == 0:
+                i.image.set_alpha(255)
 
         
         # Traitement events
@@ -234,10 +239,8 @@ def jeu(app, map, perso):
                     app.blit(i)
             else:
                 i.anim()
-                if i.picture == 2:
-                    set_dark(shadow, i.x, i.y, 8)
-
                 app.blit(i)
+ 
         app.blit(perso)
 
         src_x = app.perso.x
@@ -246,7 +249,7 @@ def jeu(app, map, perso):
         for dark in shadow:
             if math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < (intens-2)*50:
                 dark.image.set_alpha(0)
-            elif math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < intens*50 and dark.image.get_alpha() > 75:
+            elif math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < intens*50 and dark.image.get_alpha != 75:
                 dark.image.set_alpha(75)
             app.blit(dark)
 
