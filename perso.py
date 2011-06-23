@@ -25,7 +25,7 @@ class Perso(Element):
         # Propriétés
         self.map = 0
         self.id_porte = 0
-        self.vie = 3
+        self.vie = 6
         self.last_dommage = time()
         self.inv = Inventaire()
         item = Item(1, 1)
@@ -64,6 +64,7 @@ class Perso(Element):
         if (self.vie > 0 and time()-self.last_dommage > 1):
             self.last_dommage = time()
             self.vie = self.vie - degat
+            self.sauter(0,-5, True)
             return True
         if (self.vie <= 0):
             return False
@@ -82,7 +83,6 @@ class Perso(Element):
         elif self.inv.get_item().id == 4:
             rect = pygame.Rect(0,50, 50,50)
         image.blit(const.sprite_arm, (0,0), rect)
-
         if self.angle_arm != 0:
 
             image = pygame.transform.rotate(image, self.angle_arm)
@@ -92,8 +92,6 @@ class Perso(Element):
                 else:
                     self.angle_arm = 0
                 self.changement_angle = time()
-        if not self.sens:
-            image = pygame.transform.flip(image, True, False)
 
 
             
@@ -101,11 +99,8 @@ class Perso(Element):
 
         
         # corps
-        if self.sens:
-            y =0
-        else:
-            y=50
-        rect = pygame.Rect(self.rang_image*50,y, 50,50)
+
+        rect = pygame.Rect(self.rang_image*50,0, 50,50)
 
         if time() - self.changement > 0.1 and etat and not self.isingrav:
             self.changement = time()
@@ -113,15 +108,19 @@ class Perso(Element):
                 self.rang_image += 1
             else:
                 self.rang_image = 0
-            rect = pygame.Rect(self.rang_image*50,y, 50,50)
+            rect = pygame.Rect(self.rang_image*50,0, 50,50)
  
         elif not etat:
-            rect = pygame.Rect(0,y, 50,50)
+            rect = pygame.Rect(0,0, 50,50)
         elif self.isingrav:
-            rect = pygame.Rect(100,y, 50,50)
+            rect = pygame.Rect(100,0, 50,50)
+        
             
 
+
         image.blit(const.sprite_perso, (0,0), rect)
+        if not self.sens:
+            image = pygame.transform.flip(image, True, False)
         self.changer_image(image)
         
     def hit(self):
@@ -282,6 +281,19 @@ class Perso(Element):
         future_rect = future_rect.move(dep_x, dep_y)
         if future_rect.colliderect(element.rect):
             return True
+        return False
+
+    def collided_mob(self, dep_x, dep_y, mob):
+        future_rect = pygame.Rect(self.rect)
+        future_rect.width = 50
+        future_rect.height = 50
+        future_rect = future_rect.move(dep_x, dep_y)
+        # Vérification pour chaques mobs
+        for i in mob:
+            if future_rect.colliderect(i.rect):
+                i.subir_degats(self.inv.get_item().atk)
+                return True
+
         return False
 
 

@@ -59,6 +59,9 @@ class Bloc(Element):
         elif picture == 11:
             rect = pygame.Rect(0,100, 50,50)
             image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 12:
+            rect = pygame.Rect(0,150, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
 
 
 
@@ -163,5 +166,9 @@ class Coffre(Wood):
         Bloc.__init__(self, picture)
 
 class Forge(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Deco(Bloc):
     def __init__(self, picture):
         Bloc.__init__(self, picture)

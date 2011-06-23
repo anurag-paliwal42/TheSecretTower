@@ -25,5 +25,6 @@ global sprite_lave
 global sprite_perso
 global sprite_arm
 global sprite_item
+global sprite_mobs
 global vide
 

@@ -2,6 +2,7 @@
 # Auteur : Pierre Surply
 
 from perso import *
+from mob import *
 from bloc import *
 from element import *
 from event import *
@@ -9,6 +10,7 @@ from map import *
 from menu import *
 
 from time import *
+import random
 
 import pygame
 from pygame.locals import *
@@ -51,11 +53,27 @@ def jeu(app, map, perso):
             if delete == False:
                 shadow.append(dark)
 
+    mobs = []
+    for i in shadow:
+        # pop monstre
+        if i.image.get_alpha() >= 75 and random.randint(0, 10) == 1:
+            creat = True
+            for bloc in map:
+                if bloc.x == i.x and bloc.y == i.y:
+                    creat = False
+            if creat:
+                mob = Mob(1)
+                mob.move_el(i.x, i.y)
+                mobs.append(mob)
+
 
     # interface 
     coeur = Element()
     coeur.changer_image(pygame.image.load("img/coeur.png").convert_alpha())
     coeur.y = 540
+    coeur_vide = Element()
+    coeur_vide.changer_image(pygame.image.load("img/coeur_vide.png").convert_alpha())
+    coeur_vide.y = 540
 
     interface = Element()
     interface.changer_image(pygame.image.load("img/interface.png").convert())
@@ -98,10 +116,17 @@ def jeu(app, map, perso):
         else : 
             text_item2.changer_text("" , app.font_petit)
 
+        # Shadow
         for i in shadow:
             if i.image.get_alpha() == 0:
                 i.image.set_alpha(255)
 
+        # Hit perso
+        for i in mobs:
+            i.collided_perso(0,0, perso)
+
+
+                
         
         # Traitement events
         cmd = update_event(input)
@@ -124,46 +149,21 @@ def jeu(app, map, perso):
             input[K_a] = 0
             input[K_q] = 0
 
-        if (input[K_z] or input[K_w]) and input[K_DOWN]:
-            perso.hit()
-            if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone, app) or perso.collided_type(0,10,map,Wood, app)):
-                if isinstance(perso.inv.get_item(), Item_Bloc):
-                    bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
-                    bloc.move_el(-bloc.x+50*int((perso.x+10)/50), -bloc.y+50*int((perso.y+75)/50))
-                    if not perso.collided_bloc(0,0, bloc):
-                        collided = False
-                        for i in map:
-                            if i.x == bloc.x and i.y == bloc.y:
-                                collided = True
-
-                        if not collided:
-                            map.append(bloc) 
-                            perso.inv.delete()
-            input[K_z] = 0
-            input[K_w] = 0
-        if (input[K_z] or  input[K_w]) and input[K_UP]:
-            perso.hit()
-            if not perso.collided_type(0,-50,map,Terre):
-                if not perso.collided_type(0,-50,map,Stone, app):
-                    perso.collided_type(0,-50,map,Wood, app)
-            input[K_z] = 0
-            input[K_w] = 0
-        if (input[K_z] or  input[K_w]) and input[K_LEFT]:
-            perso.hit()
-            if not perso.collided_type(-10,0,map,Terre):
-                if not perso.collided_type(-10,0,map,Stone, app):
-                    perso.collided_type(-10,0,map,Wood, app)
-            input[K_z] = 0
-            input[K_w] = 0
-        if (input[K_z] or  input[K_w]) and input[K_RIGHT]:
-            perso.hit()
-            if not (perso.collided_type(10,0,map,Terre)):
-                if not perso.collided_type(10,0,map,Stone, app):
-                    perso.collided_type(10,0,map,Wood, app)
-            input[K_z] = 0
-            input[K_w] = 0
         if (input[K_z] or  input[K_w]):
             perso.hit()
+            #Destruction bloc + atk
+            if perso.sens == False:
+                if not perso.collided_type(-10,0,map,Terre):
+                    if not perso.collided_type(-10,0,map,Stone, app):
+                        if not perso.collided_type(-10,0,map,Wood, app):
+                            perso.collided_mob(-40,0,mobs)
+            else:
+                if not (perso.collided_type(10,0,map,Terre)):
+                    if not perso.collided_type(10,0,map,Stone, app):
+                        if not perso.collided_type(10,0,map,Wood, app):
+                            perso.collided_mob(40,0,mobs) 
+
+            # Placement bloc
             if not perso.collided_type(0,0,map,Porte):
                 if isinstance(perso.inv.get_item(), Item_Bloc):
                     bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
@@ -180,9 +180,32 @@ def jeu(app, map, perso):
                         if not collided:
                             map.append(bloc) 
                             perso.inv.delete()
+                            
+            if input[K_DOWN]:
+                if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone, app) or perso.collided_type(0,10,map,Wood, app)):
+                    if isinstance(perso.inv.get_item(), Item_Bloc):
+                        bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
+                        bloc.move_el(-bloc.x+50*int((perso.x+10)/50), -bloc.y+50*int((perso.y+75)/50))
+                        if not perso.collided_bloc(0,0, bloc):
+                            collided = False
+                            for i in map:
+                                if i.x == bloc.x and i.y == bloc.y:
+                                    collided = True
+
+                            if not collided:
+                                map.append(bloc) 
+                                perso.inv.delete()
+
+            if input[K_UP]:
+                if not perso.collided_type(0,-50,map,Terre):
+                    if not perso.collided_type(0,-50,map,Stone, app):
+                        perso.collided_type(0,-50,map,Wood, app)
+
 
             input[K_z] = 0
             input[K_w] = 0
+
+
         if (input[K_e]):
             perso.inv.changer_select(-1)
             input[K_e] = 0
@@ -240,6 +263,17 @@ def jeu(app, map, perso):
             else:
                 i.anim()
                 app.blit(i)
+
+        for i in mobs:
+            i.update(map)
+            creat = True
+            for dark in shadow:
+                if (int(i.x/50) == int(dark.x/50) and int(i.y/50) == int(dark.y/50)):
+                    if dark.image.get_alpha() < 255:
+                        creat = False
+            if creat and i.vie > 0:
+                i.update(map)
+                app.blit(i)
  
         app.blit(perso)
 
@@ -257,9 +291,13 @@ def jeu(app, map, perso):
             app.scale(app.coef)
 
         app.blit(interface)
-        for i in range(perso.vie):
-            coeur.x = 380 + i*30
-            app.blit(coeur)
+        for i in range(6):
+            if i < perso.vie:
+                coeur.x = 370 + i*15
+                app.blit(coeur)
+            else:
+                coeur_vide.x = 370 + i*15
+                app.blit(coeur_vide)
 
 
         app.blit(perso.inv.get_element())
@@ -272,7 +310,7 @@ def jeu(app, map, perso):
 
 
         if perso.vie <= 0:
-            perso.vie = 3
+            perso.vie = 6
             for i in map:
                 if isinstance(i, Porte):
                     if i.id == perso.id_porte:

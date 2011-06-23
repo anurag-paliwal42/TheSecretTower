@@ -87,6 +87,7 @@ class Item():
     
     def __init__(self, id, nbr):
         self.id = id
+        self.atk = 0
         self.element = Element()
         if (id != 0):
             image = copy.copy(const.vide)
@@ -94,14 +95,19 @@ class Item():
             image.blit(const.sprite_item, (0,0), rect)
             self.element.changer_image(image)
             self.element.move_el(320,540)
+            self.atk = 1
         if id == 1:
             self.nom = "Epee"
+            self.atk = 5
         elif id == 2:
             self.nom = "Pelle"
+            self.atk = 2
         elif id == 3:
             self.nom = "Pioche"
+            self.atk = 3
         elif id == 4:
             self.nom = "Hache"
+            self.atk = 4
         self.nbr = nbr
         self.prix = Inventaire()
 

@@ -44,6 +44,7 @@ class App:
         const.sprite_perso = pygame.image.load("img/perso.png").convert_alpha()
         const.sprite_arm = pygame.image.load("img/arm_perso.png").convert_alpha()
         const.sprite_item = pygame.image.load("img/item.png").convert_alpha()
+        const.sprite_mobs = pygame.image.load("img/mobs.png").convert_alpha()
         const.vide = pygame.image.load("img/vide.png").convert_alpha()
 
         self.perso = Perso()
@@ -88,7 +89,12 @@ class App:
         
     def blit(self, element):
         """Ajoute Element à l'écran"""
-        if isinstance(element, Element):
+        if isinstance(element, Perso):
+            if not element.sens:
+                self.fenetre.blit(element.image, (element.x-(element.image.get_width()-50), element.y))
+            else:
+                self.fenetre.blit(element.image, (element.x,element.y))
+        elif isinstance(element, Element):
             self.fenetre.blit(element.image, (element.x,element.y))
     
     def scale(self, coef):
