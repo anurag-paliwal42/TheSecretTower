@@ -38,7 +38,7 @@ def menu(app, ptitle, pmenu):
 
     cmd = 1
 
-    while update_event(input):
+    while update_event(input, app):
         # Evenement
 
         if input[K_UP]:
@@ -95,7 +95,7 @@ def ask(app, ptitle):
     reponse.move_el(100, 300)
 
     while 1:
-        update_event(input)
+        update_event(input, app)
         if input[K_a]:
             preponse = preponse+"a"
             input[K_a] = 0

@@ -30,7 +30,7 @@ def editeur(app, map):
     cmd = 1
 
     while cmd<>0: 
-        cmd = update_event(input)
+        cmd = update_event(input, app)
         if input[K_UP]:
             input[K_UP] = 0
             if select.y > 0:
@@ -111,6 +111,12 @@ def editeur(app, map):
                     if i.etat == 1:
                         map.remove(i)
             bloc = Porte(0, 1)
+            bloc.move_el(select.x, select.y)
+            map.append(bloc)
+
+        if input[K_KP7]:
+            input[K_KP7] = 0
+            bloc = Deco(13)
             bloc.move_el(select.x, select.y)
             map.append(bloc)
 

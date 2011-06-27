@@ -45,7 +45,9 @@ def jeu(app, map, perso):
             for i in map:
                 intens = 0
                 if i.picture == 2:
-                    intens = 5
+                    intens = 4
+                if i.picture == 13:
+                    intens = 6
                 if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
                     delete = True
                 elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
@@ -129,7 +131,7 @@ def jeu(app, map, perso):
                 
         
         # Traitement events
-        cmd = update_event(input)
+        cmd = update_event(input, app)
   
         if (input[K_SPACE] or input[K_a] or input[K_q]) and input[K_LEFT]:
             perso.sauter(-5, -15)
@@ -151,35 +153,94 @@ def jeu(app, map, perso):
 
         if (input[K_z] or  input[K_w]):
             perso.hit()
+
             #Destruction bloc + atk
             if perso.sens == False:
-                if not perso.collided_type(-10,0,map,Terre):
-                    if not perso.collided_type(-10,0,map,Stone, app):
-                        if not perso.collided_type(-10,0,map,Wood, app):
-                            perso.collided_mob(-40,0,mobs)
+                s=-1
             else:
-                if not (perso.collided_type(10,0,map,Terre)):
-                    if not perso.collided_type(10,0,map,Stone, app):
-                        if not perso.collided_type(10,0,map,Wood, app):
-                            perso.collided_mob(40,0,mobs) 
-
-            # Placement bloc
-            if not perso.collided_type(0,0,map,Porte):
-                if isinstance(perso.inv.get_item(), Item_Bloc):
-                    bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
-                    if perso.sens:
-                        bloc.move_el(-bloc.x+50*int((perso.x+75)/50), -bloc.y+50*int((perso.y+25)/50))
-                    if perso.sens == False:
-                        bloc.move_el(-bloc.x+50*int((perso.x-50)/50), -bloc.y+50*int((perso.y+10)/50))
-                    if not perso.collided_bloc(0,0, bloc):
-                        collided = False
+                s=1
+            perso.collided_type(s*10,0,map,Terre)
+            perso.collided_type(s*10,0,map,Stone, app)
+            perso.collided_type(s*10,0,map,Wood, app)
+            if perso.collided_type(s*10, 0, map, Deco, app):
+                shadow_new = []
+                for x in range(16):
+                    for y in range(12):
+                        alpha = 0
+                        for i in shadow:
+                            if i.x == x*50 and i.y == y*50:
+                                alpha = i.image.get_alpha()
+                        dark = Element()
+                        dark.changer_image(pygame.Surface((50, 50)))
+                        dark.move_el(x*50,y*50)
+                        if alpha == 75:
+                            dark.image.set_alpha(75)
+                        delete = False
                         for i in map:
-                            if i.x == bloc.x and i.y == bloc.y:
-                                collided = True
+                            intens = 0
+                            if i.picture == 2:
+                                intens = 4
+                            if i.picture == 13:
+                                intens = 6
+                            if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
+                                delete = True
+                            elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
+                                dark.image.set_alpha(75)
+                        if delete == False:
+                            shadow_new.append(dark)
 
-                        if not collided:
-                            map.append(bloc) 
-                            perso.inv.delete()
+                shadow = shadow_new
+            perso.collided_mob(s*30,0,mobs)
+
+
+                                
+                                
+
+            if not input[K_DOWN] and not input[K_UP]:
+                # Placement bloc
+                if not perso.collided_type(0,0,map,Porte):
+                    if isinstance(perso.inv.get_item(), Item_Bloc):
+                        bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
+                        if perso.sens:
+                            bloc.move_el(-bloc.x+50*int((perso.x+75)/50), -bloc.y+50*int((perso.y+25)/50))
+                        if perso.sens == False:
+                            bloc.move_el(-bloc.x+50*int((perso.x-50)/50), -bloc.y+50*int((perso.y+10)/50))
+                        if not perso.collided_bloc(0,0, bloc):
+                            collided = False
+                            for i in map:
+                                if i.x == bloc.x and i.y == bloc.y:
+                                    collided = True
+
+                            if not collided:
+                                map.append(bloc) 
+                                if isinstance(bloc, Deco):
+                                    shadow_new = []
+                                    for x in range(16):
+                                        for y in range(12):
+                                            alpha = 0
+                                            for i in shadow:
+                                                if i.x == x*50 and i.y == y*50:
+                                                    alpha = i.image.get_alpha()
+                                            dark = Element()
+                                            dark.changer_image(pygame.Surface((50, 50)))
+                                            dark.move_el(x*50,y*50)
+                                            if alpha == 75:
+                                                dark.image.set_alpha(75)
+                                            delete = False
+                                            for i in map:
+                                                intens = 0
+                                                if i.picture == 2:
+                                                    intens = 4
+                                                if i.picture == 13:
+                                                    intens = 6
+                                                if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
+                                                    delete = True
+                                                elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
+                                                    dark.image.set_alpha(75)
+                                            if delete == False:
+                                                shadow_new.append(dark)
+                                    shadow = shadow_new
+                                perso.inv.delete()
                             
             if input[K_DOWN]:
                 if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone, app) or perso.collided_type(0,10,map,Wood, app)):
@@ -194,6 +255,33 @@ def jeu(app, map, perso):
 
                             if not collided:
                                 map.append(bloc) 
+                                if isinstance(bloc, Deco):
+                                    shadow_new = []
+                                    for x in range(16):
+                                        for y in range(12):
+                                            alpha = 0
+                                            for i in shadow:
+                                                if i.x == x*50 and i.y == y*50:
+                                                    alpha = i.image.get_alpha()
+                                            dark = Element()
+                                            dark.changer_image(pygame.Surface((50, 50)))
+                                            dark.move_el(x*50,y*50)
+                                            if alpha == 75:
+                                                dark.image.set_alpha(75)
+                                            delete = False
+                                            for i in map:
+                                                intens = 0
+                                            if i.picture == 2:
+                                                intens = 4
+                                            if i.picture == 13:
+                                                intens = 6
+                                            if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
+                                                delete = True
+                                            elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
+                                                dark.image.set_alpha(75)
+                                    if delete == False:
+                                        shadow_new.append(dark)
+                                    shadow = shadow_new
                                 perso.inv.delete()
 
             if input[K_UP]:
@@ -279,7 +367,10 @@ def jeu(app, map, perso):
 
         src_x = app.perso.x
         src_y = app.perso.y
-        intens = 5
+        intens = 4
+        if app.perso.inv.get_item().id == 0:
+            if app.perso.inv.get_item().bloc.picture == 13:
+                intens = 6
         for dark in shadow:
             if math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < (intens-2)*50:
                 dark.image.set_alpha(0)

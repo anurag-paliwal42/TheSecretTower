@@ -9,6 +9,8 @@ from item import *
 
 from time import *
 import copy
+import math
+
 # Pygame
 import pygame
 from pygame.locals import *
@@ -82,6 +84,9 @@ class Perso(Element):
             rect = pygame.Rect(150,0, 50,50)
         elif self.inv.get_item().id == 4:
             rect = pygame.Rect(0,50, 50,50)
+        elif self.inv.get_item().id == 0:
+            if self.inv.get_item().bloc.picture == 13:
+                rect = pygame.Rect(50,50, 50,50)
         image.blit(const.sprite_arm, (0,0), rect)
         if self.angle_arm != 0:
 
@@ -167,7 +172,7 @@ class Perso(Element):
     # y : deplacement en y
     #
     # Retour :
-    #     True : Deplacement effectué (peut etre modifié)
+    #     True : Deplacement effectué (peut etre modaifié)
     #     False : Deplacement non effectué (collision)
     def move(self, x, y, map):
         if self.collided_map(x, y, map) == False:
@@ -232,13 +237,13 @@ class Perso(Element):
                 elif isinstance(i, BlocDanger):
                     self.subir_degats(i.atk)
                     collided=True
-                elif not isinstance(i, Porte) and not isinstance(i, Echelle):
+                elif not isinstance(i, Porte) and not isinstance(i, Echelle) and not isinstance(i, Deco):
                     collided=True
             
         return collided
 
 
-    def collided_type(self, dep_x, dep_y, map, type, app=0):
+    def collided_type(self, dep_x, dep_y, map, type, app=0, shadow=0):
         future_rect = pygame.Rect(self.rect)
         future_rect = future_rect.move(dep_x, dep_y)
         # Vérification pour chaques éléments de la map
@@ -271,8 +276,12 @@ class Perso(Element):
                             atelier(app, self, "Atelier")
                         elif isinstance(i, Coffre):
                             print "Coffre"
+                    elif type == Deco:
+                        if self.inv.get_item().id == 2 or self.inv.get_item().id == 3 or self.inv.get_item().id == 4:
+                            self.inv.add(i)
+                            map.remove(i)
                     return True
-
+            
         return False
 
 
@@ -287,7 +296,7 @@ class Perso(Element):
         future_rect = pygame.Rect(self.rect)
         future_rect.width = 50
         future_rect.height = 50
-        future_rect = future_rect.move(dep_x, dep_y)
+        future_rect = future_rect.move(-future_rect.x+self.x+dep_x,-future_rect.y+self.y+dep_y)
         # Vérification pour chaques mobs
         for i in mob:
             if future_rect.colliderect(i.rect):

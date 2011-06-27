@@ -23,7 +23,7 @@ from editeur import *
 import const
 
 class App:
-    """ Classe définissant l'application The Secret of Tower"""
+    """ Classe définissant l'application The Secret Tower"""
 
     def __init__(self):
         """Initialisation de l'application"""
@@ -32,7 +32,8 @@ class App:
         pygame.init()
         
         # création de la fenetre
-        self.fenetre = pygame.display.set_mode((const.fenetre_size_x, const.fenetre_size_y))
+        self.size = [800, 600]
+        self.fenetre = pygame.display.set_mode((self.size[0], self.size[1]), pygame.DOUBLEBUF)
         pygame.display.set_caption(const.fenetre_titre)
 
         # font
@@ -41,6 +42,7 @@ class App:
 
         const.sprite_bloc = pygame.image.load("img/bloc.png").convert_alpha()
         const.sprite_lave = pygame.image.load("img/lave.png").convert_alpha()
+        const.sprite_torch = pygame.image.load("img/torch.png").convert_alpha()
         const.sprite_perso = pygame.image.load("img/perso.png").convert_alpha()
         const.sprite_arm = pygame.image.load("img/arm_perso.png").convert_alpha()
         const.sprite_item = pygame.image.load("img/item.png").convert_alpha()
@@ -55,7 +57,7 @@ class App:
     def main(self):
         cmd = 1
         while cmd:
-            cmd =  menu(self, "Menu principal", ["Nouvelle Partie", "Charger Partie", "Charger Niveau","Editeur de Niveaux", "Quitter"])
+            cmd =  menu(self, "Main Menu", ["New Game", "Load Game", "Load Level","Edit Level", "Quitter"])
             
             if cmd == 1 or cmd == 2:
                 if cmd == 1:
@@ -79,7 +81,7 @@ class App:
             elif cmd == 4:
                 self.partie = ["Gen", 0]
                 self.perso.map = 0
-                cmd = menu(self, "Editeur de map", ["Nouvelle map", "Charger map"])
+                cmd = menu(self, "Edit Level", ["New level", "Load level"])
                 if cmd == 1:
                     cmd = editeur(self, [])
                 elif cmd == 2:
@@ -114,6 +116,8 @@ class App:
 
     def flip(self):
         """Rafraichissement"""
+        """if self.size[0] != 800 or self.size[1] != 600:
+            self.fenetre.blit(pygame.transform.scale(self.fenetre, (self.size[0], self.size[1])), (0,0))"""
         pygame.display.flip()
 
     def nouvelle_partie(self, nom):
@@ -147,7 +151,13 @@ class App:
         for x in range(16):
             for y in range(10):
                 if (random.randint(0, 10)) < 2:
-                    bloc = Bloc(1)
+                    rand = random.randint(0,5)
+                    if rand < 2:
+                        bloc = Coal(14)
+                    elif rand == 2:
+                        bloc = Copper(15)
+                    else:
+                        bloc = Stone(1)
                     bloc.move_el(x*50, y*50+100)
                     map.append(bloc)
                 elif math.fabs(xd-x)+math.fabs(yd-y) > size:
@@ -195,3 +205,9 @@ class App:
         
         file.write(tampon)
         file.close()
+
+    def set_size(self,new_size):
+        self.size = new_size
+        print new_size
+        print self.size
+        self.fenetre = pygame.display.set_mode((self.size[0], self.size[1]), pygame.RESIZABLE)

@@ -62,6 +62,27 @@ class Bloc(Element):
         elif picture == 12:
             rect = pygame.Rect(0,150, 50,50)
             image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 13:
+            rect = pygame.Rect(0,random.randint(0, 3)*50, 50,50)
+            image.blit(const.sprite_torch, (0,0), rect)
+        elif picture == 14:
+            rect = pygame.Rect(50,100, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 15:
+            rect = pygame.Rect(100,100, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 16:
+            rect = pygame.Rect(150,100, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 17:
+            rect = pygame.Rect(200,100, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 18:
+            rect = pygame.Rect(0,150, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 19:
+            rect = pygame.Rect(50,150, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
 
 
 
@@ -71,15 +92,20 @@ class Bloc(Element):
         if self.picture == 2:
             if time() - self.last > 1: 
                 image = copy.copy(const.vide)
-                rect = pygame.Rect(0,random.randint(0, 3)*50, 50,50)
+                rect = pygame.Rect(0,random.randint(0, 4)*50, 50,50)
                 image.blit(const.sprite_lave, (0,0), rect)
+                self.changer_image(image)
+                self.last = time()
+
+        if self.picture == 13:
+            if time()-self.last > 0.1:
+                image = copy.copy(const.vide)
+                rect = pygame.Rect(0,random.randint(0, 3)*50, 50,50)
+                image.blit(const.sprite_torch, (0,0), rect)
                 self.changer_image(image)
                 self.last = time()
             
             
-            
-
-
 class BlocDisp(Bloc):
     def __init__(self, picture, begin = 0):
         Bloc.__init__(self, picture)
@@ -165,10 +191,37 @@ class Coffre(Wood):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
+
+
 class Forge(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Coal(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Copper(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Iron(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Silver(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class Gold(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+class Diamond(Stone):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
 class Deco(Bloc):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
+
+

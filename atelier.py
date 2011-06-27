@@ -150,7 +150,7 @@ def atelier(app, perso, type):
             title_craft.changer_text(craft[choix].nom, app.font)
 
         # Events
-        cmd = update_event(input)
+        cmd = update_event(input, app)
 
 
       

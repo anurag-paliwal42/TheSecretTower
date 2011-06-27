@@ -97,16 +97,16 @@ class Item():
             self.element.move_el(320,540)
             self.atk = 1
         if id == 1:
-            self.nom = "Epee"
+            self.nom = "Sword"
             self.atk = 5
         elif id == 2:
-            self.nom = "Pelle"
+            self.nom = "Shovel"
             self.atk = 2
         elif id == 3:
-            self.nom = "Pioche"
+            self.nom = "Pickaxe"
             self.atk = 3
         elif id == 4:
-            self.nom = "Hache"
+            self.nom = "Axe"
             self.atk = 4
         self.nbr = nbr
         self.prix = Inventaire()
@@ -149,16 +149,31 @@ class Item_Bloc(Item):
         self.type = bloc.__class__
         self.element.move_el(320,540)
         if self.type == Terre:
-            self.nom = "Terre"
+            self.nom = "Dirt"
         elif self.type == Stone:
-            self.nom = "Pierre"
+            self.nom = "Stone"
         elif self.type == Echelle:
-            self.nom = "Echelle"
+            self.nom = "Ladder"
         elif self.type == Wood:
-            self.nom = "Bois"
+            self.nom = "Wood"
         elif self.type == Atelier:
-            self.nom = "Atelier"
+            self.nom = "Workbench"
         elif self.type == Forge:
             self.nom = "Forge"
         elif self.type == Coffre:
-            self.nom = "Coffre"
+            self.nom = "Chest"
+        elif self.type == Deco:
+            if bloc.picture == 13:
+                self.nom = "Torch"
+        elif self.type == Coal:
+            self.nom = "Coal"
+        elif self.type == Copper:
+            self.nom = "Copper"
+        elif self.type == Iron:
+            self.nom = "Iron"
+        elif self.type == Silver:
+            self.nom = "Silver"
+        elif self.type == Gold:
+            self.nom = "Gold"
+        elif self.type == Diamond:
+            self.nom = "Diamond"

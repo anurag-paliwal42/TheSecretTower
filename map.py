@@ -79,6 +79,41 @@ def open_map(path):
                 bloc = Echelle(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
+            # Deco
+            elif pbloc[0] == 13:
+                bloc = Deco(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Coal
+            elif pbloc[0] == 14:
+                bloc = Coal(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Copper
+            elif pbloc[0] == 15:
+                bloc = Copper(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Iron
+            elif pbloc[0] == 16:
+                bloc = Iron(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Silver
+            elif pbloc[0] == 17:
+                bloc = Silver(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Gold
+            elif pbloc[0] == 18:
+                bloc = Gold(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Diamond
+            elif pbloc[0] == 19:
+                bloc = Diamond(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
     except IOError:
         print(path + " : Map introuvable !")
 
@@ -112,6 +147,20 @@ def save_map(nom, map):
             tampon = tampon + "11," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Forge):
             tampon = tampon + "12," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Deco):
+            tampon = tampon + "13," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Coal):
+            tampon = tampon + "14," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Copper):
+            tampon = tampon + "15," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Iron):
+            tampon = tampon + "16," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Silver):
+            tampon = tampon + "17," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Gold):
+            tampon = tampon + "18," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Diamond):
+            tampon = tampon + "19," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Bloc):
             tampon = tampon + "1," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
 
