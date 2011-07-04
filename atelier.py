@@ -172,16 +172,17 @@ def atelier(app, perso, type):
             input[K_LEFT] = 0
         if (input[K_p]):
             input[K_p] = 0
-            if perso.inv.get_item().id != 1 and not depot.isfull(perso.inv.get_item().type):
+            if perso.inv.get_item().id != 1 and not depot.isfull(perso.inv.get_item()):
                 depot.add(copy.copy(perso.inv.get_item()), 1)
                 perso.inv.delete()
             
         if (input[K_c]):
             for i in craft:
                 i.prix.item_sel = 0
-                if i.achat(depot) and not perso.inv.isfull(i.type):
-                    perso.inv.add(i)
-                    break
+                if not perso.inv.isfull(i):
+                    if i.achat(depot):
+                        perso.inv.add(i)
+                        break
             input[K_c] = 0
 
         if (input[K_x]):
