@@ -8,6 +8,7 @@ from element import *
 from event import *
 from map import *
 from menu import *
+from char import *
 
 from time import *
 import random
@@ -76,18 +77,19 @@ def jeu(app, map, perso):
     coeur_vide = Element()
     coeur_vide.changer_image(pygame.image.load("img/coeur_vide.png").convert_alpha())
     coeur_vide.y = 540
-
-    interface = Element()
-    interface.changer_image(pygame.image.load("img/interface.png").convert())
-    interface.image.set_alpha(150)
-    interface.move_el(310, 530)
     
-    text_item = Element()
-    text_item.changer_text(perso.inv.get_item().nom , app.font_petit)
-    text_item.move_el(380, 565)
-    text_item2 = Element()
-    text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
-    text_item2.move_el(380, 580)
+    b_text_item = Element()
+    b_text_item.changer_text(perso.inv.get_item().nom , app.font_petit)
+    b_text_item.move_el(384, 569)
+    w_text_item = Element()
+    w_text_item.changer_text(perso.inv.get_item().nom , app.font_petit)
+    w_text_item.move_el(380, 565)
+    b_text_item2 = Element()
+    b_text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
+    b_text_item2.move_el(384, 584)
+    w_text_item2 = Element()
+    w_text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
+    w_text_item2.move_el(380, 580)
   
     imgversion = Element()
     imgversion.changer_text(str(const.version), app.font)
@@ -97,6 +99,12 @@ def jeu(app, map, perso):
     imgfps = Element()
     imgfps.changer_text("FPS : " + str(fps), app.font)
     imgfps.move_el(0, 30)
+
+    commandes =  "(a) : Jump\n(z) : Use\n(e/r) : Scroll inventory\n(i) : Inventory \n(v) : Change View\n(ESC) : Break"
+    b_commandes = []
+    b_commandes = write(app,commandes, 24, 54)
+    w_commandes = []
+    w_commandes = write(app, commandes, 20, 50, (255,255,255))
     
     cmd = 1
     prev = time()+1
@@ -112,11 +120,14 @@ def jeu(app, map, perso):
         imgfps.changer_text("FPS : " +str(fps), app.font)
         prev = time()
 
-        text_item.changer_text(perso.inv.get_item().nom, app.font_petit)
+        b_text_item.changer_text(perso.inv.get_item().nom, app.font_petit)
+        w_text_item.changer_text(perso.inv.get_item().nom, app.font_petit, (255,255,255))
         if perso.inv.get_item().nbr > 1:
-            text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
+            b_text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
+            w_text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit, (255,255,255))
         else : 
-            text_item2.changer_text("" , app.font_petit)
+            b_text_item2.changer_text("" , app.font_petit)
+            w_text_item2.changer_text("" , app.font_petit, (255,255,255))
 
         # Shadow
         for i in shadow:
@@ -300,6 +311,9 @@ def jeu(app, map, perso):
         if (input[K_r]):
             perso.inv.changer_select(1)
             input[K_r] = 0
+        if (input[K_i]):
+            atelier(app, perso, "Inventory")
+            input[K_i] = 0
         # Zoom
         if (input[K_v]):
             app.coef+=1
@@ -381,7 +395,6 @@ def jeu(app, map, perso):
         if app.coef > 1:
             app.scale(app.coef)
 
-        app.blit(interface)
         for i in range(6):
             if i < perso.vie:
                 coeur.x = 370 + i*15
@@ -392,10 +405,18 @@ def jeu(app, map, perso):
 
 
         app.blit(perso.inv.get_element())
-        app.blit(text_item)
-        app.blit(text_item2)
+        app.blit(b_text_item)
+        app.blit(b_text_item2)
+        app.blit(w_text_item)
+        app.blit(w_text_item2)
         app.blit(imgversion)
         app.blit(imgfps)
+
+        if input[K_TAB]:
+            for i in b_commandes:
+                app.blit(i)
+            for i in w_commandes:
+                app.blit(i)
 
         app.flip()
 

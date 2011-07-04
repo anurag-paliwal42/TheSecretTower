@@ -5,6 +5,7 @@
 import os
 import random
 import math
+import copy
 
 # Pygame
 import pygame
@@ -47,6 +48,7 @@ class App:
         const.sprite_arm = pygame.image.load("img/arm_perso.png").convert_alpha()
         const.sprite_item = pygame.image.load("img/item.png").convert_alpha()
         const.sprite_mobs = pygame.image.load("img/mobs.png").convert_alpha()
+        const.sprite_degats = pygame.image.load("img/degats.png").convert_alpha()
         const.vide = pygame.image.load("img/vide.png").convert_alpha()
 
         self.perso = Perso()
@@ -88,6 +90,7 @@ class App:
                     cmd = editeur(self, open_map("map/custom/"+ask(self, "Entrez le nom de la map :")))
 
         pygame.quit()
+        print "Merci d'avoir joué !"
         
     def blit(self, element):
         """Ajoute Element à l'écran"""
@@ -119,6 +122,9 @@ class App:
         """if self.size[0] != 800 or self.size[1] != 600:
             self.fenetre.blit(pygame.transform.scale(self.fenetre, (self.size[0], self.size[1])), (0,0))"""
         pygame.display.flip()
+
+    def save_screen(self):
+        return copy.copy(self.fenetre)
 
     def nouvelle_partie(self, nom):
         partie = [nom, 0, 0]

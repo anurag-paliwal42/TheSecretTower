@@ -6,6 +6,7 @@ from event import *
 from element import *
 from bloc import *
 from item import *
+from char import *
 import const
 
 import copy
@@ -16,64 +17,87 @@ from pygame.locals import *
 def load_craft(type):
     
     craft = []
-    if type == "Atelier":
-        
-        # Atelier
-        bloc = Atelier(9)
-        item = Item_Bloc(bloc)
-        item.element.move_el(-item.element.x+400,-item.element.y+100)
-        prix = Wood(6)
-        item.set_prix(prix)
-        craft.append(item)
 
+    if type == "Workbench":
         # Coffre
         bloc = Coffre(11)
         item = Item_Bloc(bloc)
-        item.element.move_el(-item.element.x+400,-item.element.y+100)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
         prix = Wood(6)
         item.set_prix(prix)
         prix = Wood(6)
         item.set_prix(prix)
+        item.nbr = 2
         craft.append(item)
 
         # Forge
         bloc = Forge(10)
         item = Item_Bloc(bloc)
-        item.element.move_el(-item.element.x+400,-item.element.y+100)
-        prix = Stone(1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        prix = Stone(6)
         item.set_prix(prix)
-        prix = Stone(1)
+        prix = Stone(6)
         item.set_prix(prix)
         craft.append(item)
 
+        # Echelle
+        bloc = Echelle(8)
+        item = Item_Bloc(bloc)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Item(5,5))
+        craft.append(item)
+
     elif type == "Forge":
-        
-        # Pelle
-        item = Item(2, 1)
-        item.element.move_el(-item.element.x+400,-item.element.y+100)
-        prix = Wood(6)
-        item.set_prix(prix)
-        prix = Stone(1)
-        item.set_prix(prix)
+        # Hache
+        item = Item(4,1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Stone(1))
+        item.set_prix(Stone(1))
+        item.set_prix(Stone(1))
+        item.set_prix(Item(5,2))
         craft.append(item)
 
         # Pioche
         item = Item(3,1)
-        item.element.move_el(-item.element.x+400,-item.element.y+100)
-        prix = Wood(6)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Stone(1))
+        item.set_prix(Stone(1))
+        item.set_prix(Item(5,2))
+        craft.append(item)
+
+        # Pelle
+        item = Item(2, 1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        prix = Item(5,2)
         item.set_prix(prix)
         prix = Stone(1)
         item.set_prix(prix)
         craft.append(item)
 
-        # Hache
-        item = Item(4,1)
-        item.element.move_el(-item.element.x+400,-item.element.y+100)
-        prix = Wood(6)
-        item.set_prix(prix)
-        prix = Stone(1)
-        item.set_prix(prix)
-        craft.append(item)
+    # Atelier
+    bloc = Atelier(9)
+    item = Item_Bloc(bloc)
+    item.element.move_el(-item.element.x+500,-item.element.y+310)
+    prix = Wood(6)
+    item.set_prix(prix)
+    prix = Wood(6)
+    item.set_prix(prix)
+    craft.append(item)
+    # Torch
+    item = Item_Bloc(Deco(13))
+    item.nbr = 4
+    item.element.move_el(-item.element.x+500,-item.element.y+310)
+    item.set_prix(Item(5, 1))
+    item.set_prix(Coal(14))
+    craft.append(item)
+    # Stick
+    item = Item(5, 8)
+    item.element.move_el(-item.element.x+500,-item.element.y+310)
+    prix = Wood(6)
+    item.set_prix(prix)
+    craft.append(item)
+
+
 
     return craft
 
@@ -85,69 +109,48 @@ def atelier(app, perso, type):
         input[i] = 0
 
     fond = Element()
-    fond.changer_image(pygame.image.load(const.path_fond2).convert())
+    fond.changer_image(app.save_screen())
+    fond.image.blit(pygame.image.load("img/fond_inv.png").convert_alpha(), (0,0))
     
-        
-    title = Element()
-    title.changer_text(type, app.font)
-    title.move_el(50, 50)
-
-    choix = 0
+    if type == "Inventory":
+        symb = copy.copy(const.vide)
+    if type == "Workbench":
+        symb = Atelier(9)
+        symb.move_el(520, 170)
+    if type == "Forge":
+        symb = Forge(10)
+        symb.move_el(520, 170)
+    
 
     craft = []
     text_craft = []
 
     craft = load_craft(type)
 
-    x = 100
-    y = 100
-    for i in craft:
-        buffer = Element()
-        buffer.changer_text(i.nom, app.font_petit)
-        buffer.move_el(x,y)
-        text_craft.append(buffer)
-        y = y + 20
-    text_craft[choix].move_el(20, 0)
     
     title_craft = Element()
-    title_craft.changer_text(craft[choix].nom, app.font)
-    title_craft.move_el(500, 110)
+    title_craft.changer_text("", app.font)
+    title_craft.move_el(560, 320)
+    title_craft2 = Element()
+    title_craft2.changer_text("", app.font)
+    title_craft2.move_el(560, 335)
 
-    description = Element()
-    description.changer_text("(c) : Craft   (e) : Scroll inventary  (ESQ): Leave ", app.font_petit)
-    description.move_el(100, 500)
-
-    cout = Element()
-    cout.changer_text("Cout : ", app.font_petit)
-    cout.move_el(350, 175)
-    item_cout = Element()
-    text_cout = Element()
-    text_cout.changer_text("" , app.font_petit)
+    description = write(app, "(p) : Put down the item \n      for crafting\n(c) : Craft\n(x) : Cancel\n(ESQ): Resume", 20, 380)
     
-    # Inventaire
+    # depot
+    depot = Inventaire()
 
-    interface = Element()
-    interface.changer_image(pygame.image.load("img/interface.png").convert())
-    interface.image.set_alpha(150)
-    interface.move_el(310, 530)
-    text_item = Element()
-    text_item.changer_text(perso.inv.get_item().nom , app.font_petit)
-    text_item.move_el(380, 565)
-    text_item2 = Element()
-    text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
-    text_item2.move_el(380, 580)
+    # Inventaire
+    select = Element()
+    select.changer_image(pygame.image.load("img/select.png").convert_alpha())
+    text_nbr = Element()
+    text_nbr.changer_text("", app.font)
+
+    choix = 0
 
     cmd = 1
     while cmd<>0:
-        title_craft.changer_text(craft[choix].nom, app.font)
 
-        text_item.changer_text(perso.inv.get_item().nom, app.font_petit)
-        if perso.inv.get_item().nbr > 1:
-            text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
-        else : 
-            text_item2.changer_text("" , app.font_petit)
-
-            title_craft.changer_text(craft[choix].nom, app.font)
 
         # Events
         cmd = update_event(input, app)
@@ -155,71 +158,112 @@ def atelier(app, perso, type):
 
       
         if input[K_UP]:
-            if choix > 0:
-                choix = choix -1
-                text_craft[choix].move_el(20, 0)
-                text_craft[choix+1].move_el(-20,0)
-            else:
-                choix = len(craft)-1
-                text_craft[choix].move_el(20, 0)
-                text_craft[0].move_el(-20,0)
+            perso.inv.changer_select(-5)
+
             input[K_UP] = 0
         if input[K_DOWN]:
-            if choix < len(craft)-1:
-                choix = choix +1
-                text_craft[choix].move_el(20, 0)
-                text_craft[choix-1].move_el(-20,0)
-            else:
-                choix = 0
-                text_craft[choix].move_el(20, 0)
-                text_craft[-1].move_el(-20,0)
+            perso.inv.changer_select(5)
             input[K_DOWN] = 0
-        if (input[K_e]):
-            perso.inv.changer_select(-1)
-            input[K_e] = 0
-        if (input[K_r]):
+        if input[K_RIGHT]:
             perso.inv.changer_select(1)
-            input[K_r] = 0
+            input[K_RIGHT] = 0
+        if input[K_LEFT]:
+            perso.inv.changer_select(-1)
+            input[K_LEFT] = 0
+        if (input[K_p]):
+            input[K_p] = 0
+            if perso.inv.get_item().id != 1:
+                depot.add(copy.copy(perso.inv.get_item()), 1)
+                perso.inv.delete()
+            
         if (input[K_c]):
-            if craft[choix].achat(perso.inv):
-                perso.inv.add(craft[choix])
-            craft = load_craft(type)
+            for i in craft:
+                i.prix.item_sel = 0
+                if i.achat(depot):
+                    perso.inv.add(i)
+                    break
             input[K_c] = 0
 
-        if input[K_ESCAPE]:
+        if (input[K_x]):
+            # Cancel
+            for i in depot.data:
+                perso.inv.add(i)
+
+            depot = Inventaire()
+            input[K_x] = 0
+
+        if input[K_ESCAPE] or input[K_i]:
+            for i in depot.data:
+                perso.inv.add(i)
+
+            depot = Inventaire()
             return 0
 
         # Affichage
         app.blit(fond)
-        app.blit(title)
         
-        app.blit(craft[choix].element)
-        
-        for i in text_craft:
-            app.blit(i)
-        
-        app.blit(title_craft)
-        app.blit(description)
-        app.blit(cout)
+        for i in craft:
 
-        x = 375
-        y = 200
-        craft[choix].prix.item_sel = 0
-        for i in range(len(craft[choix].prix.data)):
-            item_cout = craft[choix].prix.get_item().element
-            item_cout.move_el(-item_cout.x+x, -item_cout.y+y)
-            app.blit(item_cout)
-            if craft[choix].prix.get_item().nbr > 1: 
-                text_cout.changer_text("x"+str(craft[choix].prix.get_item().nbr) , app.font_petit)
-                text_cout.move_el(-text_cout.x+x+20, -text_cout.y+y+30)
-                app.blit(text_cout)
-            craft[choix].prix.changer_select(1)
-            x = x +60
+            inv_temp = copy.deepcopy(depot)
+            i.prix.item_sel = 0
+            if i.achat(inv_temp):
+                title_craft.changer_text(i.nom, app.font)
+                if i.nbr > 1:
+                    title_craft2.changer_text("x" + str(i.nbr) , app.font)
+                else : 
+                    title_craft2.changer_text("" , app.font)
+
+                app.blit(i.element)
+                app.blit(title_craft)
+                app.blit(title_craft2)
+                choix = i 
+                break
+        craft = load_craft(type)
             
 
-        app.blit(interface)
-        app.blit(perso.inv.get_element())
-        app.blit(text_item)
-        app.blit(text_item2)
+        # Affichage inventaire
+        x = 20
+        y = 100
+        for i in perso.inv.data:
+            i.element.move_el(-i.element.x+x,-i.element.y+y)
+            app.blit(i.element)
+            if i.nbr > 1:
+                text_nbr.changer_text(str(i.nbr) , app.font_petit)
+                text_nbr.move_el(-text_nbr.x+x+27,-text_nbr.y+y+32)
+                app.blit(text_nbr)
+                text_nbr.changer_text(str(i.nbr) , app.font_petit, (255,255,255))
+                text_nbr.move_el(-text_nbr.x+x+25,-text_nbr.y+y+30)
+                app.blit(text_nbr)
+            if i == perso.inv.get_item():
+                select.move_el(-select.x+x,-select.y+y) 
+                app.blit(select)
+            x += 60
+            if x+60 > 360:
+                x = 20 
+                y += 60
+
+        x = 730
+        y = 100
+        for i in depot.data:
+            i.element.move_el(-i.element.x+x,-i.element.y+y)
+            app.blit(i.element)
+            if i.nbr > 1:
+                text_nbr.changer_text(str(i.nbr) , app.font_petit)
+                text_nbr.move_el(-text_nbr.x+x+27,-text_nbr.y+y+32)
+                app.blit(text_nbr)
+                text_nbr.changer_text(str(i.nbr) , app.font_petit, (255,255,255))
+                text_nbr.move_el(-text_nbr.x+x+25,-text_nbr.y+y+30)
+                app.blit(text_nbr)
+            x -= 60
+            if x-60 < 400:
+                x = 730 
+                y += 60
+        for i in description:                                
+            app.blit(i)
+        app.blit(symb)
 
         app.flip()
+
+    for i in depot.data:
+        perso.inv.add(i)
+        

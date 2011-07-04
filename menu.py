@@ -24,13 +24,23 @@ def menu(app, ptitle, pmenu):
     img_choix.x = 30
     img_choix.y = 300
 
+
+    w_title = Element()
+    w_title.changer_text(ptitle, app.font, (255,255,255))
+    w_title.move_el(84,254)
     title = Element()
     title.changer_text(ptitle, app.font)
     title.move_el(80,250)
     
     menu = []
+    w_menu = []
 
     for i in pmenu:
+        # White
+        entry = Element()
+        entry.changer_text(i, app.font, (255,255,255))
+        w_menu.append(entry)
+        # Black
         entry = Element()
         entry.changer_text(i, app.font)
         menu.append(entry)
@@ -58,7 +68,16 @@ def menu(app, ptitle, pmenu):
 
         img_choix.y = 250 + (cmd*50)
         app.blit(fond_menu)
+        app.blit(w_title)
         app.blit(title)
+
+        x = 104
+        y = 304
+        for entry in w_menu:
+            entry.x = x
+            entry.y = y
+            app.blit(entry)
+            y = y + 50
                 
         x = 100
         y = 300
@@ -84,12 +103,17 @@ def ask(app, ptitle):
     fond_menu = Element()
     fond_menu.changer_image(pygame.image.load(const.path_fond_menu).convert())
 
-
+    w_title = Element()
+    w_title.changer_text(ptitle, app.font, (255,255,255))
+    w_title.move_el(84,254)
     title = Element()
     title.changer_text(ptitle, app.font)
     title.move_el(80,250)
 
     preponse = ""
+    w_reponse = Element()
+    w_reponse.changer_text(preponse, app.font, (255,255,255))
+    w_reponse.move_el(104, 304)
     reponse = Element()
     reponse.changer_text(preponse, app.font)
     reponse.move_el(100, 300)
@@ -240,10 +264,12 @@ def ask(app, ptitle):
         elif input[K_RETURN]:
             return preponse
 
-
+        w_reponse.changer_text(preponse, app.font, (255,255,255))
         reponse.changer_text(preponse, app.font)
         app.blit(fond_menu)
+        app.blit(w_title)
         app.blit(title)
+        app.blit(w_reponse)
         app.blit(reponse)
 
         app.flip()

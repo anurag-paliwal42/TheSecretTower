@@ -32,17 +32,12 @@ class Perso(Element):
         self.inv = Inventaire()
         item = Item(1, 1)
         self.inv.add(item)
+        """"item = Item(3, 1)
+        self.inv.add(item)
         item = Item(2, 1)
         self.inv.add(item)
-        item = Item(3, 1)
-        self.inv.add(item)
         item = Item(4, 1)
-        self.inv.add(item)
-        for i in range(10):
-            item = Echelle(8)
-            self.inv.add(item)
-        item = Atelier(9)
-        self.inv.add(item)
+        self.inv.add(item)"""
 
         # changer_image
         self.sens = True
@@ -259,21 +254,24 @@ class Perso(Element):
                             self.map = i.target 
                         self.id_porte = i.id
                     elif type == Terre:
-                        if self.inv.get_item().id == 2:
-                            self.inv.add(i)
-                            map.remove(i)
+                        if self.inv.get_item().id == 2 or self.inv.get_item().id == 1:
+                            if i.hit(self.inv.get_item().damage):
+                                self.inv.add(i)
+                                map.remove(i)
                     elif type == Stone:
-                        if self.inv.get_item().id == 3:
-                            self.inv.add(i)
-                            map.remove(i)
+                        if self.inv.get_item().id == 3 or (self.inv.get_item().id == 1 and not isinstance(i, Forge) ):
+                            if i.hit(self.inv.get_item().damage):
+                                self.inv.add(i)
+                                map.remove(i)
                         elif isinstance(i, Forge):
                             atelier(app, self, "Forge")
                     elif type == Wood:
-                        if self.inv.get_item().id == 4:
-                            self.inv.add(i)
-                            map.remove(i)
+                        if self.inv.get_item().id == 4 or (self.inv.get_item().id == 1 and not isinstance(i, Atelier) and not isinstance(i, Coffre)):
+                            if i.hit(self.inv.get_item().damage):
+                                self.inv.add(i)
+                                map.remove(i)
                         elif isinstance(i, Atelier):
-                            atelier(app, self, "Atelier")
+                            atelier(app, self, "Workbench")
                         elif isinstance(i, Coffre):
                             print "Coffre"
                     elif type == Deco:

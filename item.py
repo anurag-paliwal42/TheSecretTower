@@ -15,35 +15,50 @@ class Inventaire():
         self.data = []
         self.item_sel = 0
 
-    def add(self,objet):
+    def add(self,objet, nbr = 0):
         if isinstance(objet, Item_Bloc):
             for i in self.data:
                 if isinstance(i, Item_Bloc):
                     if i.type == objet.type:
-                        i.nbr = i.nbr + objet.nbr
+                        if nbr == 0:
+                            i.nbr = i.nbr + objet.nbr
+                        else:
+                            i.nbr += nbr
                         return True
             item = objet
+            if nbr != 0:
+                item.nbr = nbr
 
         elif isinstance(objet, Item):
             item = Item(1,1)
             item = objet
+            if nbr != 0:
+                item.nbr = nbr
             for i in self.data:
                 if i.id == item.id:
-                    i.nbr = i.nbr + item.nbr
+                    if nbr == 0:
+                        i.nbr = i.nbr + item.nbr
+                    else:
+                        i.nbr += nbr
                     return True
 
         elif isinstance(objet, Bloc):
             item = Item_Bloc(objet)
+            if nbr != 0:
+                item.nbr = nbr
             for i in self.data:
                 if isinstance(i, Item_Bloc):
                     if i.type == item.type:
-                        i.nbr = i.nbr + item.nbr
+                        if nbr == 0:
+                            i.nbr = i.nbr + item.nbr
+                        else:
+                            i.nbr += nbr
                         return True
-
 
         self.data.append(item)
         return True
     def delete(self):
+
         if self.data[self.item_sel].nbr > 1:
             self.data[self.item_sel].nbr = self.data[self.item_sel].nbr - 1
         else:
@@ -58,14 +73,15 @@ class Inventaire():
         return self.data[self.item_sel]
 
     def changer_select(self, step):
+
         if self.item_sel + step < len(self.data) and step > 0: 
             self.item_sel = self.item_sel + step
         elif self.item_sel + step >= 0 and step < 0:
             self.item_sel = self.item_sel + step
         elif step > 0:
             self.item_sel = 0
-        else:
-            self.item_sel = len(self.data)-1
+        elif step < 0:
+            self.item_sel =len(self.data)-1
 
     def search(self, item):
         for i in range(len(self.data)):
@@ -78,7 +94,7 @@ class Inventaire():
         return -1
 
     def isempty(self):
-        if self.data == []:
+        if len(self.data) == 0:
             return True
         else:
             return False
@@ -96,18 +112,26 @@ class Item():
             self.element.changer_image(image)
             self.element.move_el(320,540)
             self.atk = 1
+            self.damage = 0
         if id == 1:
             self.nom = "Sword"
             self.atk = 5
+            self.damage = 0.2 
         elif id == 2:
             self.nom = "Shovel"
             self.atk = 2
+            self.damage = 4
         elif id == 3:
             self.nom = "Pickaxe"
             self.atk = 3
+            self.damage=1
         elif id == 4:
             self.nom = "Axe"
             self.atk = 4
+            self.damage=1
+        elif id == 5:
+            self.nom = "Stick"
+            self.atk = 1
         self.nbr = nbr
         self.prix = Inventaire()
 
@@ -118,9 +142,9 @@ class Item():
 
         prix = Inventaire()
         prix = copy.copy(self.prix)
+        prix.item_sel = 0
         item_sel = inv.item_sel
         item_del = []
-
         while prix.isempty() == False:
             id_prix = inv.search(prix.get_item())
             inv.item_sel = 0
@@ -128,7 +152,7 @@ class Item():
                 inv.changer_select(id_prix)
                 item_del.append(inv.get_item())
                 inv.delete()
-                self.prix.delete()
+                prix.delete()
             else:
                 inv.item_sel = item_sel
                 for i in item_del:
@@ -136,7 +160,6 @@ class Item():
                 return False
                 
             prix.changer_select(1)
-
         inv.item_sel = item_sel
         return True
         

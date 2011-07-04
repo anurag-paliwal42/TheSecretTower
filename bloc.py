@@ -17,9 +17,38 @@ class Bloc(Element):
 
     def __init__(self, picture):
         Element.__init__(self)
+        self.vie = 5
         self.last = time()
         self.picture = picture
+        self.set_image()
 
+    def anim(self):
+        if self.picture == 2:
+            if time() - self.last > 1: 
+                image = copy.copy(const.vide)
+                rect = pygame.Rect(0,random.randint(0, 4)*50, 50,50)
+                image.blit(const.sprite_lave, (0,0), rect)
+                self.changer_image(image)
+                self.last = time()
+
+        if self.picture == 13:
+            if time()-self.last > 0.1:
+                image = copy.copy(const.vide)
+                rect = pygame.Rect(0,random.randint(0, 3)*50, 50,50)
+                image.blit(const.sprite_torch, (0,0), rect)
+                self.changer_image(image)
+                self.last = time()
+
+    def hit(self, damage):
+        self.vie -= damage
+        self.set_image()
+        if self.vie > 0:
+            return False
+        else:
+            return True
+
+    def set_image(self):
+        picture = self.picture
         image = copy.copy(const.vide)
         rect = pygame.Rect(0,0, 50,50)
         if picture == 0:
@@ -83,29 +112,13 @@ class Bloc(Element):
         elif picture == 19:
             rect = pygame.Rect(50,150, 50,50)
             image.blit(const.sprite_bloc, (0,0), rect)
-
-
-
+        
+        # Damage
+        if self.vie != 5:
+            rect = pygame.Rect(0,int(4-self.vie)*50, 50,50)
+            image.blit(const.sprite_degats, (0,0), rect)
         self.changer_image(image)
-
-    def anim(self):
-        if self.picture == 2:
-            if time() - self.last > 1: 
-                image = copy.copy(const.vide)
-                rect = pygame.Rect(0,random.randint(0, 4)*50, 50,50)
-                image.blit(const.sprite_lave, (0,0), rect)
-                self.changer_image(image)
-                self.last = time()
-
-        if self.picture == 13:
-            if time()-self.last > 0.1:
-                image = copy.copy(const.vide)
-                rect = pygame.Rect(0,random.randint(0, 3)*50, 50,50)
-                image.blit(const.sprite_torch, (0,0), rect)
-                self.changer_image(image)
-                self.last = time()
-            
-            
+    
 class BlocDisp(Bloc):
     def __init__(self, picture, begin = 0):
         Bloc.__init__(self, picture)
@@ -168,7 +181,6 @@ class Porte(Bloc):
 class Terre(Bloc):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
-
 
 
 class Stone(Bloc):
