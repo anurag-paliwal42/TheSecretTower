@@ -254,19 +254,19 @@ class Perso(Element):
                             self.map = i.target 
                         self.id_porte = i.id
                     elif type == Terre:
-                        if self.inv.get_item().id == 2 or self.inv.get_item().id == 1:
+                        if (self.inv.get_item().id == 2 or self.inv.get_item().id == 1) and not self.inv.isfull(Terre):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
                     elif type == Stone:
-                        if self.inv.get_item().id == 3 or (self.inv.get_item().id == 1 and not isinstance(i, Forge) ):
+                        if (self.inv.get_item().id == 3 or (self.inv.get_item().id == 1 and not isinstance(i, Forge) )) and not self.inv.isfull(Stone):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
                         elif isinstance(i, Forge):
                             atelier(app, self, "Forge")
                     elif type == Wood:
-                        if self.inv.get_item().id == 4 or (self.inv.get_item().id == 1 and not isinstance(i, Atelier) and not isinstance(i, Coffre)):
+                        if (self.inv.get_item().id == 4 or (self.inv.get_item().id == 1 and not isinstance(i, Atelier) and not isinstance(i, Coffre))) and not self.inv.isfull(Wood):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
@@ -275,7 +275,7 @@ class Perso(Element):
                         elif isinstance(i, Coffre):
                             print "Coffre"
                     elif type == Deco:
-                        if self.inv.get_item().id == 2 or self.inv.get_item().id == 3 or self.inv.get_item().id == 4:
+                        if (self.inv.get_item().id == 2 or self.inv.get_item().id == 3 or self.inv.get_item().id == 4) and not self.inv.isfull(Deco):
                             self.inv.add(i)
                             map.remove(i)
                     return True

@@ -11,9 +11,10 @@ import pygame
 from pygame.locals import *
  
 class Inventaire():
-    def __init__(self):
+    def __init__(self, limit=20):
         self.data = []
         self.item_sel = 0
+        self.limit = limit
 
     def add(self,objet, nbr = 0):
         if isinstance(objet, Item_Bloc):
@@ -95,6 +96,16 @@ class Inventaire():
 
     def isempty(self):
         if len(self.data) == 0:
+            return True
+        else:
+            return False
+
+    def isfull(self, type):
+        if len(self.data) >= self.limit:
+            for i in self.data:
+                if i.id == 0:
+                        if type == i.type and i.nbr < 8:
+                            return False
             return True
         else:
             return False
