@@ -236,4 +236,9 @@ class Deco(Bloc):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
+class Torch(Deco):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+
 

@@ -79,9 +79,9 @@ def open_map(path):
                 bloc = Echelle(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
-            # Deco
+            # Torch
             elif pbloc[0] == 13:
-                bloc = Deco(pbloc[1])
+                bloc = Torch(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
             # Coal
@@ -147,7 +147,7 @@ def save_map(nom, map):
             tampon = tampon + "11," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Forge):
             tampon = tampon + "12," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
-        elif isinstance(i, Deco):
+        elif isinstance(i, Torch):
             tampon = tampon + "13," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Coal):
             tampon = tampon + "14," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"

@@ -138,7 +138,7 @@ def atelier(app, perso, type):
     description = write(app, "(p) : Put down the item \n      for crafting\n(c) : Craft\n(x) : Cancel\n(ESQ): Resume", 20, 380)
     
     # depot
-    depot = Inventaire()
+    depot = Inventaire(2)
 
     # Inventaire
     select = Element()
@@ -172,14 +172,14 @@ def atelier(app, perso, type):
             input[K_LEFT] = 0
         if (input[K_p]):
             input[K_p] = 0
-            if perso.inv.get_item().id != 1:
+            if perso.inv.get_item().id != 1 and not depot.isfull(perso.inv.get_item().type):
                 depot.add(copy.copy(perso.inv.get_item()), 1)
                 perso.inv.delete()
             
         if (input[K_c]):
             for i in craft:
                 i.prix.item_sel = 0
-                if i.achat(depot):
+                if i.achat(depot) and not perso.inv.isfull(i.type):
                     perso.inv.add(i)
                     break
             input[K_c] = 0
@@ -196,7 +196,7 @@ def atelier(app, perso, type):
             for i in depot.data:
                 perso.inv.add(i)
 
-            depot = Inventaire()
+            depot = Inventaire(2)
             return 0
 
         # Affichage

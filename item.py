@@ -11,7 +11,7 @@ import pygame
 from pygame.locals import *
  
 class Inventaire():
-    def __init__(self, limit=20):
+    def __init__(self, limit=5):
         self.data = []
         self.item_sel = 0
         self.limit = limit
