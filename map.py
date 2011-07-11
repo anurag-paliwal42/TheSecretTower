@@ -2,6 +2,7 @@
 # Auteur : Pierre Surply
 
 from bloc import *
+from item import *
 
 # Chargement carte
 def open_map(path):
@@ -17,9 +18,13 @@ def open_map(path):
         for element in elements:
             if element != "":
                 prop = element.split(",")
-                prop = [int(i) for i in prop]
+                if int(prop[0]) == 11 or  int(prop[0])==22:
+                    for i in range(4):
+                        prop[i] = int(prop[i])
+                else:
+                    prop = [int(i) for i in prop]
                 pmap.append(prop)
-         
+                
         for i in pmap:
             pbloc = i
             if pbloc[0] == 0:
@@ -71,8 +76,9 @@ def open_map(path):
                 map.append(bloc)
             # Coffre
             elif pbloc[0] == 11:
-                bloc = Echelle(pbloc[1])
+                bloc = Coffre(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
+                bloc.inv.load(pbloc[4])                 
                 map.append(bloc)
             # Forge
             elif pbloc[0] == 12:
@@ -99,9 +105,9 @@ def open_map(path):
                 bloc = Iron(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
-            # Silver
+            # Titanium
             elif pbloc[0] == 17:
-                bloc = Silver(pbloc[1])
+                bloc = Titanium(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
             # Gold
@@ -114,6 +120,27 @@ def open_map(path):
                 bloc = Diamond(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
+            # Tin
+            elif pbloc[0] == 20:
+                bloc = Tin(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Uranium
+            elif pbloc[0] == 21:
+                bloc = Uranium(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Sign
+            elif pbloc[0] == 22:
+                bloc = Sign(pbloc[1], pbloc[4].replace("/n", "\n"))
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+            # Furnace
+            elif pbloc[0] == 23:
+                bloc = Furnace(pbloc[1])
+                bloc.move_el(pbloc[2], pbloc[3])
+                map.append(bloc)
+
     except IOError:
         print(path + " : Map introuvable !")
 
@@ -144,7 +171,8 @@ def save_map(nom, map):
         elif isinstance(i, Atelier):
             tampon = tampon + "10," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Coffre):
-            tampon = tampon + "11," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+            tampon = tampon + "11," + str(i.picture) +","+str(i.x)+","+str(i.y)+","+i.inv.save()+"\n"
+            #tampon = tampon + "11," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Forge):
             tampon = tampon + "12," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Torch):
@@ -155,12 +183,20 @@ def save_map(nom, map):
             tampon = tampon + "15," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Iron):
             tampon = tampon + "16," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
-        elif isinstance(i, Silver):
+        elif isinstance(i, Titanium):
             tampon = tampon + "17," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Gold):
             tampon = tampon + "18," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Diamond):
             tampon = tampon + "19," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Tin):
+            tampon = tampon + "20," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Uranium):
+            tampon = tampon + "21," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Sign):
+            tampon = tampon + "22," + str(i.picture) +","+str(i.x)+","+str(i.y)+","+i.txt.replace("\n", "/n")+"\n"
+        elif isinstance(i, Furnace):
+            tampon = tampon + "23," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Bloc):
             tampon = tampon + "1," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
 

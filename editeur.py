@@ -116,7 +116,7 @@ def editeur(app, map):
 
         if input[K_KP7]:
             input[K_KP7] = 0
-            bloc = Deco(13)
+            bloc = Torch(13)
             bloc.move_el(select.x, select.y)
             map.append(bloc)
 

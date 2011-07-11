@@ -21,6 +21,7 @@ class Bloc(Element):
         self.last = time()
         self.picture = picture
         self.set_image()
+        self.fire = False
 
     def anim(self):
         if self.picture == 2:
@@ -38,6 +39,21 @@ class Bloc(Element):
                 image.blit(const.sprite_torch, (0,0), rect)
                 self.changer_image(image)
                 self.last = time()
+        if self.picture == 23:
+            if time() > self.last and self.fire:
+                image = copy.copy(const.vide)
+                rect = pygame.Rect(0,200, 50,50)
+                image.blit(const.sprite_bloc, (0,0), rect)
+                self.changer_image(image)
+                self.fire = False
+            elif time() < self.last and not self.fire:
+                image = copy.copy(const.vide)
+                rect = pygame.Rect(50,200, 50,50)
+                image.blit(const.sprite_bloc, (0,0), rect)
+                self.changer_image(image)
+                self.fire = True
+                
+                
 
     def hit(self, damage):
         self.vie -= damage
@@ -112,6 +128,18 @@ class Bloc(Element):
         elif picture == 19:
             rect = pygame.Rect(50,150, 50,50)
             image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 20:
+            rect = pygame.Rect(100,150, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 21:
+            rect = pygame.Rect(150,150, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 22:
+            rect = pygame.Rect(200,150, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 23:
+            rect = pygame.Rect(0,200, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
         
         # Damage
         if self.vie != 5:
@@ -170,6 +198,12 @@ class BlocDanger(Bloc):
         Bloc.__init__(self, picture)
         self.atk = atk
 
+
+
+# etat
+#      0 = map--
+#      1 = map++
+#      2 = map=target
 class Porte(Bloc):
     
     def __init__(self, picture, etat, id=0, target=0):
@@ -199,10 +233,6 @@ class Atelier(Wood):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
-class Coffre(Wood):
-    def __init__(self, picture):
-        Bloc.__init__(self, picture)
-
 
 
 class Forge(Stone):
@@ -221,7 +251,7 @@ class Iron(Stone):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
-class Silver(Stone):
+class Titanium(Stone):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
@@ -229,6 +259,12 @@ class Gold(Stone):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 class Diamond(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+class Tin(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+class Uranium(Stone):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
@@ -239,6 +275,18 @@ class Deco(Bloc):
 class Torch(Deco):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
+
+class Sign(Deco):
+    def __init__(self, picture, txt):
+        Bloc.__init__(self, picture)
+        self.txt = txt
+
+class Furnace(Stone):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+        
+    
 
 
 

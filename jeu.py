@@ -59,13 +59,13 @@ def jeu(app, map, perso):
     mobs = []
     for i in shadow:
         # pop monstre
-        if i.image.get_alpha() >= 75 and random.randint(0, 10) == 1:
+        if (i.image.get_alpha() == 75 or i.image.get_alpha() == None) and random.randint(1, 5) == 1:
             creat = True
             for bloc in map:
                 if bloc.x == i.x and bloc.y == i.y:
                     creat = False
             if creat:
-                mob = Mob(1)
+                mob = Mob(random.randint(0,2))
                 mob.move_el(i.x, i.y)
                 mobs.append(mob)
 
@@ -144,25 +144,25 @@ def jeu(app, map, perso):
         # Traitement events
         cmd = update_event(input, app)
   
-        if (input[K_SPACE] or input[K_a] or input[K_q]) and input[K_LEFT]:
+        if (input[K_SPACE] or input[K_a] or input[K_q]) and input[K_LEFT] and  perso.vie > 0:
             perso.sauter(-5, -15)
             input[K_SPACE] = 0
             input[K_a] = 0
             input[K_q] = 0
 
-        if (input[K_SPACE] or input[K_a] or input[K_q]) and input[K_RIGHT]:
+        if (input[K_SPACE] or input[K_a] or input[K_q]) and input[K_RIGHT] and  perso.vie > 0:
             perso.sauter(5, -15)
             input[K_SPACE] = 0
             input[K_a] = 0
             input[K_q] = 0
 
-        if (input[K_SPACE] or input[K_a] or input[K_q]):
+        if (input[K_SPACE] or input[K_a] or input[K_q]) and  perso.vie > 0:
             perso.sauter(0, -15)
             input[K_SPACE] = 0
             input[K_a] = 0
             input[K_q] = 0
 
-        if (input[K_z] or  input[K_w]):
+        if (input[K_z] or  input[K_w]) and  perso.vie > 0:
             perso.hit()
 
             #Destruction bloc + atk
@@ -201,7 +201,7 @@ def jeu(app, map, perso):
                             shadow_new.append(dark)
 
                 shadow = shadow_new
-            perso.collided_mob(s*30,0,mobs)
+            perso.collided_mob(0,0,mobs)
 
 
                                 
@@ -320,20 +320,26 @@ def jeu(app, map, perso):
             if app.coef > 2:
                 app.coef = 1
             input[K_v] = 0
-        if input[K_UP]:
+        if input[K_UP] and  perso.vie > 0:
             perso.monter_echelle(map)
-        if input[K_LEFT]:
+        if input[K_LEFT] and  perso.vie > 0:
             perso.move(-5,0, map)
             perso.sens = False
             perso.anim(True)
-        if input[K_RIGHT]:
+        if input[K_RIGHT] and  perso.vie > 0:
             perso.move(5,0, map)
             perso.sens = True
             perso.anim(True)
         if not input[K_RIGHT] and not input[K_LEFT]:
             perso.anim(False)
         if input[K_RETURN]:
-            perso.subir_degats(1)
+            if perso.vie <= 0:
+                perso.vie = 6
+                for i in map:
+                    if isinstance(i, Porte):
+                        if i.id == perso.id_porte:
+                            perso.move_el(-perso.x, -perso.y)
+                            perso.move_el(i.x,i.y)
         if input[K_ESCAPE]:
             input[K_ESCAPE] = 0
             if app.partie[0] != "Gen":
@@ -418,16 +424,31 @@ def jeu(app, map, perso):
             for i in w_commandes:
                 app.blit(i)
 
+        for i in map:
+            if isinstance(i, Sign):
+                if perso.collided_bloc(0,0, i):
+                    b_txt = []
+                    b_txt = write(app,"Sign :\n\n     "+i.txt, 24, 204)
+                    w_txt = []
+                    w_txt = write(app, "Sign : \n\n     "+i.txt, 20, 200, (255,255,255))
+                    for i in b_txt:
+                        app.blit(i)
+                    for i in w_txt:
+                        app.blit(i)
+
+        if perso.vie <= 0:
+            b_txt = []
+            b_txt = write(app, "Hard luck ! You are dead...\n\n      Press [RETURN] to respawn", 204, 204)
+            w_txt = []
+            w_txt = write(app, "Hard luck ! You are dead...\n\n      Press [RETURN] to respawn", 200, 200, (255,255,255))
+            for i in b_txt:
+                app.blit(i)
+            for i in w_txt:
+                app.blit(i)
+
         app.flip()
 
 
-        if perso.vie <= 0:
-            perso.vie = 6
-            for i in map:
-                if isinstance(i, Porte):
-                    if i.id == perso.id_porte:
-                        perso.move_el(-perso.x, -perso.y)
-                        perso.move_el(i.x,i.y)
 
         if perso.map != app.partie[1]:
             if app.partie[0] != "Gen":

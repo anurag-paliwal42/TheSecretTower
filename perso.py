@@ -29,15 +29,10 @@ class Perso(Element):
         self.id_porte = 0
         self.vie = 6
         self.last_dommage = time()
+        self.last_dommage_ur = time()
         self.inv = Inventaire()
         item = Item(1, 1)
         self.inv.add(item)
-        """"item = Item(3, 1)
-        self.inv.add(item)
-        item = Item(2, 1)
-        self.inv.add(item)
-        item = Item(4, 1)
-        self.inv.add(item)"""
 
         # changer_image
         self.sens = True
@@ -71,17 +66,22 @@ class Perso(Element):
         image = copy.copy(const.vide)
         # Bras
         rect = pygame.Rect(0,0, 50,50)
-        if self.inv.get_item().id == 1:
-            rect = pygame.Rect(50,0, 50,50)
-        elif self.inv.get_item().id == 2:
-            rect = pygame.Rect(100,0, 50,50)
-        elif self.inv.get_item().id == 3:
-            rect = pygame.Rect(150,0, 50,50)
-        elif self.inv.get_item().id == 4:
-            rect = pygame.Rect(0,50, 50,50)
+        if self.inv.get_item().id%5 !=0 and self.inv.get_item().id < 30:
+            rect = pygame.Rect((self.inv.get_item().id%5)*50-50,(self.inv.get_item().id/5)*50+50, 50,50)
         elif self.inv.get_item().id == 0:
             if self.inv.get_item().bloc.picture == 13:
-                rect = pygame.Rect(50,50, 50,50)
+                rect = pygame.Rect(50,0, 50,50)
+        """if self.inv.get_item().id == 1:
+            rect = pygame.Rect(0,50, 50,50)
+        elif self.inv.get_item().id == 2:
+            rect = pygame.Rect(50,50, 50,50)
+        elif self.inv.get_item().id == 3:
+            rect = pygame.Rect(100,50, 50,50)
+        elif self.inv.get_item().id == 4:
+            rect = pygame.Rect(150,50, 50,50)
+        elif self.inv.get_item().id == 6:
+            rect = pygame.Rect(150,50, 50,50)"""
+
         image.blit(const.sprite_arm, (0,0), rect)
         if self.angle_arm != 0:
 
@@ -121,7 +121,30 @@ class Perso(Element):
         image.blit(const.sprite_perso, (0,0), rect)
         if not self.sens:
             image = pygame.transform.flip(image, True, False)
+
+        if self.vie <= 0:
+            ecart_mod = 0.4
+            coef = 1
+            ecart = time() -self.last_dommage
+            if ecart < 0.1:
+                rect = pygame.Rect(50,0, 50,50)
+            elif ecart < 0.2:
+                rect = pygame.Rect(50,50, 50,50)
+            elif ecart < 0.3:
+                rect = pygame.Rect(50,100, 50,50)
+            else:
+                rect = pygame.Rect(50,150, 50,50)
+            image = copy.copy(const.vide)
+            image.blit(const.sprite_degats, (0,0), rect)
+
+        
         self.changer_image(image)
+
+        # Uranium
+        if self.inv.get_item().id in [26,27,28,29,30]:
+            if time()-self.last_dommage_ur > 15:
+                self.subir_degats(1)
+                self.last_dommage_ur = time()
         
     def hit(self):
         if self.angle_arm == 0:
@@ -254,28 +277,33 @@ class Perso(Element):
                             self.map = i.target 
                         self.id_porte = i.id
                     elif type == Terre:
-                        if (self.inv.get_item().id == 2 or self.inv.get_item().id == 1) and not self.inv.isfull(i):
+                        if (self.inv.get_item().id in [1,2,7,12,17,22,27]) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
                     elif type == Stone:
-                        if (self.inv.get_item().id == 3 or (self.inv.get_item().id == 1 and not isinstance(i, Forge) )) and not self.inv.isfull(i):
+                        if (self.inv.get_item().id in [3,8,13,18,23,28] or (self.inv.get_item().id == 1 and not isinstance(i, Forge) and not isinstance(i, Furnace) )) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
-                                self.inv.add(i)
+                                if isinstance(i, Coal):
+                                    self.inv.add(Item(34, 4))
+                                else:
+                                    self.inv.add(i)
                                 map.remove(i)
                         elif isinstance(i, Forge):
                             atelier(app, self, "Forge")
+                        elif isinstance(i, Furnace):
+                            atelier(app, self, "Furnace", i)
                     elif type == Wood:
-                        if (self.inv.get_item().id == 4 or (self.inv.get_item().id == 1 and not isinstance(i, Atelier) and not isinstance(i, Coffre))) and not self.inv.isfull(i):
+                        if (self.inv.get_item().id in [4,9,14,19,24,29] or (self.inv.get_item().id == 1 and not isinstance(i, Atelier) and not isinstance(i, Coffre))) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
                         elif isinstance(i, Atelier):
                             atelier(app, self, "Workbench")
                         elif isinstance(i, Coffre):
-                            print "Coffre"
+                            atelier(app, self, "Chest", i)
                     elif type == Deco:
-                        if (self.inv.get_item().id == 2 or self.inv.get_item().id == 3 or self.inv.get_item().id == 4) and not self.inv.isfull(i):
+                        if (self.inv.get_item().id in [2,3,4,7,8,9,12,13,14,17,18,19,22,23,24,27,28,29]) and not self.inv.isfull(i):
                             self.inv.add(i)
                             map.remove(i)
                     return True
@@ -292,16 +320,20 @@ class Perso(Element):
 
     def collided_mob(self, dep_x, dep_y, mob):
         future_rect = pygame.Rect(self.rect)
-        future_rect.width = 50
-        future_rect.height = 50
-        future_rect = future_rect.move(-future_rect.x+self.x+dep_x,-future_rect.y+self.y+dep_y)
+        future_rect.width = 100
+        future_rect.height = 100
+        if self.sens:
+            future_rect = future_rect.move(-future_rect.x+self.x+dep_x,-future_rect.y+self.y+dep_y-50)
+        else:
+            future_rect = future_rect.move(-future_rect.x+self.x+dep_x-50,-future_rect.y+self.y+dep_y-50)
         # Vérification pour chaques mobs
+        collided = False
         for i in mob:
             if future_rect.colliderect(i.rect):
                 i.subir_degats(self.inv.get_item().atk)
-                return True
+                collided = True
 
-        return False
+        return collided
 
 
 

@@ -15,11 +15,23 @@ class Mob(Element):
     def __init__(self, id):
         Element.__init__(self)
         self.id = id
-        self.vie = 10
-        self.atk = 1
+        if id == 0:
+            self.vie = 20
+            self.atk = 1
+            self.vitesse = 1
+        if id == 1:
+            self.vie = 10
+            self.atk = 1
+            self.vitesse = 1
+        if id == 2:
+            self.vie = 10
+            self.atk = 1
+            self.vitesse = 2
+
         self.sens = True
         self.changement = 0
         self.rang_image = 0
+        self.last_degats = 0
 
 
 
@@ -35,13 +47,13 @@ class Mob(Element):
         if self.vie > 0:
             self.tomber(map)
             if self.sens:
-                if self.move(1, 0, map) != True:
+                if self.move(self.vitesse, 0, map) != True:
                     if random.randint(0,3) == 0 and not self.isingrav:
                         self.sens = False
                     else:
                         self.sauter(-10)
             elif not self.sens:
-                if self.move(-1, 0, map) != True:
+                if self.move(-self.vitesse, 0, map) != True:
                     if random.randint(0,3) == 0 and not self.isingrav:
                         self.sens = True
                     else:
@@ -53,6 +65,7 @@ class Mob(Element):
         if (self.vie > 0):
             self.vie = self.vie - degat
             self.sauter(-5)
+            self.last_degats = time()
             return True
         if (self.vie <= 0):
             return False
@@ -60,7 +73,7 @@ class Mob(Element):
 
     def anim(self):
         image = copy.copy(const.vide)
-        rect = pygame.Rect(self.rang_image*50,0, 50,50)
+        rect = pygame.Rect(self.rang_image*50,self.id*50, 50,50)
 
         if time() - self.changement > 0.1 and not self.isingrav:
             self.changement = time()
@@ -68,13 +81,28 @@ class Mob(Element):
                 self.rang_image += 1
             else:
                 self.rang_image = 0
-            rect = pygame.Rect(self.rang_image*50,0, 50,50)
+            rect = pygame.Rect(self.rang_image*50,self.id*50, 50,50)
         elif self.isingrav:
-            rect = pygame.Rect(100, 0, 50,50)
+            rect = pygame.Rect(100, self.id*50, 50,50)
         
         image.blit(const.sprite_mobs, (0,0), rect)
         if not self.sens:
             image = pygame.transform.flip(image, True, False)
+
+
+        ecart_mod = 0.2
+        ecart = time() -self.last_degats
+        if ecart < ecart_mod:
+            if ecart < 0.05:
+                rect = pygame.Rect(50,0, 50,50)
+            elif ecart < 0.1:
+                rect = pygame.Rect(50,50, 50,50)
+            elif ecart < 0.15:
+                rect = pygame.Rect(50,100, 50,50)
+            else:
+                rect = pygame.Rect(50,150, 50,50)
+            image.blit(const.sprite_degats, (0,0), rect)
+                
         self.changer_image(image)
 
 
@@ -100,18 +128,22 @@ class Mob(Element):
 
     def move(self, x, y, map):
         if self.collided_map(x, y, map) == False:
-            if self.y+y < 550: 
-                self.move_el(0,y)
-            else:
-                self.move_el(0, 550-self.y)
-                
             if self.x + x > 0 and self.x +x < 750:
                 self.move_el(x,0)
             else:
                 return False
+
+            if self.y+y < 550: 
+                self.move_el(0,y)
+            else:
+                self.move_el(0, 550-self.y)
+                return False
+                
+
             return True
+        else:
+            return False
         
-        return False
 
     def collided_map(self, dep_x, dep_y, map):
         future_rect = pygame.Rect(self.rect)
@@ -138,7 +170,7 @@ class Mob(Element):
                     if (i.etat):
                         collided=True
                 elif isinstance(i, BlocDanger):
-                    if i.atk >= self.vie:
+                    if i.atk >= 10:
                         self.subir_degats(i.atk)
                     collided=True
                 elif not isinstance(i, Porte) and not isinstance(i, Echelle) and not isinstance(i, Deco):

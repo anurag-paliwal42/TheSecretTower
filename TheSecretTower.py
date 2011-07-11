@@ -11,7 +11,7 @@
 #                                              # 
 ################################################
 
-# www.thesecrettower.net
+# www.secrettower.net
 
 
 # App
