@@ -134,8 +134,6 @@ class App:
         partie = [nom, 0, 0]
         self.perso.inv.empty()
         self.perso.inv.add(Item(1,1))
-        self.perso.inv.add(Item(6,1))
-        self.perso.inv.add(Item(7,1))
         # Copie map std
         i = 0
 

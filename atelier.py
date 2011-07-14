@@ -353,11 +353,12 @@ def atelier(app, perso, type, chest = None):
     title_craft2.changer_text("", app.font)
     title_craft2.move_el(560, 335)
 
-    if type != "Chest":
+    if type != "Chest" and type != "Furnace":
         description = write(app, "(p) : Put down the item \n      for crafting\n(c) : Craft\n(x) : Cancel\n(ESQ): Resume", 20, 380)
-    else:
+    elif type == "Chest":
         description = write(app, "(p) : Swap the Item\n(TAB) : Switch the cursor\n(ESQ): Resume", 20, 380)
-    
+    elif type == "Furnace":
+        description = write(app, "(p) : Put down the item \n      for crafting\n(b) : Use as fuel\n(c) : Craft\n(x) : Cancel\n(ESQ): Resume", 20, 380)
     # depot
     if type != "Chest":
         depot = Inventaire(2)

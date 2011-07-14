@@ -82,7 +82,7 @@ def open_map(path):
                 map.append(bloc)
             # Forge
             elif pbloc[0] == 12:
-                bloc = Echelle(pbloc[1])
+                bloc = Forge(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
             # Torch
