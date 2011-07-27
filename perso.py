@@ -261,7 +261,7 @@ class Perso(Element):
         return collided
 
 
-    def collided_type(self, dep_x, dep_y, map, type, app=0, shadow=0):
+    def collided_type(self, dep_x, dep_y, map, type, app=0, input=[]):
         future_rect = pygame.Rect(self.rect)
         future_rect = future_rect.move(dep_x, dep_y)
         # Vérification pour chaques éléments de la map
@@ -291,8 +291,10 @@ class Perso(Element):
                                 map.remove(i)
                         elif isinstance(i, Forge):
                             atelier(app, self, "Forge")
+                            input = [0 for i in input]
                         elif isinstance(i, Furnace):
                             atelier(app, self, "Furnace", i)
+                            input = [0 for i in input]
                     elif type == Wood:
                         if (self.inv.get_item().id in [4,9,14,19,24,29] or (self.inv.get_item().id == 1 and not isinstance(i, Atelier) and not isinstance(i, Coffre))) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
@@ -300,8 +302,11 @@ class Perso(Element):
                                 map.remove(i)
                         elif isinstance(i, Atelier):
                             atelier(app, self, "Workbench")
+                            input = [0 for i in input]
+                            input[K_z] = 0
                         elif isinstance(i, Coffre):
                             atelier(app, self, "Chest", i)
+                            input = [0 for i in input]
                     elif type == Deco:
                         if (self.inv.get_item().id in [2,3,4,7,8,9,12,13,14,17,18,19,22,23,24,27,28,29]) and not self.inv.isfull(i):
                             self.inv.add(i)

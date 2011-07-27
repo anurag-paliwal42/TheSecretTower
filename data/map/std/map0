@@ -85,5 +85,7 @@
 1,6,150,450
 1,6,150,500
 1,6,350,500
-22,22,250,500, Congratulations !/n/n-The Fallen King
+22,22,250,500, Congratulations !/nNow open your invenory with (i)/nThen try to craft a workbench/nwith 2 woods/n/n-The Fallen King
 1,1,200,300
+22,22,400,500, Take your Workbench with (e) or (r)/nthen put it on the floor with (z)/nAfter you could use it to craft another items/n/n-The Fallen King
+22,22,600,300, Try to build a forge/nPut 2 stones on the workbench/nYou can use a forge to craft utils/nFor example put 2 sticks and 1 stone/non the forge/n/n-The Fallen King

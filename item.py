@@ -157,6 +157,10 @@ class Inventaire():
                         bloc = Torch(13)
                     elif param[1] == 15:
                         bloc = Furnace(23)
+                    elif param[1] == 16:
+                        bloc = Tin(20)
+                    elif param[1] == 17:
+                        bloc = Uranium(21)
                     new_item = Item_Bloc(bloc)
 
                     new_item.nbr = param[2]
@@ -201,6 +205,10 @@ class Inventaire():
                     buffer += "13"
                 elif i.type == Furnace:
                     buffer += "15"
+                elif i.type == Tin:
+                    buffer += "16"
+                elif i.type == Uranium:
+                    buffer += "17"
 
             else:
                 buffer += str(i.id)

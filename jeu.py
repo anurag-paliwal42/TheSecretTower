@@ -171,8 +171,8 @@ def jeu(app, map, perso):
             else:
                 s=1
             perso.collided_type(s*10,0,map,Terre)
-            perso.collided_type(s*10,0,map,Stone, app)
-            perso.collided_type(s*10,0,map,Wood, app)
+            perso.collided_type(s*10,0,map,Stone, app, input)
+            perso.collided_type(s*10,0,map,Wood, app, input)
             if perso.collided_type(s*10, 0, map, Deco, app):
                 shadow_new = []
                 for x in range(16):
@@ -254,7 +254,7 @@ def jeu(app, map, perso):
                                 perso.inv.delete()
                             
             if input[K_DOWN]:
-                if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone, app) or perso.collided_type(0,10,map,Wood, app)):
+                if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone, app, input) or perso.collided_type(0,10,map,Wood, app, input)):
                     if isinstance(perso.inv.get_item(), Item_Bloc):
                         bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
                         bloc.move_el(-bloc.x+50*int((perso.x+10)/50), -bloc.y+50*int((perso.y+75)/50))
@@ -297,12 +297,12 @@ def jeu(app, map, perso):
 
             if input[K_UP]:
                 if not perso.collided_type(0,-50,map,Terre):
-                    if not perso.collided_type(0,-50,map,Stone, app):
-                        perso.collided_type(0,-50,map,Wood, app)
+                    if not perso.collided_type(0,-50,map,Stone, app, input):
+                        perso.collided_type(0,-50,map,Wood, app, input)
 
 
-            input[K_z] = 0
-            input[K_w] = 0
+            #input[K_z] = 0
+            #input[K_w] = 0
 
 
         if (input[K_e]):
