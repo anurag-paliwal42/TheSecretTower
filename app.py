@@ -22,7 +22,6 @@ from editeur import *
 
 # Constante
 import const
-
 class App:
     """ Classe définissant l'application The Secret Tower"""
 
@@ -59,15 +58,15 @@ class App:
     def main(self):
         cmd = 1
         while cmd:
-            cmd =  menu(self, "Main Menu", ["New Game", "Load Game", "Load Level","Edit Level", "Quitter"])
+            cmd =  menu(self, "Main Menu", ["New Game", "Load Game", "Load Level","Edit Level", "Quit"])
             
             if cmd == 1 or cmd == 2:
                 if cmd == 1:
                     self.perso = Perso()
                     self.partie = []
-                    self.partie = self.nouvelle_partie(ask(self, "Nom de la partie : "))
+                    self.partie = self.nouvelle_partie(ask(self, "New Game] Game's name : "))
                 elif cmd == 2:
-                    self.partie = self.charger_partie(ask(self, "Nom de la partie : "))
+                    self.partie = self.charger_partie(ask(self, "Load Game] Game's name : "))
                 
                 self.perso.map = self.partie[1]
                 self.perso.id = self.partie[2]
@@ -83,15 +82,16 @@ class App:
             elif cmd == 3:
                 self.partie = ["Gen", 0]
                 self.perso.map = 0
-                cmd = jeu(self, open_map("map/custom/" + ask(self, "Entrez le nom de la map :")), self.perso)
+                cmd = jeu(self, open_map("map/custom/" + ask(self, "Load Level] Level's name :")), self.perso)
             elif cmd == 4:
                 self.partie = ["Gen", 0]
                 self.perso.map = 0
                 cmd = menu(self, "Edit Level", ["New level", "Load level"])
                 if cmd == 1:
-                    cmd = editeur(self, [])
+                    cmd = editeur(self, [], "Unnamed")
                 elif cmd == 2:
-                    cmd = editeur(self, open_map("map/custom/"+ask(self, "Entrez le nom de la map :")))
+                    nom = ask(self, "Edit Level] Level's name :")
+                    cmd = editeur(self, open_map("map/custom/"+nom), nom)
 
         pygame.quit()
         print "Merci d'avoir joué !"
@@ -137,13 +137,21 @@ class App:
         # Copie map std
         i = 0
 
-        if not os.path.isdir("data/save/{0}/".format(nom)):
-            os.mkdir("data/save/{0}/".format(nom))
-        else:
-            for entry in os.listdir("data/save/"+nom+"/"):
-                os.remove("data/save/"+nom+"/"+entry)
-            os.rmdir("data/save/"+nom+"/")
-            os.mkdir("data/save/{0}/".format(nom))
+        while True:
+            if not os.path.isdir("data/save/"):
+                os.mkdir("data/save/")
+            if not os.path.isdir("data/save/{0}/".format(nom)):
+                os.mkdir("data/save/{0}/".format(nom))
+                break
+            elif menu(self, "/!\ Warning : Erase existing game ?", ["Yes", "No"]) == 1:
+                for entry in os.listdir("data/save/"+nom+"/"):
+                    os.remove("data/save/"+nom+"/"+entry)
+                os.rmdir("data/save/"+nom+"/")
+                os.mkdir("data/save/{0}/".format(nom))
+                break
+            else:
+                nom = ask(self, "New Game] Game's name : ")
+                
        
         while open_map("map/std/map{0}".format(i)) != []:
             save_map("save/{0}/map{1}".format(nom,i),open_map("map/std/map{0}".format(i)))

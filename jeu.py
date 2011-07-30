@@ -96,9 +96,10 @@ def jeu(app, map, perso):
     imgversion.move_el(0, 0)
     
     fps= 0
-    imgfps = Element()
-    imgfps.changer_text("FPS : " + str(fps), app.font)
-    imgfps.move_el(0, 30)
+    info_b_txt = []
+    info_b_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 4, 4)
+    info_w_txt = []
+    info_w_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 0, 0, (255,255,255))
 
     commandes =  "(a) : Jump\n(z) : Use\n(e/r) : Scroll inventory\n(i) : Inventory \n(v) : Change View\n(ESC) : Break"
     b_commandes = []
@@ -117,7 +118,10 @@ def jeu(app, map, perso):
         while fps > const.fps: 
             fps = int(1/(time() - prev))
 
-        imgfps.changer_text("FPS : " +str(fps), app.font)
+        info_b_txt = []
+        info_b_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 4, 4)
+        info_w_txt = []
+        info_w_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 0, 0, (255,255,255))
         prev = time()
 
         b_text_item.changer_text(perso.inv.get_item().nom, app.font_petit)
@@ -162,7 +166,11 @@ def jeu(app, map, perso):
             input[K_a] = 0
             input[K_q] = 0
 
-        if (input[K_z] or  input[K_w]) and  perso.vie > 0:
+        if input[K_UP]:
+            perso.collided_type(0,0,map,Porte)
+
+        if (input[K_z] or  input[K_w]) and  perso.vie > 0 and time()-perso.last_hit > 0.3:
+
             perso.hit()
 
             #Destruction bloc + atk
@@ -209,49 +217,49 @@ def jeu(app, map, perso):
 
             if not input[K_DOWN] and not input[K_UP]:
                 # Placement bloc
-                if not perso.collided_type(0,0,map,Porte):
-                    if isinstance(perso.inv.get_item(), Item_Bloc):
-                        bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
-                        if perso.sens:
-                            bloc.move_el(-bloc.x+50*int((perso.x+75)/50), -bloc.y+50*int((perso.y+25)/50))
-                        if perso.sens == False:
-                            bloc.move_el(-bloc.x+50*int((perso.x-50)/50), -bloc.y+50*int((perso.y+10)/50))
-                        if not perso.collided_bloc(0,0, bloc):
-                            collided = False
-                            for i in map:
-                                if i.x == bloc.x and i.y == bloc.y:
-                                    collided = True
 
-                            if not collided:
-                                map.append(bloc) 
-                                if isinstance(bloc, Deco):
-                                    shadow_new = []
-                                    for x in range(16):
-                                        for y in range(12):
-                                            alpha = 0
-                                            for i in shadow:
-                                                if i.x == x*50 and i.y == y*50:
-                                                    alpha = i.image.get_alpha()
-                                            dark = Element()
-                                            dark.changer_image(pygame.Surface((50, 50)))
-                                            dark.move_el(x*50,y*50)
-                                            if alpha == 75:
+                if isinstance(perso.inv.get_item(), Item_Bloc):
+                    bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
+                    if perso.sens:
+                        bloc.move_el(-bloc.x+50*int((perso.x+75)/50), -bloc.y+50*int((perso.y+25)/50))
+                    if perso.sens == False:
+                        bloc.move_el(-bloc.x+50*int((perso.x-50)/50), -bloc.y+50*int((perso.y+10)/50))
+                    if not perso.collided_bloc(0,0, bloc):
+                        collided = False
+                        for i in map:
+                            if i.x == bloc.x and i.y == bloc.y:
+                                collided = True
+
+                        if not collided:
+                            map.append(bloc) 
+                            if isinstance(bloc, Deco):
+                                shadow_new = []
+                                for x in range(16):
+                                    for y in range(12):
+                                        alpha = 0
+                                        for i in shadow:
+                                            if i.x == x*50 and i.y == y*50:
+                                                alpha = i.image.get_alpha()
+                                        dark = Element()
+                                        dark.changer_image(pygame.Surface((50, 50)))
+                                        dark.move_el(x*50,y*50)
+                                        if alpha == 75:
+                                            dark.image.set_alpha(75)
+                                        delete = False
+                                        for i in map:
+                                            intens = 0
+                                            if i.picture == 2:
+                                                intens = 4
+                                            if i.picture == 13:
+                                                intens = 6
+                                            if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
+                                                delete = True
+                                            elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
                                                 dark.image.set_alpha(75)
-                                            delete = False
-                                            for i in map:
-                                                intens = 0
-                                                if i.picture == 2:
-                                                    intens = 4
-                                                if i.picture == 13:
-                                                    intens = 6
-                                                if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
-                                                    delete = True
-                                                elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
-                                                    dark.image.set_alpha(75)
-                                            if delete == False:
-                                                shadow_new.append(dark)
-                                    shadow = shadow_new
-                                perso.inv.delete()
+                                        if delete == False:
+                                            shadow_new.append(dark)
+                                shadow = shadow_new
+                            perso.inv.delete()
                             
             if input[K_DOWN]:
                 if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone, app, input) or perso.collided_type(0,10,map,Wood, app, input)):
@@ -343,9 +351,9 @@ def jeu(app, map, perso):
         if input[K_ESCAPE]:
             input[K_ESCAPE] = 0
             if app.partie[0] != "Gen":
-                cmd = menu(app, "Pause", ["Reprendre", "Sauvegarder", "Quitter"])
+                cmd = menu(app, "Break", ["Resume", "Save game", "Quit"])
             else:
-                 cmd = menu(app, "Pause", ["Reprendre", "Quitter"])
+                 cmd = menu(app, "Break", ["Resume", "Quit"])
             if cmd == 2:
                 app.save_partie()
                 save_map("save/{0}/map{1}".format(app.partie[0], app.partie[1]), map)
@@ -415,8 +423,10 @@ def jeu(app, map, perso):
         app.blit(b_text_item2)
         app.blit(w_text_item)
         app.blit(w_text_item2)
-        app.blit(imgversion)
-        app.blit(imgfps)
+        for i in info_b_txt:
+            app.blit(i)
+        for i in info_w_txt:
+            app.blit(i)
 
         if input[K_TAB]:
             for i in b_commandes:

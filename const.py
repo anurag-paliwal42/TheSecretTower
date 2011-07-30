@@ -7,7 +7,7 @@ from pygame.locals import *
 
 """Constantes du jeu The Scret of Tower"""
 
-version = "Alpha"
+version = "Beta 0.0.1"
 
 # Constante de fps
 fps = 40

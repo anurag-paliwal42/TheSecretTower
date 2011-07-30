@@ -30,6 +30,7 @@ class Perso(Element):
         self.vie = 6
         self.last_dommage = time()
         self.last_dommage_ur = time()
+        self.last_hit = 0
         self.inv = Inventaire()
         item = Item(1, 1)
         self.inv.add(item)
@@ -92,16 +93,8 @@ class Perso(Element):
                 else:
                     self.angle_arm = 0
                 self.changement_angle = time()
-
-
-            
-            
-
-        
         # corps
-
         rect = pygame.Rect(self.rang_image*50,0, 50,50)
-
         if time() - self.changement > 0.1 and etat and not self.isingrav:
             self.changement = time()
             if self.rang_image < 2:
@@ -109,19 +102,13 @@ class Perso(Element):
             else:
                 self.rang_image = 0
             rect = pygame.Rect(self.rang_image*50,0, 50,50)
- 
         elif not etat:
             rect = pygame.Rect(0,0, 50,50)
         elif self.isingrav:
             rect = pygame.Rect(100,0, 50,50)
-        
-            
-
-
         image.blit(const.sprite_perso, (0,0), rect)
         if not self.sens:
             image = pygame.transform.flip(image, True, False)
-
         if self.vie <= 0:
             ecart_mod = 0.4
             coef = 1
@@ -147,6 +134,7 @@ class Perso(Element):
                 self.last_dommage_ur = time()
         
     def hit(self):
+        self.last_hit = time()
         if self.angle_arm == 0:
             if self.sens:
                 self.angle_arm = 70
@@ -261,7 +249,7 @@ class Perso(Element):
         return collided
 
 
-    def collided_type(self, dep_x, dep_y, map, type, app=0, input=[]):
+    def collided_type(self, dep_x, dep_y, map, type, app=0, input=0):
         future_rect = pygame.Rect(self.rect)
         future_rect = future_rect.move(dep_x, dep_y)
         # Vérification pour chaques éléments de la map
@@ -291,10 +279,16 @@ class Perso(Element):
                                 map.remove(i)
                         elif isinstance(i, Forge):
                             atelier(app, self, "Forge")
-                            input = [0 for i in input]
+                            input[K_z] = 0
+                            input[K_w] = 0
+                            input[K_LEFT] = 0
+                            input[K_RIGHT] = 0
                         elif isinstance(i, Furnace):
                             atelier(app, self, "Furnace", i)
-                            input = [0 for i in input]
+                            input[K_z] = 0
+                            input[K_w] = 0
+                            input[K_LEFT] = 0
+                            input[K_RIGHT] = 0
                     elif type == Wood:
                         if (self.inv.get_item().id in [4,9,14,19,24,29] or (self.inv.get_item().id == 1 and not isinstance(i, Atelier) and not isinstance(i, Coffre))) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
@@ -302,11 +296,16 @@ class Perso(Element):
                                 map.remove(i)
                         elif isinstance(i, Atelier):
                             atelier(app, self, "Workbench")
-                            input = [0 for i in input]
                             input[K_z] = 0
+                            input[K_w] = 0
+                            input[K_LEFT] = 0
+                            input[K_RIGHT] = 0
                         elif isinstance(i, Coffre):
                             atelier(app, self, "Chest", i)
-                            input = [0 for i in input]
+                            input[K_z] = 0
+                            input[K_w] = 0
+                            input[K_LEFT] = 0
+                            input[K_RIGHT] = 0
                     elif type == Deco:
                         if (self.inv.get_item().id in [2,3,4,7,8,9,12,13,14,17,18,19,22,23,24,27,28,29]) and not self.inv.isfull(i):
                             self.inv.add(i)

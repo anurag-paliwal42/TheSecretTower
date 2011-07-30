@@ -60,7 +60,7 @@ def menu(app, ptitle, pmenu):
                 cmd = cmd + 1
             input[K_DOWN] = 0
         if input[K_SPACE] or input[K_RETURN]:
-            if pmenu[cmd-1] == "Quitter":
+            if pmenu[cmd-1] == "Quit":
                 return 0
             return cmd
         

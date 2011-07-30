@@ -11,7 +11,7 @@ from menu import *
 from jeu import *
 import const
 
-def editeur(app, map):
+def editeur(app, map, nom):
 
     input = range(0, 1000, 1)
 
@@ -24,9 +24,10 @@ def editeur(app, map):
     select = Element()
     select.changer_image(pygame.image.load("img/select.png").convert_alpha())
     select.move_el(0,0)
-    coord = Element()
-    coord.changer_text("("+str(select.x)+";"+str(select.y)+")", app.font)
-    coord.move_el(0,0)
+    b_txt = []
+    b_txt = write(app, "("+str(select.x)+";"+str(select.y)+")", 0, 0)
+    w_txt = []
+    w_txt = write(app, "("+str(select.x)+";"+str(select.y)+")", 0, 0, (255,255,255))
     cmd = 1
 
     while cmd<>0: 
@@ -127,23 +128,33 @@ def editeur(app, map):
                     map.remove(i)
         if input[K_ESCAPE]:
             input[K_ESCAPE] = 0
-            cmd = menu(app, "Editeur de map", ["Sauvegarder", "Charger","Tester", "Quitter"])
-            if cmd == 1:
-                save_map("map/custom/"+ask(app, "Sauvegarder la map :"), map)
-            elif cmd == 2:
-                map = open_map("map/custom/"+ask(app,"Entrez le nom de la map : "))
-                cmd =1
+            cmd = menu(app, "Edit Level", ["Save Level","Save Level as", "Load Level","Try Level", "Quit"])
+            if cmd == 2:
+                nom = ask(app, "Save as :")
+            if cmd == 2 or cmd == 1:
+                save_map("map/custom/"+nom, map)
             elif cmd == 3:
+                nom = ask(app,"Load Level] Level's name : ")
+                map = open_map("map/custom/"+nom)
+                cmd =1
+            elif cmd == 4:
                 jeu(app, map, app.perso)
             elif cmd == 0:
                 return 5
             
-        coord.changer_text("("+str(select.x)+";"+str(select.y)+")", app.font)
+        b_txt = []
+        b_txt = write(app, "("+str(select.x)+";"+str(select.y)+")\n"+nom, 0, 0)
+        w_txt = []
+        w_txt = write(app, "("+str(select.x)+";"+str(select.y)+")\n"+nom, 2, 2, (255,255,255))
         app.blit(fond)
         for i in map:
             app.blit(i)
         app.blit(select)
-        app.blit(coord)
+        for i in w_txt:
+            app.blit(i)
+        for i in b_txt:
+            app.blit(i)
+
         app.flip()
 
     return cmd

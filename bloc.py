@@ -17,7 +17,7 @@ class Bloc(Element):
 
     def __init__(self, picture):
         Element.__init__(self)
-        self.vie = 20
+        self.vie = 5
         self.last = time()
         self.picture = picture
         self.set_image()
@@ -142,8 +142,8 @@ class Bloc(Element):
             image.blit(const.sprite_bloc, (0,0), rect)
         
         # Damage
-        if self.vie != 20:
-            rect = pygame.Rect(0,int(4-self.vie/4)*50, 50,50)
+        if self.vie != 5:
+            rect = pygame.Rect(0,int(4-self.vie)*50, 50,50)
             image.blit(const.sprite_degats, (0,0), rect)
         self.changer_image(image)
     

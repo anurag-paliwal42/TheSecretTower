@@ -1,6 +1,7 @@
 #-*-coding:Utf-8 -*
 # Auteur : Pierre Surply
 
+import os
 from bloc import *
 from item import *
 
@@ -148,6 +149,8 @@ def open_map(path):
         return map
 
 def save_map(nom, map):
+    if not os.path.isdir("data/map/custom/"):
+        os.mkdir("data/map/custom/")
     file = open("data/"+nom, "w")
     tampon = ""
     for i in map:
