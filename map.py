@@ -148,6 +148,8 @@ def open_map(path):
     finally:
         return map
 
+    
+
 def save_map(nom, map):
     if not os.path.isdir("data/map/custom/"):
         os.mkdir("data/map/custom/")
