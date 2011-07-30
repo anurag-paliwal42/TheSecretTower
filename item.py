@@ -1,3 +1,5 @@
+#-*-coding:Utf-8 -*
+
 #    TheSecretTower
 #    Copyright (C) 2011 Pierre SURPLY
 #
@@ -16,7 +18,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with TheSecretTower.  If not, see <http://www.gnu.org/licenses/>.
 
-#-*-coding:Utf-8 -*
 # Auteur : Pierre Surply
 
 from bloc import *
