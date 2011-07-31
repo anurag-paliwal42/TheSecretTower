@@ -49,8 +49,8 @@ class App:
         pygame.init()
         
         # création de la fenetre
-        self.size = [800, 600]
-        self.fenetre = pygame.display.set_mode((self.size[0], self.size[1]), pygame.DOUBLEBUF)
+        self.size = (800, 600)
+        self.fenetre = pygame.display.set_mode(self.size, pygame.DOUBLEBUF)
         pygame.display.set_icon(pygame.image.load("img/perso_small.png").convert_alpha())
         pygame.display.set_caption(const.fenetre_titre)
 

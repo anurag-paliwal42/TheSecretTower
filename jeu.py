@@ -37,10 +37,8 @@ from pygame.locals import *
 
 
 def jeu(app, map, perso):
-    input = range(0, 1000, 1)
 
-    for i in range(len(input)):
-        input[i] = 0
+    input = [0]*1000
 
     for i in map:
         if isinstance(i, Porte):

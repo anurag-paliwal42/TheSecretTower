@@ -31,10 +31,7 @@ import event
 
 def menu(app, ptitle, pmenu):
 
-    input = range(0, 1000, 1)
-
-    for i in range(len(input)):
-        input[i] = 0
+    input = [0]*1000
 
     fond_menu = element.Element()
     fond_menu.changer_image(pygame.image.load(const.path_fond_menu).convert())
@@ -115,10 +112,7 @@ def menu(app, ptitle, pmenu):
 
 def ask(app, ptitle):
     
-    input = range(0, 1000, 1)
-
-    for i in range(len(input)):
-        input[i] = 0
+    input = [0]*1000
 
     fond_menu = element.Element()
     fond_menu.changer_image(pygame.image.load(const.path_fond_menu).convert())
@@ -141,142 +135,142 @@ def ask(app, ptitle):
     while 1:
         event.update_event(input, app)
         if input[K_a]:
-            preponse = preponse+"a"
+            preponse += "a"
             input[K_a] = 0
         elif input[K_z]:
-            preponse = preponse+"z"
+            preponse +="z"
             input[K_z] = 0
         elif input[K_e]:
-            preponse = preponse+"e"
+            preponse +="e"
             input[K_e] = 0
         elif input[K_r]:
-            preponse = preponse+"r"
+            preponse += "r"
             input[K_r] = 0
         elif input[K_t]:
-            preponse = preponse+"t"
+            preponse += "t"
             input[K_t] = 0
         elif input[K_y]:
-            preponse = preponse+"y"
+            preponse += "y"
             input[K_y] = 0
         elif input[K_u]:
-            preponse = preponse+"u"
+            preponse += "u"
             input[K_u] = 0
         elif input[K_i]:
-            preponse = preponse+"i"
+            preponse += "i"
             input[K_i] = 0
         elif input[K_o]:
-            preponse = preponse+"o"
+            preponse += "o"
             input[K_o] = 0
         elif input[K_p]:
-            preponse = preponse+"p"
+            preponse += "p"
             input[K_p] = 0
         elif input[K_q]:
-            preponse = preponse+"q"
+            preponse += "q"
             input[K_q] = 0
         elif input[K_s]:
-            preponse = preponse+"s"
+            preponse += "s"
             input[K_s] = 0
         elif input[K_d]:
-            preponse = preponse+"d"
+            preponse += "d"
             input[K_d] = 0
         elif input[K_f]:
-            preponse = preponse+"f"
+            preponse += "f"
             input[K_f] = 0
         elif input[K_g]:
-            preponse = preponse+"g"
+            preponse += "g"
             input[K_g] = 0
         elif input[K_h]:
-            preponse = preponse+"h"
+            preponse += "h"
             input[K_h] = 0
         elif input[K_j]:
-            preponse = preponse+"j"
+            preponse += "j"
             input[K_j] = 0
         elif input[K_k]:
-            preponse = preponse+"k"
+            preponse += "k"
             input[K_k] = 0
         elif input[K_l]:
-            preponse = preponse+"l"
+            preponse += "l"
             input[K_l] = 0
         elif input[K_m]:
-            preponse = preponse+"m"
+            preponse += "m"
             input[K_m] = 0
         elif input[K_w]:
-            preponse = preponse+"w"
+            preponse += "w"
             input[K_w] = 0
         elif input[K_x]:
-            preponse = preponse+"x"
+            preponse += "x"
             input[K_x] = 0
         elif input[K_c]:
-            preponse = preponse+"c"
+            preponse += "c"
             input[K_c] = 0
         elif input[K_v]:
-            preponse = preponse+"v"
+            preponse += "v"
             input[K_v] = 0
         elif input[K_b]:
-            preponse = preponse+"b"
+            preponse += "b"
             input[K_b] = 0
         elif input[K_n]:
-            preponse = preponse+"n"
+            preponse += "n"
             input[K_n] = 0
         elif input[K_KP0]:
-            preponse = preponse+"0"
+            preponse += "0"
             input[K_KP0] = 0
         elif input[K_KP1]:
-            preponse = preponse+"1"
+            preponse += "1"
             input[K_KP1] = 0
         elif input[K_KP2]:
-            preponse = preponse+"2"
+            preponse += "2"
             input[K_KP2] = 0
         elif input[K_KP3]:
-            preponse = preponse+"3"
+            preponse += "3"
             input[K_KP3] = 0
         elif input[K_KP4]:
-            preponse = preponse+"4"
+            preponse += "4"
             input[K_KP4] = 0
         elif input[K_KP5]:
-            preponse = preponse+"5"
+            preponse += "5"
             input[K_KP5] = 0
         elif input[K_KP6]:
-            preponse = preponse+"6"
+            preponse += "6"
             input[K_KP6] = 0
         elif input[K_KP7]:
-            preponse = preponse+"7"
+            preponse += "7"
             input[K_KP7] = 0
         elif input[K_KP8]:
-            preponse = preponse+"8"
+            preponse += "8"
             input[K_KP8] = 0
         elif input[K_KP9]:
-            preponse = preponse+"9"
+            preponse += "9"
             input[K_KP9] = 0
         elif input[K_0]:
-            preponse = preponse+"0"
+            preponse += "0"
             input[K_0] = 0
         elif input[K_1]:
-            preponse = preponse+"1"
+            preponse += "1"
             input[K_1] = 0
         elif input[K_2]:
-            preponse = preponse+"2"
+            preponse += "2"
             input[K_2] = 0
         elif input[K_3]:
-            preponse = preponse+"3"
+            preponse += "3"
             input[K_3] = 0
         elif input[K_4]:
-            preponse = preponse+"4"
+            preponse += "4"
             input[K_4] = 0
         elif input[K_5]:
-            preponse = preponse+"5"
+            preponse += "5"
             input[K_5] = 0
         elif input[K_6]:
-            preponse = preponse+"6"
+            preponse += "6"
             input[K_6] = 0
         elif input[K_7]:
-            preponse = preponse+"7"
+            preponse += "7"
             input[K_7] = 0
         elif input[K_8]:
-            preponse = preponse+"8"
+            preponse += "8"
             input[K_8] = 0
         elif input[K_9]:
-            preponse = preponse+"9"
+            preponse += "9"
             input[K_9] = 0
         elif input[K_BACKSPACE]:
             preponse = preponse[0:-1]

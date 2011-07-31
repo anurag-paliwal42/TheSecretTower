@@ -29,7 +29,7 @@ from pygame.locals import *
 version = "Beta 0.1.0"
 
 # Constante de fps
-fps = 40
+fps = 30
 
 fenetre_size_x = 800
 fenetre_size_y = 600

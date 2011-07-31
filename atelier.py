@@ -329,10 +329,7 @@ def load_craft(type):
 
 def atelier(app, perso, type, chest = None):
 
-    input = range(0, 1000, 1)
-
-    for i in range(len(input)):
-        input[i] = 0
+    input = [0]*1000
 
     fond = Element()
     fond.changer_image(app.save_screen())
