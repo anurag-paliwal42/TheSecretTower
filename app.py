@@ -1,4 +1,5 @@
 #-*-coding:Utf-8 -*
+
 #    TheSecretTower
 #    Copyright (C) 2011 Pierre SURPLY
 #
@@ -30,11 +31,8 @@ import copy
 import pygame
 from pygame.locals import *
 
-
-# Element
-from element import *
-
-from menu import *
+import element
+import menu
 from jeu import *
 from map import *
 from editeur import *
@@ -53,6 +51,7 @@ class App:
         # création de la fenetre
         self.size = [800, 600]
         self.fenetre = pygame.display.set_mode((self.size[0], self.size[1]), pygame.DOUBLEBUF)
+        pygame.display.set_icon(pygame.image.load("img/perso_small.png").convert_alpha())
         pygame.display.set_caption(const.fenetre_titre)
 
         # font

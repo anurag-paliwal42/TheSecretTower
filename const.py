@@ -1,4 +1,5 @@
 #-*-coding:Utf-8 -*
+
 #    TheSecretTower
 #    Copyright (C) 2011 Pierre SURPLY
 #
@@ -25,7 +26,7 @@ from pygame.locals import *
 
 """Constantes du jeu The Scret of Tower"""
 
-version = "Beta 0.0.1"
+version = "Beta 0.1.0"
 
 # Constante de fps
 fps = 40

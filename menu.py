@@ -23,9 +23,10 @@
 import pygame
 from pygame.locals import *
 
-from app import *
+import app
+import element
 import const
-from event import *
+import event
 
 
 def menu(app, ptitle, pmenu):
@@ -35,19 +36,19 @@ def menu(app, ptitle, pmenu):
     for i in range(len(input)):
         input[i] = 0
 
-    fond_menu = Element()
+    fond_menu = element.Element()
     fond_menu.changer_image(pygame.image.load(const.path_fond_menu).convert())
 
-    img_choix = Element()
+    img_choix = element.Element()
     img_choix.changer_image(pygame.image.load(const.path_choix).convert_alpha())
     img_choix.x = 30
     img_choix.y = 300
 
 
-    w_title = Element()
+    w_title = element.Element()
     w_title.changer_text(ptitle, app.font, (255,255,255))
     w_title.move_el(84,254)
-    title = Element()
+    title = element.Element()
     title.changer_text(ptitle, app.font)
     title.move_el(80,250)
     
@@ -56,18 +57,18 @@ def menu(app, ptitle, pmenu):
 
     for i in pmenu:
         # White
-        entry = Element()
+        entry = element.Element()
         entry.changer_text(i, app.font, (255,255,255))
         w_menu.append(entry)
         # Black
-        entry = Element()
+        entry = element.Element()
         entry.changer_text(i, app.font)
         menu.append(entry)
 
 
     cmd = 1
 
-    while update_event(input, app):
+    while event.update_event(input, app):
         # Evenement
 
         if input[K_UP]:
@@ -119,26 +120,26 @@ def ask(app, ptitle):
     for i in range(len(input)):
         input[i] = 0
 
-    fond_menu = Element()
+    fond_menu = element.Element()
     fond_menu.changer_image(pygame.image.load(const.path_fond_menu).convert())
 
-    w_title = Element()
+    w_title = element.Element()
     w_title.changer_text(ptitle, app.font, (255,255,255))
     w_title.move_el(84,254)
-    title = Element()
+    title = element.Element()
     title.changer_text(ptitle, app.font)
     title.move_el(80,250)
 
     preponse = ""
-    w_reponse = Element()
+    w_reponse = element.Element()
     w_reponse.changer_text(preponse, app.font, (255,255,255))
     w_reponse.move_el(104, 304)
-    reponse = Element()
+    reponse = element.Element()
     reponse.changer_text(preponse, app.font)
     reponse.move_el(100, 300)
 
     while 1:
-        update_event(input, app)
+        event.update_event(input, app)
         if input[K_a]:
             preponse = preponse+"a"
             input[K_a] = 0
@@ -281,7 +282,8 @@ def ask(app, ptitle):
             preponse = preponse[0:-1]
             input[K_BACKSPACE] = 0
         elif input[K_RETURN]:
-            return preponse
+            if preponse != "":
+                return preponse
 
         w_reponse.changer_text(preponse, app.font, (255,255,255))
         reponse.changer_text(preponse, app.font)

@@ -120,7 +120,7 @@ def jeu(app, map, perso):
     info_w_txt = []
     info_w_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 0, 0, (255,255,255))
 
-    commandes =  "(a) : Jump\n(z) : Use\n(e/r) : Scroll inventory\n(i) : Inventory \n(v) : Change View\n(ESC) : Break"
+    commandes =  "(a) : Jump\n(z) : Use\n(UP) : Open a door\n(e/r) : Scroll inventory\n(i) : Inventory \n(v) : Change View\n(ESC) : Break"
     b_commandes = []
     b_commandes = write(app,commandes, 24, 54)
     w_commandes = []
