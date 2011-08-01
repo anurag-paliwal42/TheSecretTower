@@ -310,11 +310,11 @@ def load_craft(type):
     item.set_prix(prix)
     craft.append(item)
     # Torch
-    item = Item_Bloc(Deco(13))
+    item = Item_Bloc(Torch(13))
     item.nbr = 4
     item.element.move_el(-item.element.x+500,-item.element.y+310)
     item.set_prix(Item(5, 1))
-    item.set_prix(Coal(14))
+    item.set_prix(Item(34,1))
     craft.append(item)
     # Stick
     item = Item(5, 8)

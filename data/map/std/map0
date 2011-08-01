@@ -80,12 +80,14 @@
 13,13,150,0
 13,13,650,100
 13,13,200,150
-22,22,50,500,Welcome to my Secret Tower/nTry to break this wooden door/nPress (z) or (w) to hit with your sword/n/n-The Fallen King
+22,22,50,500,Welcome to my Secret Tower/nTry to break this wooden door/nPress (z) or (w) to hit with your sword/nPress (TAB) to see controls/n/n-The Fallen King
 1,6,150,400
 1,6,150,450
 1,6,150,500
 1,6,350,500
 22,22,250,500, Congratulations !/nNow open your invenory with (i)/nThen try to craft a workbench/nwith 2 woods/n/n-The Fallen King
 1,1,200,300
-22,22,400,500, Take your Workbench with (e) or (r)/nthen put it on the floor with (z)/nAfter you could use it to craft another items/n/n-The Fallen King
+22,22,400,500, Take your Workbench with (e) or (r)/nthen put it on the floor with (z)/nAfter you could use it to craft another items/n/nThis door is a gate to underground/c press (UP) to use it/n/n-The Fallen King
 22,22,600,300, Try to build a forge/nPut 2 stones on the workbench/nYou can use a forge to craft utils/nFor example put 2 sticks and 1 stone/non the forge/n/n-The Fallen King
+22,22,250,50, If you put 2 stones and 2 stocks in a forge/c/nyou could build a pickaxe/n/n-Yours sincerely/c The Fallen King
+22,22,450,50, Warning ! /nI love lava !/nIt's so dangerous.../n/n-The Fallen King

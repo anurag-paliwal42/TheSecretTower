@@ -161,7 +161,7 @@ class App:
             if not os.path.isdir("data/save/{0}/".format(nom)):
                 os.mkdir("data/save/{0}/".format(nom))
                 break
-            elif menu(self, "/!\ Warning : Erase existing game ?", ["Yes", "No"]) == 1:
+            elif menu(self, "Warning : Erase existing game ?", ["Yes", "No"]) == 1:
                 for entry in os.listdir("data/save/"+nom+"/"):
                     os.remove("data/save/"+nom+"/"+entry)
                 os.rmdir("data/save/"+nom+"/")
@@ -258,10 +258,10 @@ class App:
             for y in range(10):
                 if (math.fabs(xent-x) > 2 or math.fabs(y+2-yent) > 1) and (math.fabs(xsor-x) > 2 or math.fabs(y-ysor) > 1):
                     
-                    if int(10+(level/1)) < 4:
+                    if int(10+(level/10)) < 4:
                         rand_max = 4
                     else:
-                        rand_max = int(10+(level/1))
+                        rand_max = int(10+(level/10))
                     if (random.randint(0, rand_max)) < 2:
                         rand = random.randint(0,200)
                         if rand < 20:

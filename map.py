@@ -152,7 +152,7 @@ def open_map(path):
                 map.append(bloc)
             # Sign
             elif pbloc[0] == 22:
-                bloc = Sign(pbloc[1], pbloc[4].replace("/n", "\n"))
+                bloc = Sign(pbloc[1], pbloc[4].replace("/n", "\n").replace("/c",","))
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
             # Furnace
@@ -218,7 +218,7 @@ def save_map(nom, map):
         elif isinstance(i, Uranium):
             tampon = tampon + "21," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Sign):
-            tampon = tampon + "22," + str(i.picture) +","+str(i.x)+","+str(i.y)+","+i.txt.replace("\n", "/n")+"\n"
+            tampon = tampon + "22," + str(i.picture) +","+str(i.x)+","+str(i.y)+","+i.txt.replace("\n", "/n").replace(",", "/c")+"\n"
         elif isinstance(i, Furnace):
             tampon = tampon + "23," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Bloc):

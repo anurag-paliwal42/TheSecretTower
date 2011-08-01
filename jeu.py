@@ -118,11 +118,18 @@ def jeu(app, map, perso):
     info_w_txt = []
     info_w_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 0, 0, (255,255,255))
 
-    commandes =  "(a) : Jump\n(z) : Use\n(UP) : Open a door\n(e/r) : Scroll inventory\n(i) : Inventory \n(v) : Change View\n(ESC) : Break"
+    commandes =  "(a) : Jump\n(z) : Use\n(UP) : Open a door\n(e/r) : Scroll inventory\n(i) : Inventory \n(s) : Select a place to put the block\n(v) : Change View\n(ESC) : Break"
     b_commandes = []
     b_commandes = write(app,commandes, 24, 54)
     w_commandes = []
     w_commandes = write(app, commandes, 20, 50, (255,255,255))
+
+    # Pose bloc
+    pose_bloc = False
+    select = Element()
+    select.changer_image(pygame.image.load("img/select.png").convert_alpha())
+    select.move_el(0,0)
+    limite = (0,0,0,0)
     
     cmd = 1
     prev = time()+1
@@ -159,9 +166,6 @@ def jeu(app, map, perso):
         for i in mobs:
             i.collided_perso(0,0, perso)
 
-
-                
-        
         # Traitement events
         cmd = update_event(input, app)
   
@@ -183,10 +187,59 @@ def jeu(app, map, perso):
             input[K_a] = 0
             input[K_q] = 0
 
-        if input[K_UP]:
-            perso.collided_type(0,0,map,Porte)
 
-        if (input[K_z] or  input[K_w]) and  perso.vie > 0 and time()-perso.last_hit > 0.3:
+        if input[K_s]:
+            if pose_bloc:
+                pose_bloc = False
+            else:
+                pose_bloc = True
+                select.move_el(-select.x+int((perso.x+25)/50)*50,-select.y+int((perso.y+25)/50)*50)
+                limite = (select.x-100,select.x+100, select.y-100, select.y+100)
+            input[K_s] = 0
+            
+
+        # pose_bloc
+        if (input[K_z] or  input[K_w]) and pose_bloc:
+            bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
+            bloc.move_el(select.x, select.y)
+            if not perso.collided_bloc(0,0,bloc):
+                collided = False
+                for i in map:
+                    if i.x == bloc.x and i.y == bloc.y:
+                        collided = True
+
+                if not collided:
+                    map.append(bloc) 
+                    if isinstance(bloc, Deco):
+                        shadow_new = []
+                        for x in range(16):
+                            for y in range(12):
+                                alpha = 0
+                                for i in shadow:
+                                    if i.x == x*50 and i.y == y*50:
+                                        alpha = i.image.get_alpha()
+                                dark = Element()
+                                dark.changer_image(pygame.Surface((50, 50)))
+                                dark.move_el(x*50,y*50)
+                                if alpha == 75:
+                                    dark.image.set_alpha(75)
+                                delete = False
+                                for i in map:
+                                    intens = 0
+                                    if i.picture == 2:
+                                        intens = 4
+                                    if i.picture == 13:
+                                        intens = 6
+                                    if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
+                                        delete = True
+                                    elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
+                                        dark.image.set_alpha(75)
+                                if delete == False:
+                                    shadow_new.append(dark)
+                        shadow = shadow_new
+                    perso.inv.delete()
+
+        if (input[K_z] or  input[K_w]) and  perso.vie > 0 and time()-perso.last_hit > 0.3 and not pose_bloc:
 
             perso.hit()
 
@@ -345,16 +398,35 @@ def jeu(app, map, perso):
             if app.coef > 2:
                 app.coef = 1
             input[K_v] = 0
-        if input[K_UP] and  perso.vie > 0:
-            perso.monter_echelle(map)
-        if input[K_LEFT] and  perso.vie > 0:
-            perso.move(-5,0, map)
-            perso.sens = False
-            perso.anim(True)
-        if input[K_RIGHT] and  perso.vie > 0:
-            perso.move(5,0, map)
-            perso.sens = True
-            perso.anim(True)
+        if pose_bloc:
+            if input[K_UP]:
+                input[K_UP] = 0
+                if select.y-50 >= limite[2] and select.y-50 >= 0:
+                    select.move_el(0,-50)
+            if input[K_DOWN]:
+                input[K_DOWN] = 0
+                if select.y+50 <= limite[3] and select.y+50 <= 550:
+                    select.move_el(0,50)
+            if input[K_RIGHT]:
+                input[K_RIGHT] = 0
+                if select.x+50 <= limite[1] and select.x+50 <= 750:
+                    select.move_el(50,0)
+            if input[K_LEFT]:
+                input[K_LEFT] = 0
+                if select.x-50 >= limite[0] and select.x-50 >= 0:
+                    select.move_el(-50,0)
+        elif perso.vie > 0:
+            if input[K_UP]:
+                perso.monter_echelle(map)
+                perso.collided_type(0,0,map,Porte)
+            if input[K_LEFT]:
+                perso.move(-5,0, map)
+                perso.sens = False
+                perso.anim(True)
+            if input[K_RIGHT]:
+                perso.move(5,0, map)
+                perso.sens = True
+                perso.anim(True)
         if not input[K_RIGHT] and not input[K_LEFT]:
             perso.anim(False)
         if input[K_RETURN]:
@@ -367,16 +439,23 @@ def jeu(app, map, perso):
                             perso.move_el(i.x,i.y)
         if input[K_ESCAPE]:
             input[K_ESCAPE] = 0
-            if app.partie[0] != "Gen":
-                cmd = menu(app, "Break", ["Resume", "Save game", "Quit"])
+            if pose_bloc:
+                pose_bloc = False
             else:
-                 cmd = menu(app, "Break", ["Resume", "Quit"])
-            if cmd == 2:
-                app.save_partie()
-                save_map("save/{0}/map{1}".format(app.partie[0], app.partie[1]), map)
-            if cmd == 0:
-                return 5
+                if app.partie[0] != "Gen":
+                    cmd = menu(app, "Break", ["Resume", "Save game", "Quit"])
+                else:
+                    cmd = menu(app, "Break", ["Resume", "Quit"])
+                if cmd == 2:
+                    app.save_partie()
+                    save_map("save/{0}/map{1}".format(app.partie[0], app.partie[1]), map)
+                if cmd == 0:
+                    return 5
                 
+
+        # Pose bloc
+        if not isinstance(perso.inv.get_item(), Item_Bloc):
+            pose_bloc = False
 
         
         perso.tomber(map)
@@ -422,6 +501,9 @@ def jeu(app, map, perso):
             elif math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < intens*50 and dark.image.get_alpha != 75:
                 dark.image.set_alpha(75)
             app.blit(dark)
+        
+        if pose_bloc:
+            app.blit(select)
 
         if app.coef > 1:
             app.scale(app.coef)
