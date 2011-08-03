@@ -89,12 +89,12 @@ class App:
                 self.perso.map = self.partie[1]
                 self.perso.id = self.partie[2]
                 cmd = 1
-                while open_map("save/{0}/map{1}".format(self.partie[0], self.partie[1])) != [] and cmd == 1:
-                    cmd = jeu(self, open_map("save/{0}/map{1}".format(self.partie[0], self.partie[1])), self.perso)
+                while open_map("save/"+self.partie[0]+"/map"+str(self.partie[1])) != [] and cmd == 1:
+                    cmd = jeu(self, open_map("save/"+self.partie[0]+"/map"+str(self.partie[1])), self.perso)
                     self.partie[1] = self.perso.map
                     if self.partie[1] < 0:
-                        if open_map("save/{0}/map{1}".format(self.partie[0], self.partie[1])) == []:
-                            save_map("save/{0}/map{1}".format(self.partie[0], self.partie[1]), self.gen_map(self.partie[1]))
+                        if open_map("save/"+self.partie[0]+"/map"+str(self.partie[1])) == []:
+                            save_map("save/"+self.partie[0]+"/map"+str(self.partie[1]), self.gen_map(self.partie[1]))
                             
 
             elif cmd == 3:
@@ -112,7 +112,6 @@ class App:
                     cmd = editeur(self, open_map("map/custom/"+nom), nom)
 
         pygame.quit()
-        print "Merci d'avoir joué !"
         
     def blit(self, element):
         """Ajoute Element à l'écran"""
@@ -158,28 +157,28 @@ class App:
         while True:
             if not os.path.isdir("data/save/"):
                 os.mkdir("data/save/")
-            if not os.path.isdir("data/save/{0}/".format(nom)):
-                os.mkdir("data/save/{0}/".format(nom))
+            if not os.path.isdir("data/save/"+nom+"/"):
+                os.mkdir("data/save/"+nom+"/")
                 break
             elif menu(self, "Warning : Erase existing game ?", ["Yes", "No"]) == 1:
                 for entry in os.listdir("data/save/"+nom+"/"):
                     os.remove("data/save/"+nom+"/"+entry)
                 os.rmdir("data/save/"+nom+"/")
-                os.mkdir("data/save/{0}/".format(nom))
+                os.mkdir("data/save/"+nom+"/")
                 break
             else:
                 nom = ask(self, "New Game] Game's name : ")
                 
        
-        while open_map("map/std/map{0}".format(i)) != []:
-            save_map("save/{0}/map{1}".format(nom,i),open_map("map/std/map{0}".format(i)))
+        while open_map("map/std/map"+str(i)) != []:
+            save_map("save/"+nom+"/map"+str(i),open_map("map/std/map"+str(i)))
             i = i+1
 
         # Génération sous-sol
-        save_map("save/{0}/map-1".format(nom), self.gen_map(-1))
+        save_map("save/"+nom+"/map-1", self.gen_map(-1))
        
         # Fichier global
-        file = open("data/save/{0}/{0}".format(nom), "w")
+        file = open("data/save/"+nom+"/"+nom, "w")
         file.write("map=0\nid=0\n")
         file.close()
         return partie
@@ -188,7 +187,7 @@ class App:
         partie = []
         partie.append(nom)
         try:
-            file = open("data/save/{0}/{0}".format(nom))
+            file = open("data/save/"+nom+"/"+nom)
             tampon = file.read()
             elements = tampon.split("\n")
             i = 1
@@ -214,9 +213,9 @@ class App:
 
 
     def save_partie(self):
-        file = open("data/save/{0}/{0}".format(self.partie[0]), "w")
+        file = open("data/save/"+self.partie[0]+"/"+self.partie[0], "w")
         
-        tampon = "map={0}\n".format(self.partie[1])
+        tampon = "map="+str(self.partie[1])+"\n"
         tampon = tampon +"id="+str(self.perso.id_porte)+"\n"
         tampon +=  "inv="+self.perso.inv.save()+"\n"
         

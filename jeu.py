@@ -448,7 +448,7 @@ def jeu(app, map, perso):
                     cmd = menu(app, "Break", ["Resume", "Quit"])
                 if cmd == 2:
                     app.save_partie()
-                    save_map("save/{0}/map{1}".format(app.partie[0], app.partie[1]), map)
+                    save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
                 if cmd == 0:
                     return 5
                 
@@ -561,7 +561,7 @@ def jeu(app, map, perso):
 
         if perso.map != app.partie[1]:
             if app.partie[0] != "Gen":
-                save_map("save/{0}/map{1}".format(app.partie[0], app.partie[1]), map)
+                save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
             return 1
 
     return 0
