@@ -188,14 +188,7 @@ def jeu(app, map, perso):
             input[K_q] = 0
 
 
-        if input[K_s]:
-            if pose_bloc:
-                pose_bloc = False
-            else:
-                pose_bloc = True
-                select.move_el(-select.x+int((perso.x+25)/50)*50,-select.y+int((perso.y+25)/50)*50)
-                limite = (select.x-100,select.x+100, select.y-100, select.y+100)
-            input[K_s] = 0
+
             
 
         # pose_bloc
@@ -454,6 +447,14 @@ def jeu(app, map, perso):
                 
 
         # Pose bloc
+        if input[K_s]:
+            if pose_bloc:
+                pose_bloc = False
+            else:
+                pose_bloc = True
+                select.move_el(-select.x+int((perso.x+25)/50)*50,-select.y+int((perso.y+25)/50)*50)
+                limite = (select.x-100,select.x+100, select.y-100, select.y+100)
+            input[K_s] = 0
         if not isinstance(perso.inv.get_item(), Item_Bloc):
             pose_bloc = False
 
