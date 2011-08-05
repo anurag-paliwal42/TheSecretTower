@@ -53,6 +53,8 @@ class App:
         self.fenetre = pygame.display.set_mode(self.size, pygame.DOUBLEBUF)
         pygame.display.set_icon(pygame.image.load("img/perso_small.png").convert_alpha())
         pygame.display.set_caption(const.fenetre_titre)
+        
+        pygame.mouse.set_visible(False)
 
         # font
         self.font = pygame.font.Font("img/font.ttf", 20)
@@ -71,6 +73,8 @@ class App:
         self.perso = Perso()
         self.partie = []
         self.coef = 2
+
+        self.pos_screen = (0,0)
         
         
     def main(self):
@@ -135,6 +139,7 @@ class App:
         if y+600 >600*coef:
             y = 600*coef-600
 
+        self.pos_screen = (x,y)
         self.fenetre.blit(pygame.transform.scale(self.fenetre, (800*coef, 600*coef)), (0,0), (x,y, 800, 600))
             
 

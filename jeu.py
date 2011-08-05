@@ -38,7 +38,7 @@ from pygame.locals import *
 
 def jeu(app, map, perso):
 
-    input = [0]*1000
+    input = Input()
 
     for i in map:
         if isinstance(i, Porte):
@@ -51,6 +51,9 @@ def jeu(app, map, perso):
         fond.changer_image(pygame.image.load(const.path_fond1).convert())
     else:
         fond.changer_image(pygame.image.load(const.path_fond2).convert())
+
+    pointeur = element.Element()
+    pointeur.changer_image(pygame.image.load("img/pointeur.png").convert_alpha())
 
     # Noir
     shadow = []
@@ -118,7 +121,7 @@ def jeu(app, map, perso):
     info_w_txt = []
     info_w_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 0, 0, (255,255,255))
 
-    commandes =  "(a) : Jump\n(z) : Use\n(UP) : Open a door\n(e/r) : Scroll inventory\n(i) : Inventory \n(s) : Select a place to put the block\n(v) : Change View\n(ESC) : Break"
+    commandes =  "(Space) : Jump\n(Mouse Left) : Hit\n(Mouse Right) : Use/Put a bloc\n(Mouse scroll) : Scroll inventory\n(i) : Inventory \n(v) : Change View\n(ESC) : Break"
     b_commandes = []
     b_commandes = write(app,commandes, 24, 54)
     w_commandes = []
@@ -130,11 +133,14 @@ def jeu(app, map, perso):
     select.changer_image(pygame.image.load("img/select.png").convert_alpha())
     select.move_el(0,0)
     limite = (0,0,0,0)
+
+    last_reset = time()
+
     
     cmd = 1
     prev = time()+1
 
-    while cmd<>0:
+    while not input.quit:
         
 
         # controle fps
@@ -162,48 +168,56 @@ def jeu(app, map, perso):
             if i.image.get_alpha() == 0:
                 i.image.set_alpha(255)
 
+        # Physique Liquide
+        for i in copy.copy(map):
+            if isinstance(i, Liquid):
+                i.chuter(map)
+        # Reset Blocs
+        #if time()-last_reset > 10:
+        #    last_reset = time()
+        #    for i in copy.copy(map):
+        #        if isinstance(i, Liquid):
+        #            i.fixe = False
+            
+
         # Hit perso
         for i in mobs:
             i.collided_perso(0,0, perso)
 
         # Traitement events
-        cmd = update_event(input, app)
-  
-        if (input[K_SPACE] or input[K_a] or input[K_q]) and input[K_LEFT] and  perso.vie > 0:
+        input.update_event(app)
+
+        pointeur.move_el(-pointeur.x+input.mouse[0], -pointeur.y+input.mouse[1])
+        if input.key[K_SPACE] and input.key[K_a] and  perso.vie > 0:
             perso.sauter(-5, -15)
-            input[K_SPACE] = 0
-            input[K_a] = 0
-            input[K_q] = 0
+            input.key[K_SPACE] = 0
 
-        if (input[K_SPACE] or input[K_a] or input[K_q]) and input[K_RIGHT] and  perso.vie > 0:
+        elif input.key[K_SPACE] and input.key[K_d] and  perso.vie > 0:
             perso.sauter(5, -15)
-            input[K_SPACE] = 0
-            input[K_a] = 0
-            input[K_q] = 0
+            input.key[K_SPACE] = 0
 
-        if (input[K_SPACE] or input[K_a] or input[K_q]) and  perso.vie > 0:
+        elif input.key[K_SPACE] and  perso.vie > 0:
             perso.sauter(0, -15)
-            input[K_SPACE] = 0
-            input[K_a] = 0
-            input[K_q] = 0
+            input.key[K_SPACE] = 0 
 
+        if input.get_mouse(app)[0] >= perso.x+25:
+            perso.sens = True
+        else:
+            perso.sens = False
 
-
-            
-
-        # pose_bloc
-        if (input[K_z] or  input[K_w]) and pose_bloc:
-            bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
-            bloc.move_el(select.x, select.y)
-            if not perso.collided_bloc(0,0,bloc):
-                collided = False
-                for i in map:
-                    if i.x == bloc.x and i.y == bloc.y:
-                        collided = True
-
-                if not collided:
-                    map.append(bloc) 
-                    if isinstance(bloc, Deco):
+        if input.mousebuttons[1] and time()-perso.last_hit > 0.3:
+            last_hit = time()
+            perso.hit()
+            if app.coef == 1:
+                coord = (int(input.mouse[0]/50)*50, int(input.mouse[1]/50)*50)
+            else:
+                coord = (int((input.mouse[0]+app.pos_screen[0])/100)*50, int((input.mouse[1]+app.pos_screen[1])/100)*50)
+            if math.sqrt((coord[0]-perso.x)**2 + (coord[1]-perso.y)**2) < 200:
+                if not isinstance(perso.inv.get_item(), Item_Bloc):
+                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Terre)
+                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Stone)
+                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Wood)
+                    if perso.collided_type(-perso.x+coord[0],-perso.y+coord[1], map, Deco):
                         shadow_new = []
                         for x in range(16):
                             for y in range(12):
@@ -229,70 +243,29 @@ def jeu(app, map, perso):
                                         dark.image.set_alpha(75)
                                 if delete == False:
                                     shadow_new.append(dark)
+
                         shadow = shadow_new
-                    perso.inv.delete()
+                    perso.collided_mob(mobs)
 
-        if (input[K_z] or  input[K_w]) and  perso.vie > 0 and time()-perso.last_hit > 0.3 and not pose_bloc:
-
+                
+        if input.mousebuttons[3]:
             perso.hit()
-
-            #Destruction bloc + atk
-            if perso.sens == False:
-                s=-1
+            input.mousebuttons[3] = 0
+            if app.coef == 1:
+                coord = (int(input.mouse[0]/50)*50, int(input.mouse[1]/50)*50)
             else:
-                s=1
-            perso.collided_type(s*10,0,map,Terre)
-            perso.collided_type(s*10,0,map,Stone, app, input)
-            perso.collided_type(s*10,0,map,Wood, app, input)
-            if perso.collided_type(s*10, 0, map, Deco, app):
-                shadow_new = []
-                for x in range(16):
-                    for y in range(12):
-                        alpha = 0
-                        for i in shadow:
-                            if i.x == x*50 and i.y == y*50:
-                                alpha = i.image.get_alpha()
-                        dark = Element()
-                        dark.changer_image(pygame.Surface((50, 50)))
-                        dark.move_el(x*50,y*50)
-                        if alpha == 75:
-                            dark.image.set_alpha(75)
-                        delete = False
-                        for i in map:
-                            intens = 0
-                            if i.picture == 2:
-                                intens = 4
-                            if i.picture == 13:
-                                intens = 6
-                            if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
-                                delete = True
-                            elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
-                                dark.image.set_alpha(75)
-                        if delete == False:
-                            shadow_new.append(dark)
-
-                shadow = shadow_new
-            perso.collided_mob(0,0,mobs)
-
-
-                                
-                                
-
-            if not input[K_DOWN] and not input[K_UP]:
-                # Placement bloc
-
+                coord = (int((input.mouse[0]+app.pos_screen[0])/100)*50, int((input.mouse[1]+app.pos_screen[1])/100)*50)
+            if math.sqrt((coord[0]-perso.x)**2 + (coord[1]-perso.y)**2) < 100:
                 if isinstance(perso.inv.get_item(), Item_Bloc):
+
                     bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
-                    if perso.sens:
-                        bloc.move_el(-bloc.x+50*int((perso.x+75)/50), -bloc.y+50*int((perso.y+25)/50))
-                    if perso.sens == False:
-                        bloc.move_el(-bloc.x+50*int((perso.x-50)/50), -bloc.y+50*int((perso.y+10)/50))
-                    if not perso.collided_bloc(0,0, bloc):
+                    bloc.move_el(coord[0], coord[1])
+                    if not perso.collided_bloc(0,0,bloc):
                         collided = False
                         for i in map:
                             if i.x == bloc.x and i.y == bloc.y:
                                 collided = True
-
+ 
                         if not collided:
                             map.append(bloc) 
                             if isinstance(bloc, Deco):
@@ -323,106 +296,37 @@ def jeu(app, map, perso):
                                             shadow_new.append(dark)
                                 shadow = shadow_new
                             perso.inv.delete()
-                            
-            if input[K_DOWN]:
-                if not (perso.collided_type(0,10,map,Terre) or perso.collided_type(0,10,map,Stone, app, input) or perso.collided_type(0,10,map,Wood, app, input)):
-                    if isinstance(perso.inv.get_item(), Item_Bloc):
-                        bloc = perso.inv.get_item().type(perso.inv.get_item().bloc.picture)
-                        bloc.move_el(-bloc.x+50*int((perso.x+10)/50), -bloc.y+50*int((perso.y+75)/50))
-                        if not perso.collided_bloc(0,0, bloc):
-                            collided = False
-                            for i in map:
-                                if i.x == bloc.x and i.y == bloc.y:
-                                    collided = True
-
-                            if not collided:
-                                map.append(bloc) 
-                                if isinstance(bloc, Deco):
-                                    shadow_new = []
-                                    for x in range(16):
-                                        for y in range(12):
-                                            alpha = 0
-                                            for i in shadow:
-                                                if i.x == x*50 and i.y == y*50:
-                                                    alpha = i.image.get_alpha()
-                                            dark = Element()
-                                            dark.changer_image(pygame.Surface((50, 50)))
-                                            dark.move_el(x*50,y*50)
-                                            if alpha == 75:
-                                                dark.image.set_alpha(75)
-                                            delete = False
-                                            for i in map:
-                                                intens = 0
-                                            if i.picture == 2:
-                                                intens = 4
-                                            if i.picture == 13:
-                                                intens = 6
-                                            if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
-                                                delete = True
-                                            elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
-                                                dark.image.set_alpha(75)
-                                    if delete == False:
-                                        shadow_new.append(dark)
-                                    shadow = shadow_new
-                                perso.inv.delete()
-
-            if input[K_UP]:
-                if not perso.collided_type(0,-50,map,Terre):
-                    if not perso.collided_type(0,-50,map,Stone, app, input):
-                        perso.collided_type(0,-50,map,Wood, app, input)
+                else:
+                    perso.collided_utils(-perso.x+coord[0],-perso.y+coord[1],map, app, input)
 
 
-            #input[K_z] = 0
-            #input[K_w] = 0
-
-
-        if (input[K_e]):
+        if input.mousebuttons[4]:
             perso.inv.changer_select(-1)
-            input[K_e] = 0
-        if (input[K_r]):
+            input.mousebuttons[4] = 0
+        if input.mousebuttons[5]:
             perso.inv.changer_select(1)
-            input[K_r] = 0
-        if (input[K_i]):
+            input.mousebuttons[5] = 0
+        if input.key[K_i]:
             atelier(app, perso, "Inventory")
-            input[K_i] = 0
+            input.key[K_i] = 0
         # Zoom
-        if (input[K_v]):
+        if input.key[K_v]:
             app.coef+=1
             if app.coef > 2:
                 app.coef = 1
-            input[K_v] = 0
-        if pose_bloc:
-            if input[K_UP]:
-                input[K_UP] = 0
-                if select.y-50 >= limite[2] and select.y-50 >= 0:
-                    select.move_el(0,-50)
-            if input[K_DOWN]:
-                input[K_DOWN] = 0
-                if select.y+50 <= limite[3] and select.y+50 <= 550:
-                    select.move_el(0,50)
-            if input[K_RIGHT]:
-                input[K_RIGHT] = 0
-                if select.x+50 <= limite[1] and select.x+50 <= 750:
-                    select.move_el(50,0)
-            if input[K_LEFT]:
-                input[K_LEFT] = 0
-                if select.x-50 >= limite[0] and select.x-50 >= 0:
-                    select.move_el(-50,0)
-        elif perso.vie > 0:
-            if input[K_UP]:
+            input.key[K_v] = 0
+        if perso.vie > 0:
+            if input.key[K_w]:
                 perso.monter_echelle(map)
-                perso.collided_type(0,0,map,Porte)
-            if input[K_LEFT]:
+            if input.key[K_a]:
                 perso.move(-5,0, map)
-                perso.sens = False
                 perso.anim(True)
-            if input[K_RIGHT]:
+            if input.key[K_d]:
                 perso.move(5,0, map)
-                perso.sens = True
                 perso.anim(True)
-        if not input[K_RIGHT] and not input[K_LEFT]:
+        if not input.key[K_a] and not input.key[K_d]:
             perso.anim(False)
-        if input[K_RETURN]:
+        if input.key[K_RETURN]:
             if perso.vie <= 0:
                 perso.vie = 6
                 for i in map:
@@ -430,8 +334,8 @@ def jeu(app, map, perso):
                         if i.id == perso.id_porte:
                             perso.move_el(-perso.x, -perso.y)
                             perso.move_el(i.x,i.y)
-        if input[K_ESCAPE]:
-            input[K_ESCAPE] = 0
+        if input.key[K_ESCAPE]:
+            input.key[K_ESCAPE] = 0
             if pose_bloc:
                 pose_bloc = False
             else:
@@ -447,7 +351,7 @@ def jeu(app, map, perso):
                 
 
         # Pose bloc
-        if input[K_s]:
+        """if input[K_s]:
             if pose_bloc:
                 pose_bloc = False
             else:
@@ -456,7 +360,7 @@ def jeu(app, map, perso):
                 limite = (select.x-100,select.x+100, select.y-100, select.y+100)
             input[K_s] = 0
         if not isinstance(perso.inv.get_item(), Item_Bloc):
-            pose_bloc = False
+            pose_bloc = False"""
 
         
         perso.tomber(map)
@@ -528,7 +432,7 @@ def jeu(app, map, perso):
         for i in info_w_txt:
             app.blit(i)
 
-        if input[K_TAB]:
+        if input.key[K_TAB]:
             for i in b_commandes:
                 app.blit(i)
             for i in w_commandes:
@@ -556,6 +460,8 @@ def jeu(app, map, perso):
             for i in w_txt:
                 app.blit(i)
 
+        app.blit(pointeur)
+
         app.flip()
 
 
@@ -565,4 +471,6 @@ def jeu(app, map, perso):
                 save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
             return 1
 
+    app.save_partie()
+    save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
     return 0

@@ -268,63 +268,31 @@ class Perso(Element):
         return collided
 
 
-    def collided_type(self, dep_x, dep_y, map, type, app=0, input=0):
+    def collided_type(self, dep_x, dep_y, map, type):
         future_rect = pygame.Rect(self.rect)
         future_rect = future_rect.move(dep_x, dep_y)
         # Vérification pour chaques éléments de la map
         for i in map:
             if future_rect.colliderect(i.rect):
                 if isinstance(i, type):
-                    if type == Porte:
-                        if i.etat == 1:
-                            self.map = self.map+1
-                        elif i.etat == 0:
-                            self.map = self.map-1
-                        elif i.etat == 2:
-                            self.map = i.target 
-                        self.id_porte = i.id
-                    elif type == Terre:
+                    if type == Terre:
                         if (self.inv.get_item().id in [1,2,7,12,17,22,27]) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
                     elif type == Stone:
-                        if (self.inv.get_item().id in [3,8,13,18,23,28] or (self.inv.get_item().id == 1 and not isinstance(i, Forge) and not isinstance(i, Furnace) )) and not self.inv.isfull(i):
+                        if (self.inv.get_item().id in [1,3,8,13,18,23,28]) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
                                 if isinstance(i, Coal):
                                     self.inv.add(Item(34, 4))
                                 else:
                                     self.inv.add(i)
                                 map.remove(i)
-                        elif isinstance(i, Forge):
-                            atelier(app, self, "Forge")
-                            input[K_z] = 0
-                            input[K_w] = 0
-                            input[K_LEFT] = 0
-                            input[K_RIGHT] = 0
-                        elif isinstance(i, Furnace):
-                            atelier(app, self, "Furnace", i)
-                            input[K_z] = 0
-                            input[K_w] = 0
-                            input[K_LEFT] = 0
-                            input[K_RIGHT] = 0
                     elif type == Wood:
-                        if (self.inv.get_item().id in [4,9,14,19,24,29] or (self.inv.get_item().id == 1 and not isinstance(i, Atelier) and not isinstance(i, Coffre))) and not self.inv.isfull(i):
+                        if (self.inv.get_item().id in [1,4,9,14,19,24,29]) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
-                        elif isinstance(i, Atelier):
-                            atelier(app, self, "Workbench")
-                            input[K_z] = 0
-                            input[K_w] = 0
-                            input[K_LEFT] = 0
-                            input[K_RIGHT] = 0
-                        elif isinstance(i, Coffre):
-                            atelier(app, self, "Chest", i)
-                            input[K_z] = 0
-                            input[K_w] = 0
-                            input[K_LEFT] = 0
-                            input[K_RIGHT] = 0
                     elif type == Deco:
                         if (self.inv.get_item().id in [2,3,4,7,8,9,12,13,14,17,18,19,22,23,24,27,28,29]) and not self.inv.isfull(i):
                             self.inv.add(i)
@@ -332,6 +300,33 @@ class Perso(Element):
                     return True
             
         return False
+
+    def collided_utils(self, dep_x, dep_y, map, app, input):
+        future_rect = pygame.Rect(self.rect)
+        future_rect = future_rect.move(dep_x, dep_y)
+        # Vérification pour chaques éléments de la map
+        for i in map:
+            if future_rect.colliderect(i.rect):
+                if isinstance(i,Porte):
+                    if i.etat == 1:
+                        self.map = self.map+1
+                    elif i.etat == 0:
+                        self.map = self.map-1
+                    elif i.etat == 2:
+                        self.map = i.target 
+                    self.id_porte = i.id
+                elif isinstance(i, Forge):
+                    atelier(app, self, "Forge")
+                    input.reset()
+                elif isinstance(i, Furnace):
+                    atelier(app, self, "Furnace", i)
+                    input.reset()
+                elif isinstance(i, Atelier):
+                    atelier(app, self, "Workbench")
+                    input.reset()
+                elif isinstance(i, Coffre):
+                    atelier(app, self, "Chest", i)
+                    input.reset()
 
 
     def collided_bloc(self, dep_x, dep_y, element):
@@ -341,14 +336,14 @@ class Perso(Element):
             return True
         return False
 
-    def collided_mob(self, dep_x, dep_y, mob):
+    def collided_mob(self, mob):
         future_rect = pygame.Rect(self.rect)
         future_rect.width = 100
         future_rect.height = 100
         if self.sens:
-            future_rect = future_rect.move(-future_rect.x+self.x+dep_x,-future_rect.y+self.y+dep_y-50)
+            future_rect = future_rect.move(-future_rect.x+self.x,-future_rect.y+self.y-50)
         else:
-            future_rect = future_rect.move(-future_rect.x+self.x+dep_x-50,-future_rect.y+self.y+dep_y-50)
+            future_rect = future_rect.move(-future_rect.x+self.x-50,-future_rect.y+self.y-50)
         # Vérification pour chaques mobs
         collided = False
         for i in mob:

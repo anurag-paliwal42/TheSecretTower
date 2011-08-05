@@ -68,9 +68,14 @@ def open_map(path):
                 bloc.move_el(pbloc[3], pbloc[4])
                 map.append(bloc)
             elif pbloc[0] == 4:
-                bloc = BlocDanger(pbloc[1], pbloc[2])
-                bloc.move_el(pbloc[3], pbloc[4])
-                map.append(bloc)
+                if pbloc[1] == 2:
+                    bloc = Lava()
+                    bloc.move_el(pbloc[3], pbloc[4])
+                    map.append(bloc)    
+                else:
+                    bloc = BlocDanger(pbloc[1], pbloc[2])
+                    bloc.move_el(pbloc[3], pbloc[4])
+                    map.append(bloc)
             elif pbloc[0] == 6:
                 bloc = Porte(pbloc[1], 1, pbloc[4])
                 bloc.move_el(pbloc[2], pbloc[3])

@@ -329,10 +329,12 @@ def load_craft(type):
 
 def atelier(app, perso, type, chest = None):
 
-    input = [0]*1000
+    input = Input()
 
     fond = Element()
     fond.changer_image(app.save_screen())
+    pointeur = Element()
+    pointeur.changer_image(pygame.image.load("img/pointeur.png").convert_alpha())
     if type != "Chest":
         fond.image.blit(pygame.image.load("img/fond_inv.png").convert_alpha(), (0,0))
     else:
@@ -390,40 +392,52 @@ def atelier(app, perso, type, chest = None):
     side = True
 
     cmd = 1
-    while cmd<>0:
-
-
+    while not input.quit:
         # Events
-        cmd = update_event(input, app)
+        input.update_event(app)
+        pointeur.move_el(-pointeur.x+input.mouse[0], -pointeur.y+input.mouse[1])
+        
+        for i in range(len(perso.inv.data)):
+            if input.mouse[1] > 100+(int(i/5)*60) and input.mouse[1] < 150+(int(i/5)*60) and input.mouse[0] > 20+((i%5)*60) and input.mouse[0] < 70+((i%5)*60):
+                perso.inv.item_sel = 0
+                perso.inv.changer_select(i)
+                if not side:
+                    side = True
+        if type == "Chest":
+            for i in range(len(depot.data)):
+                if input.mouse[1] > 100+(int(i/5)*60) and input.mouse[1] < 150+(int(i/5)*60) and input.mouse[0] > 730-((i%5)*60) and input.mouse[0] < 780-((i%5)*60):
+                    depot.item_sel = 0
+                    depot.changer_select(i)
+                    if side:
+                        side = False
 
-
-      
-        if input[K_UP]:
+        if input.key[K_UP]:
             if side:
                 perso.inv.changer_select(-5)
             else:
                 depot.changer_select(-5)
-            input[K_UP] = 0
-        if input[K_DOWN]:
+            input.key[K_UP] = 0
+        if input.key[K_DOWN]:
             if side:
                 perso.inv.changer_select(5)
             else:
                 depot.changer_select(5)
-            input[K_DOWN] = 0
-        if input[K_RIGHT]:
+            input.key[K_DOWN] = 0
+        if input.key[K_RIGHT]:
             if side:
                 perso.inv.changer_select(1)
             else:
                 depot.changer_select(-1)
-            input[K_RIGHT] = 0
-        if input[K_LEFT]:
+            input.key[K_RIGHT] = 0
+        if input.key[K_LEFT]:
             if side:
                 perso.inv.changer_select(-1)
             else:
                 depot.changer_select(1)
-            input[K_LEFT] = 0
-        if (input[K_p]):
-            input[K_p] = 0
+            input.key[K_LEFT] = 0
+        if input.key[K_p] or (input.mousebuttons[1] and input.mouse[1] > 90 and input.mouse[1] < 340 and ((side and input.mouse[0] > 10 and input.mouse[0] < 320) or (not side and input.mouse[0] > 480 and input.mouse[0] < 790))):
+            input.key[K_p] = 0
+            input.mousebuttons[1] = 0
             if side:
                 if perso.inv.get_item().id != 1 and not depot.isfull(perso.inv.get_item()):
                     depot.add(copy.copy(perso.inv.get_item()), 1)
@@ -435,7 +449,7 @@ def atelier(app, perso, type, chest = None):
                     if depot.isempty():
                         side = True
             
-        if (input[K_c]):
+        if (input.key[K_c] or (input.mousebuttons[1] and input.mouse[0] > 480 and input.mouse[0] < 790 and input.mouse[1] > 300 and input.mouse[1] < 370)):
             if type != "Chest":
                 if type == "Furnace":
                     if chest.fire:
@@ -452,17 +466,17 @@ def atelier(app, perso, type, chest = None):
                             if i.achat(depot):
                                 perso.inv.add(i)
                                 break
-            input[K_c] = 0
+            input.key[K_c] = 0
 
-        if (input[K_b]):
+        if (input.key[K_b] or (input.mousebuttons[3] and input.mouse[0] > 10 and input.mouse[0] < 320 and input.mouse[1] > 90 and input.mouse[1] < 340)):
             if type == "Furnace":
                 if perso.inv.get_item().id ==34:
                     perso.inv.delete()
                     chest.last = time() + 120
                     symb.last = time() + 120
-            input[K_b] = 0
+            input.key[K_b] = 0
 
-        if (input[K_s] or input[K_TAB]):
+        if (input.key[K_s] or input.key[K_TAB]):
             if type == "Chest":
                 if side and not depot.isempty():
                     side = False
@@ -470,18 +484,18 @@ def atelier(app, perso, type, chest = None):
                     side = True
                 depot.item_sel = 0
                 perso.inv.item_sel=0
-            input[K_s] = 0
-            input[K_TAB] = 0
+            input.key[K_s] = 0
+            input.key[K_TAB] = 0
 
-        if (input[K_x]):
+        if (input.key[K_x] or (input.mousebuttons[1] and input.mouse[0] > 480 and input.mouse[0] < 790 and input.mouse[1] > 90 and input.mouse[1] < 160)):
             if type != "Chest":
                 for i in depot.data:
                     perso.inv.add(i)
 
                 depot = Inventaire()
-            input[K_x] = 0
+            input.key[K_x] = 0
 
-        if input[K_ESCAPE] or input[K_i]:
+        if input.key[K_ESCAPE] or input.key[K_i]:
             if type != "Chest":
                 for i in depot.data:
                     perso.inv.add(i)
@@ -575,7 +589,7 @@ def atelier(app, perso, type, chest = None):
             symb.anim()
             chest.anim()
         app.blit(symb)
-
+        app.blit(pointeur)
         app.flip()
 
     for i in depot.data:

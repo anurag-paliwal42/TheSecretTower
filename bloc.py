@@ -303,6 +303,57 @@ class Furnace(Stone):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
 
+class Liquid(Bloc):
+    def __init__(self, picture):
+        Bloc.__init__(self, picture)
+        self.last_chute = time()
+        self.fixe = False
+
+    def chuter(self, map):
+        if time()-self.last_chute > 1 and not self.fixe:
+            self.fixe = True
+            self.last_chute = time()
+            fallen = True
+            bloc = self.__class__()
+            bloc.move_el(self.x, self.y+50)
+            for i in map:
+                if ((i.x == bloc.x and i.y == bloc.y) or bloc.y >= 600) and not isinstance(i, Liquid):
+                    fallen = False
+
+            if fallen:
+                map.append(bloc)
+            else:
+                # Right
+                fallen = True
+                bloc = self.__class__()
+                bloc.move_el(-bloc.x+self.x+50, -bloc.y+self.y)
+                if bloc.x < 800: 
+                    for i in map:
+                        if i.x == bloc.x and i.y == bloc.y:
+                            fallen = False
+                    if fallen:
+                        map.append(bloc)
+                # Left
+                fallen = True
+                bloc = self.__class__()
+                bloc.move_el(-bloc.x+self.x-50, -bloc.y+self.y)
+                if bloc.x >=0:
+                    for i in map:
+                        if i.x == bloc.x and i.y == bloc.y:
+                            fallen = False
+                    if fallen:
+                        map.append(bloc)
+
+            
+            
+
+class Lava(BlocDanger, Liquid):
+    def __init__(self, picture=2):
+        BlocDanger.__init__(self, picture, 10)
+        Liquid.__init__(self, picture)
+
+        
+
         
     
 
