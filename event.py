@@ -58,10 +58,10 @@ class Input:
     def write(self, preponse):
         if self.key[K_a]:
             preponse += "a"
-            input.key[K_a] = 0
+            self.key[K_a] = 0
         elif self.key[K_z]:
             preponse +="z"
-            input.key[K_z] = 0
+            self.key[K_z] = 0
         elif self.key[K_e]:
             preponse +="e"
             self.key[K_e] = 0
@@ -204,6 +204,9 @@ class Input:
             return ((self.mouse[0]+app.pos_screen[0])/2, (self.mouse[1]+app.pos_screen[1])/2)
         else:
             return self.mouse
+
+    def get_mouse_bloc(self):
+        return (int(self.mouse[0]/50)*50, int(self.mouse[1]/50)*50)
 
     def reset(self):
         self.key = [0]*1000

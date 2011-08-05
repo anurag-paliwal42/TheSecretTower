@@ -127,12 +127,6 @@ def jeu(app, map, perso):
     w_commandes = []
     w_commandes = write(app, commandes, 20, 50, (255,255,255))
 
-    # Pose bloc
-    pose_bloc = False
-    select = Element()
-    select.changer_image(pygame.image.load("img/select.png").convert_alpha())
-    select.move_el(0,0)
-    limite = (0,0,0,0)
 
     last_reset = time()
 
@@ -336,31 +330,16 @@ def jeu(app, map, perso):
                             perso.move_el(i.x,i.y)
         if input.key[K_ESCAPE]:
             input.key[K_ESCAPE] = 0
-            if pose_bloc:
-                pose_bloc = False
+            if app.partie[0] != "Gen":
+                cmd = menu(app, "Break", ["Resume", "Save game", "Quit"])
             else:
-                if app.partie[0] != "Gen":
-                    cmd = menu(app, "Break", ["Resume", "Save game", "Quit"])
-                else:
-                    cmd = menu(app, "Break", ["Resume", "Quit"])
-                if cmd == 2:
-                    app.save_partie()
-                    save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
-                if cmd == 0:
-                    return 5
+                cmd = menu(app, "Break", ["Resume", "Quit"])
+            if cmd == 2:
+                app.save_partie()
+                save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
+            if cmd == 0:
+                return 5
                 
-
-        # Pose bloc
-        """if input[K_s]:
-            if pose_bloc:
-                pose_bloc = False
-            else:
-                pose_bloc = True
-                select.move_el(-select.x+int((perso.x+25)/50)*50,-select.y+int((perso.y+25)/50)*50)
-                limite = (select.x-100,select.x+100, select.y-100, select.y+100)
-            input[K_s] = 0
-        if not isinstance(perso.inv.get_item(), Item_Bloc):
-            pose_bloc = False"""
 
         
         perso.tomber(map)
@@ -406,9 +385,6 @@ def jeu(app, map, perso):
             elif math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < intens*50 and dark.image.get_alpha != 75:
                 dark.image.set_alpha(75)
             app.blit(dark)
-        
-        if pose_bloc:
-            app.blit(select)
 
         if app.coef > 1:
             app.scale(app.coef)
