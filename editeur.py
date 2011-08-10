@@ -50,7 +50,7 @@ def editeur(app, map, nom):
     blocs.append(Bloc(1))
     blocs.append(Bloc(5))
     blocs.append(Bloc(6))
-    blocs.append(BlocDanger(2,10))
+    blocs.append(Lava())
     blocs.append(BlocDanger(4,1))
     blocs.append(Torch(13))
     blocs.append(Terre(7))

@@ -57,24 +57,7 @@ def jeu(app, map, perso):
 
     # Noir
     shadow = []
-    for x in range(16):
-        for y in range(12):
-            dark = Element()
-            dark.changer_image(pygame.Surface((50, 50)))
-            dark.move_el(x*50,y*50)
-            delete = False
-            for i in map:
-                intens = 0
-                if i.picture == 2:
-                    intens = 4
-                if i.picture == 13:
-                    intens = 6
-                if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
-                    delete = True
-                elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
-                    dark.image.set_alpha(75)
-            if delete == False:
-                shadow.append(dark)
+    shadow = set_shadow(shadow, map)
 
     mobs = []
     for i in shadow:
@@ -163,9 +146,12 @@ def jeu(app, map, perso):
                 i.image.set_alpha(255)
 
         # Physique Liquide
-        for i in copy.copy(map):
+        for i in map:
             if isinstance(i, Liquid):
                 i.chuter(map)
+                #i.put_nbr(app.font)
+                if i.unit < 0.1:
+                    map.remove(i)
         # Reset Blocs
         #if time()-last_reset > 10:
         #    last_reset = time()
@@ -212,33 +198,7 @@ def jeu(app, map, perso):
                     perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Stone)
                     perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Wood)
                     if perso.collided_type(-perso.x+coord[0],-perso.y+coord[1], map, Deco):
-                        shadow_new = []
-                        for x in range(16):
-                            for y in range(12):
-                                alpha = 0
-                                for i in shadow:
-                                    if i.x == x*50 and i.y == y*50:
-                                        alpha = i.image.get_alpha()
-                                dark = Element()
-                                dark.changer_image(pygame.Surface((50, 50)))
-                                dark.move_el(x*50,y*50)
-                                if alpha == 75:
-                                    dark.image.set_alpha(75)
-                                delete = False
-                                for i in map:
-                                    intens = 0
-                                    if i.picture == 2:
-                                        intens = 4
-                                    if i.picture == 13:
-                                        intens = 6
-                                    if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
-                                        delete = True
-                                    elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
-                                        dark.image.set_alpha(75)
-                                if delete == False:
-                                    shadow_new.append(dark)
-
-                        shadow = shadow_new
+                        shadow = set_shadow(shadow, map)
                     perso.collided_mob(mobs)
 
                 
@@ -262,33 +222,7 @@ def jeu(app, map, perso):
  
                         if not collided:
                             map.append(bloc) 
-                            if isinstance(bloc, Deco):
-                                shadow_new = []
-                                for x in range(16):
-                                    for y in range(12):
-                                        alpha = 0
-                                        for i in shadow:
-                                            if i.x == x*50 and i.y == y*50:
-                                                alpha = i.image.get_alpha()
-                                        dark = Element()
-                                        dark.changer_image(pygame.Surface((50, 50)))
-                                        dark.move_el(x*50,y*50)
-                                        if alpha == 75:
-                                            dark.image.set_alpha(75)
-                                        delete = False
-                                        for i in map:
-                                            intens = 0
-                                            if i.picture == 2:
-                                                intens = 4
-                                            if i.picture == 13:
-                                                intens = 6
-                                            if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
-                                                delete = True
-                                            elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
-                                                dark.image.set_alpha(75)
-                                        if delete == False:
-                                            shadow_new.append(dark)
-                                shadow = shadow_new
+                            shadow = set_shadow(shadow, map)
                             perso.inv.delete()
                 else:
                     perso.collided_utils(-perso.x+coord[0],-perso.y+coord[1],map, app, input)
@@ -450,3 +384,31 @@ def jeu(app, map, perso):
     app.save_partie()
     save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
     return 0
+
+def set_shadow(shadow, map):
+    shadow_new = []
+    for x in range(16):
+        for y in range(12):
+            alpha = 0
+            for i in shadow:
+                if i.x == x*50 and i.y == y*50:
+                    alpha = i.image.get_alpha()
+            dark = Element()
+            dark.changer_image(pygame.Surface((50, 50)))
+            dark.move_el(x*50,y*50)
+            if alpha == 75:
+                dark.image.set_alpha(75)
+            delete = False
+            for i in map:
+                intens = 0
+                if i.picture == 2:
+                    intens = 4
+                if i.picture == 13:
+                    intens = 6
+                if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
+                    delete = True
+                elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
+                    dark.image.set_alpha(75)
+            if delete == False:
+                shadow_new.append(dark)                        
+    return shadow_new

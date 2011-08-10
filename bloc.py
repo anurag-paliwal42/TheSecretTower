@@ -20,6 +20,7 @@
 # Auteur : Pierre Surply
 
 from element import *
+import jeu
 
 import pygame
 from pygame.locals import *
@@ -36,7 +37,7 @@ class Bloc(Element):
     def __init__(self, picture):
         Element.__init__(self)
         self.vie = 5
-        self.last = time()
+        self.last = 0
         self.picture = picture
         self.set_image()
         self.fire = False
@@ -46,8 +47,12 @@ class Bloc(Element):
             if time() - self.last > 1: 
                 image = copy.copy(const.vide)
                 rect = pygame.Rect(0,random.randint(0, 4)*50, 50,50)
-                image.blit(const.sprite_lave, (0,0), rect)
+                image.blit(const.sprite_lave, (0,int(50-self.unit)), rect)
                 self.changer_image(image)
+                self.rect = self.image.get_rect()
+                self.rect.height = int(self.unit)
+                self.rect.width = 50
+                self.rect = self.rect.move(self.x,self.y+int(50-self.unit))
                 self.last = time()
 
         if self.picture == 13:
@@ -306,46 +311,109 @@ class Furnace(Stone):
 class Liquid(Bloc):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
-        self.last_chute = time()
+        self.last_chute = 0
+        self.image_orig = self.image
+        self.unit = 50.0
         self.fixe = False
 
-    def chuter(self, map):
-        if time()-self.last_chute > 1 and not self.fixe:
-            self.fixe = True
-            self.last_chute = time()
-            fallen = True
-            bloc = self.__class__()
-            bloc.move_el(self.x, self.y+50)
-            for i in map:
-                if ((i.x == bloc.x and i.y == bloc.y) or bloc.y >= 600) and not isinstance(i, Liquid):
+    def put_nbr(self, font):
+        self.changer_text(str(int(self.unit)),font)
+
+    def set_unit(self, unit):
+        self.unit = unit
+
+    def chutever(self, map):
+        fallen = True
+        trans = False
+        x = self.x
+        y = self.y+50
+        if y >= 600:
+            fallen = False
+        for i in map:
+            if (i.x == x and i.y == y):
+                if isinstance(i,Liquid):
+                    if i.unit < 50:
+                        fallen = False
+                        if i.unit+self.unit < 50:
+                            i.set_unit(i.unit+self.unit)
+                            self.set_unit(0)
+                        else:
+                            self.set_unit((i.unit+self.unit)-50)
+                            i.set_unit(50)
+                    else:
+                        fallen = False
+                else:
                     fallen = False
+        return fallen
 
-            if fallen:
-                map.append(bloc)
-            else:
-                # Right
-                fallen = True
-                bloc = self.__class__()
-                bloc.move_el(-bloc.x+self.x+50, -bloc.y+self.y)
-                if bloc.x < 800: 
-                    for i in map:
-                        if i.x == bloc.x and i.y == bloc.y:
-                            fallen = False
-                    if fallen:
-                        map.append(bloc)
-                # Left
-                fallen = True
-                bloc = self.__class__()
-                bloc.move_el(-bloc.x+self.x-50, -bloc.y+self.y)
-                if bloc.x >=0:
-                    for i in map:
-                        if i.x == bloc.x and i.y == bloc.y:
-                            fallen = False
-                    if fallen:
-                        map.append(bloc)
+    def chuter(self, map):
+        if time()-self.last_chute > 0.2:
+            self.last_chute = time()
+            if self.chutever(map):
+                self.move_el(0,50)
+            elif self.unit>10:
+                self.fixe = True
+                right = [True,False]
+                left = [True, False]
+                if self.x+50 >= 800:
+                    right = [False,False]
+                if self.x-50 < 0:
+                    left = [False,False]
+                for i in map:
+                    if i.x == self.x+50 and i.y == self.y:
+                        if isinstance(i,self.__class__):
+                            right[1] = True
+                        else:
+                            right[0] = False
+                    if i.x == self.x-50 and i.y == self.y:
+                        if isinstance(i,self.__class__):
+                            left[1] = True
+                        else:
+                            left[0] = False
 
-            
-            
+                if right[0] and right[1]:
+                    for i in map:
+                        if (i.x == self.x+50) and i.y == self.y:
+                            if isinstance(i,self.__class__):
+                                if i.unit<self.unit:
+                                    diff_unit = (self.unit-i.unit)/2
+                                    i.set_unit(i.unit+diff_unit)
+                                    self.set_unit(i.unit) 
+                if left[0] and left[1]:
+                    for i in map:
+                        if (i.x == self.x-50) and i.y == self.y:
+                            if isinstance(i,self.__class__):
+                                if i.unit<self.unit:
+                                    diff_unit = (self.unit-i.unit)/2
+                                    i.set_unit(i.unit+diff_unit)
+                                    self.set_unit(i.unit)           
+                if right[0] and left[0] and not right[1] and not left[1]:
+                    tot_unit=self.unit
+                    bloc = self.__class__()
+                    bloc.move_el(-bloc.x+self.x+50, -bloc.y+self.y)
+                    bloc.set_unit((tot_unit/3))
+                    map.append(bloc)
+
+                    bloc = self.__class__()
+                    bloc.move_el(-bloc.x+self.x-50, -bloc.y+self.y)
+                    bloc.set_unit(tot_unit/3)
+                    self.set_unit(bloc.unit)
+                    map.append(bloc)
+                elif right[0] and not right[1]:
+                    bloc = self.__class__()
+                    bloc.move_el(-bloc.x+self.x+50, -bloc.y+self.y)
+                    bloc.set_unit(self.unit/2)
+                    self.set_unit(bloc.unit)
+                    bloc.chutever(map)
+                    map.append(bloc)
+                elif left[0] and not left[1]:
+                    bloc = self.__class__()
+                    bloc.move_el(-bloc.x+self.x-50, -bloc.y+self.y)
+                    bloc.set_unit(self.unit/2)
+                    self.set_unit(bloc.unit)
+                    bloc.chutever(map)
+                    map.append(bloc)
+  
 
 class Lava(BlocDanger, Liquid):
     def __init__(self, picture=2):

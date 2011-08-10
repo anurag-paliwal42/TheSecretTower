@@ -165,6 +165,12 @@ def open_map(path):
                 bloc = Furnace(pbloc[1])
                 bloc.move_el(pbloc[2], pbloc[3])
                 map.append(bloc)
+            # Lave
+            elif pbloc[0] == 24:
+                bloc = Lava()
+                bloc.set_unit(pbloc[3])
+                bloc.move_el(pbloc[1], pbloc[2])
+                map.append(bloc)
 
     except IOError:
         print(path + " : Map introuvable !")
@@ -184,6 +190,8 @@ def save_map(nom, map):
             tampon = tampon + "2," + str(i.picture) +","+str(i.debut_x)+","+str(i.debut_y)+","+str(i.dep_x)+","+ str(i.dep_y)+"\n"
         elif isinstance(i, BlocDisp):
             tampon = tampon + "3, " + str(i.picture) +","+str(i.begin)+","+str(i.x)+","+str(i.y)+"\n"
+        elif isinstance(i, Lava):
+            tampon = tampon + "24,"+str(i.x)+","+str(i.y)+","+str(int(i.unit))+"\n"
         elif isinstance(i, BlocDanger):
             tampon = tampon + "4," + str(i.picture) +","+str(i.atk)+","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Porte):
