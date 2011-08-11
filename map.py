@@ -184,6 +184,10 @@ def save_map(nom, map):
     if not os.path.isdir("data/map/custom/"):
         os.mkdir("data/map/custom/")
     file = open("data/"+nom, "w")
+    file.write(map2char(map))
+    file.close()
+
+def map2char(map):
     tampon = ""
     for i in map:
         if isinstance(i, BlocMouvant):
@@ -236,6 +240,9 @@ def save_map(nom, map):
             tampon = tampon + "23," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
         elif isinstance(i, Bloc):
             tampon = tampon + "1," + str(i.picture) +","+str(i.x)+","+str(i.y)+"\n"
+    return tampon
 
-    file.write(tampon)
-    file.close()
+class Map:
+    def __init__(self, map, id):
+        self.map = map
+        self.id = id

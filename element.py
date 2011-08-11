@@ -24,6 +24,8 @@
 import pygame
 from pygame.locals import *
 
+import const
+
 class Element:
     """ Définit l'élément de base de la fentre """
     def __init__(self):
@@ -45,7 +47,8 @@ class Element:
     def move_el(self, x, y):
         self.x = self.x+x
         self.y = self.y+y
-        self.rect = self.rect.move(x,y)
+        if const.display:
+            self.rect = self.rect.move(x,y)
         
             
         

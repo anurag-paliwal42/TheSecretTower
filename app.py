@@ -270,19 +270,19 @@ class App:
                         rand = random.randint(0,200)
                         if rand < 20:
                             bloc = Coal(14)
-                        elif rand < 40 and level >= -1:
+                        elif rand < 40 and level >= -10:
                             bloc =Tin(20)
-                        elif rand < 60 and level >= -1:
+                        elif rand < 60 and level >= -10:
                             bloc = Copper(15)
-                        elif rand < 70 and level < -1:
+                        elif rand < 70 and level < -10:
                             bloc = Iron(16)
-                        elif rand < 75 and level < -2:
+                        elif rand < 75 and level < -20:
                             bloc = Gold(18)
-                        elif rand < 80 and level < -3:
+                        elif rand < 80 and level < -30:
                             bloc = Diamond(19)
-                        elif rand < 90 and level < -2:
+                        elif rand < 90 and level < -20:
                             bloc = Titanium(17)
-                        elif rand < 95 and level < -3:
+                        elif rand < 95 and level < -30:
                             bloc = Uranium(21)
                         else:
                             bloc = Stone(1)
@@ -296,3 +296,4 @@ class App:
 
         return map
         
+

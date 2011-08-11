@@ -39,7 +39,8 @@ class Bloc(Element):
         self.vie = 5
         self.last = 0
         self.picture = picture
-        self.set_image()
+        if const.display:
+            self.set_image()
         self.fire = False
 
     def anim(self):
@@ -419,11 +420,3 @@ class Lava(BlocDanger, Liquid):
     def __init__(self, picture=2):
         BlocDanger.__init__(self, picture, 10)
         Liquid.__init__(self, picture)
-
-        
-
-        
-    
-
-
-

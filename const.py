@@ -39,6 +39,7 @@ path_fond_menu = "img/fond_menu.png"
 path_fond1 = "img/fond1.png"
 path_fond2 = "img/fond2.png"
 path_choix = "img/choix.png"
+display = True
 global sprite_bloc
 global sprite_lave
 global sprite_perso
