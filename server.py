@@ -34,11 +34,13 @@ import socket
 import select
 import os
 import math
+from time import *
 
 import jeu
 import map
 import perso
 import const
+import item
 from bloc import *
 
 class Server:
@@ -53,6 +55,7 @@ class Server:
         self.port = 234
         
         self.new_game("test_srv")
+        self.load_game("test_srv")
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -111,7 +114,10 @@ class Server:
                 buffer = buffer.split("/s")
                 if buffer[0] == "get_map":
                     nbr_map=int(buffer[1])
-                    buffer_ret(map.map2char(self.get_map(nbr_map)))
+                    buffer_ret=map.map2char(self.get_map(nbr_map))
+                elif buffer[0] == "co_perso":
+                    self.get_client(client).nom = buffer[1]
+                    self.
                 try:
                     client.send(buffer_ret)
                 except socket.error:
@@ -119,18 +125,18 @@ class Server:
                     
 
     def close(self):
-        for client in clients:
-            client.close()
-        sock.close()
+        for client in self.clients:
+            client.connection.close()
+        self.sock.close()
 
     def load_game(self, nom):
         i = 0
         while map.open_map("save_srv/"+nom+"/map"+str(i)) != []:
-            self.maps.append(map.Map(map.open_map("map/std/map"+str(i)),i))
+            self.maps.append(map.Map(map.open_map("save_srv/"+nom+"/map"+str(i)),i))
             i = i+1
         i = -1
         while map.open_map("save_srv/"+nom+"/map"+str(i)) != []:
-            self.maps.append(map.Map(map.open_map("map/std/map"+str(i)),i))
+            self.maps.append(map.Map(map.open_map("save_srv/"+nom+"/map"+str(i)),i))
             i = i-1
 
     def new_game(self, nom):
@@ -224,18 +230,19 @@ class Client():
         self.connection = connection
         self.adr = adr
         
-        """self.map = 0
+        self.nom = "Unknown"
+        self.map = 0
         self.id_porte = 0
         self.vie = 6
-        #self.last_dommage = time()
-        #self.last_dommage_ur = time()
+        self.last_dommage = time()
+        self.last_dommage_ur = time()
         self.last_hit = 0
-        self.inv = Inventaire()
-        item = Item(1, 1)
-        self.inv.add(item)"""
+        self.inv = item.Inventaire()
+        self.inv.add(item.Item(1,1))
         
 
 
 server = Server()
-#server.start()        
+server.start()
+server.close()      
         

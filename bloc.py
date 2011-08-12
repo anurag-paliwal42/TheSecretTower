@@ -313,7 +313,8 @@ class Liquid(Bloc):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
         self.last_chute = 0
-        self.image_orig = self.image
+        if const.display:
+            self.image_orig = self.image
         self.unit = 50.0
         self.fixe = False
 

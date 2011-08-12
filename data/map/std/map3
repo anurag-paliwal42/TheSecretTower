@@ -21,7 +21,7 @@
 1,5,100,350
 1,5,100,300
 1,5,100,250
-4,2,10,150,350
+24,150,350,50
 1,6,550,250
 1,5,400,300
 1,5,350,300
@@ -65,3 +65,8 @@
 1,1,550,50
 22,22,200,0,It's dark in my Tower./nI didn't build windows./nI don't know why.../nMaybe/c I wanted to keep my privacy.../n/n-The Fallen King
 22,22,550,0,My slaves born when it's dark/c/nthereone you should use some /ntorches to light up the levels. /nYou can build a torch with 1 stick and 1 coal./nNow/c you can be afreaid of the dark./n/n-The Fallen King
+24,600,350,50
+24,400,350,50
+24,350,350,50
+24,250,350,50
+24,500,350,50

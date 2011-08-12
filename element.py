@@ -34,15 +34,17 @@ class Element:
         self.rect = None
 
     def changer_image(self, src):
-        self.image = src
-        if self.rect == None:
-            self.rect = self.image.get_rect()
+        if const.display:
+            self.image = src
+            if self.rect == None:
+                self.rect = self.image.get_rect()
 
     def changer_text(self, text, font, color = (0,0,0)):
-        if isinstance(text, str):
-            self.image = font.render(text, 1, color)
-        if self.rect == None:
-            self.rect = self.image.get_rect()
+        if const.display:
+            if isinstance(text, str):
+                self.image = font.render(text, 1, color)
+            if self.rect == None:
+                self.rect = self.image.get_rect()
 
     def move_el(self, x, y):
         self.x = self.x+x

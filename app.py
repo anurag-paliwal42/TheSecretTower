@@ -80,32 +80,82 @@ class App:
     def main(self):
         cmd = 1
         while cmd:
-            cmd =  menu(self, "Main Menu", ["New Game", "Load Game", "Load Level","Edit Level", "Quit"])
-            
-            if cmd == 1 or cmd == 2:
-                if cmd == 1:
-                    self.perso = Perso()
-                    self.partie = []
-                    self.partie = self.nouvelle_partie(ask(self, "New Game] Game's name : "))
-                elif cmd == 2:
-                    self.partie = self.charger_partie(ask(self, "Load Game] Game's name : "))
+            cmd =  menu(self, "Main Menu", ["Play", "Edit Level", "Quit"])
+            if cmd == 1:
+                if not os.path.isdir("data/perso/"):
+                    os.mkdir("data/perso/")
+                characters = os.listdir("data/perso")[:5]
+                while len(characters) < 5:
+                    characters.append("Empty")
+                characters.append("Cancel")
+                cmd = menu(self, "Choose a Character", characters)
                 
-                self.perso.map = self.partie[1]
-                self.perso.id = self.partie[2]
-                cmd = 1
-                while open_map("save/"+self.partie[0]+"/map"+str(self.partie[1])) != [] and cmd == 1:
-                    cmd = jeu(self, open_map("save/"+self.partie[0]+"/map"+str(self.partie[1])), self.perso)
-                    self.partie[1] = self.perso.map
-                    if self.partie[1] < 0:
-                        if open_map("save/"+self.partie[0]+"/map"+str(self.partie[1])) == []:
-                            save_map("save/"+self.partie[0]+"/map"+str(self.partie[1]), self.gen_map(self.partie[1]))
+                if cmd > len(os.listdir("data/perso/")) and cmd != 6:
+                    self.perso.set_org_color()
+                    self.perso.nom = ask(self, "Enter a name for the Character")
+                    while cmd != 6:
+                        cmd = menu(self, "Choose "+self.perso.nom+"'s colors", ["Shirt", "Pants", "Hair", "Skin", "Other", "Done"], self.perso)
+                        if cmd != 6:
+                            menu_color(self, cmd-1, self.perso)
+                    self.perso.save()
+                elif cmd < 6:
+                    self.perso.load(os.listdir("data/perso")[cmd-1])
+                    cmd =  menu(self, "Play", ["Single Player", "Multi Player", "Delete Character", "Edit Character", "Cancel"], self.perso)
+                    if cmd == 1:
+                        cmd =  menu(self, "Single Player", ["Entering the Tower !", "Play Custom Level", "Cancel"], self.perso)
+            
+                        if cmd == 1:
+                            if not os.path.isdir("data/save"):
+                                os.mkdir("data/save/")
+                            saves = os.listdir("data/save")[:5]
+                            while len(saves) < 5:
+                                saves.append("Empty")
+                            saves.append("Cancel")
+                            cmd = menu(self, "Choose a Game", saves)
+                            if cmd < 6:
+                                self.perso.reset()
+                                if cmd > len(os.listdir("data/save/")) and cmd != 6:
+                                    self.partie = []
+                                    self.partie = self.nouvelle_partie(ask(self, "New Game] Game's name : "))
+                                else:
+                                    self.partie = self.charger_partie(os.listdir("data/save")[cmd-1])
+                                self.perso.map = self.partie[1]
+                                self.perso.id_porte = self.partie[2]
+                                cmd = 1
+                                while open_map("save/"+self.partie[0]+"/map"+str(self.partie[1])) != [] and cmd == 1:
+                                    cmd = jeu(self, open_map("save/"+self.partie[0]+"/map"+str(self.partie[1])), self.perso)
+                                    self.partie[1] = self.perso.map
+                                    if self.partie[1] < 0:
+                                        if open_map("save/"+self.partie[0]+"/map"+str(self.partie[1])) == []:
+                                            save_map("save/"+self.partie[0]+"/map"+str(self.partie[1]), self.gen_map(self.partie[1]))
                             
 
-            elif cmd == 3:
-                self.partie = ["Gen", 0]
-                self.perso.map = 0
-                cmd = jeu(self, open_map("map/custom/" + ask(self, "Load Level] Level's name :")), self.perso)
-            elif cmd == 4:
+                        elif cmd == 2:
+                            self.partie = ["Gen", 0]
+                            self.perso.map = 0
+                            cmd = jeu(self, open_map("map/custom/" + ask(self, "Load Level] Level's name :")), self.perso)
+                    elif cmd == 3:
+                        cmd =  menu(self, "Are you sure ?", ["Yes, delete "+self.perso.nom+" definitely !", "No, I want to keep "+self.perso.nom], self.perso)
+                        if cmd == 1:
+                            os.remove("data/perso/"+self.perso.nom)
+                    elif cmd == 4:
+                        old_name = self.perso.nom
+                        while cmd != 3:
+                            cmd =  menu(self, "Edit Character", ["Rename", "Change colors", "Done"], self.perso)
+                            if cmd == 1:
+                                self.perso.nom = ask(self, "Enter a name")
+                            elif cmd == 2:
+                                while cmd != 6:
+                                    cmd = menu(self, "Choose "+self.perso.nom+"'s colors", ["Shirt", "Pants", "Hair", "Skin", "Other", "Done"], self.perso)
+                                    if cmd != 6:
+                                        menu_color(self, cmd-1, self.perso)
+                        os.remove("data/perso/"+old_name)
+                        self.perso.save()
+
+                                
+            elif cmd == 2:
+                self.perso.reset()
+                self.perso.set_org_color()
                 self.partie = ["Gen", 0]
                 self.perso.map = 0
                 cmd = menu(self, "Edit Level", ["New level", "Load level"])
@@ -117,13 +167,13 @@ class App:
 
         pygame.quit()
         
-    def blit(self, element):
+    def blit(self, element, coef=1):
         """Ajoute Element à l'écran"""
         if isinstance(element, Perso):
             if not element.sens:
-                self.fenetre.blit(element.image, (element.x-(element.image.get_width()-50), element.y))
+                self.fenetre.blit(pygame.transform.scale(element.image, (element.image.get_width()*coef,element.image.get_height()*coef)), (element.x-(element.image.get_width()-50), element.y))
             else:
-                self.fenetre.blit(element.image, (element.x,element.y))
+                self.fenetre.blit(pygame.transform.scale(element.image, (element.image.get_width()*coef,element.image.get_height()*coef)), (element.x,element.y))
         elif isinstance(element, Element):
             self.fenetre.blit(element.image, (element.x,element.y))
     

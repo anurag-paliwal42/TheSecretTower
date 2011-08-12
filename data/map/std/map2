@@ -10,11 +10,11 @@
 4,4,1,150,50
 4,4,1,250,50
 1,1,200,100
-4,2,10,0,300
-4,2,10,0,150
-4,2,10,100,500
-4,2,10,550,450
-4,2,10,600,450
+24,0,300,50
+24,0,150,50
+24,100,500,50
+24,550,450,50
+24,600,450,50
 4,4,1,200,500
 4,4,1,250,500
 4,4,1,400,500
@@ -48,9 +48,9 @@
 1,5,550,100
 1,5,400,50
 1,5,550,50
-4,2,10,450,50
-4,2,10,500,50
-4,2,10,50,450
+24,450,50,50
+24,500,50,50
+24,50,450,50
 1,6,100,100
 1,6,350,100
 1,6,300,100
@@ -92,3 +92,8 @@
 22,22,500,200,If you put 1 stone in a workbench/c/nyou could build a furnace./nWith a furnace/c/nminerals could turn into ingots./nBefore/c you must burn the furnace with coal./n/n-With all good wishes/c The Fallen King
 22,22,250,200,Have you met my slaves ?/nThey guard my tower since my death./nThey are good fighter/c/nbut they are very stupid/c are they ?/nThey need a king.../n/n-The Fallen King
 1,1,50,200
+24,0,350,50
+24,0,400,50
+24,0,450,50
+24,550,500,50
+24,600,500,50

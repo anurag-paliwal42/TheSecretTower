@@ -27,6 +27,7 @@ import const
 from item import *
 
 from time import *
+import os
 import copy
 import math
 
@@ -44,6 +45,7 @@ class Perso(Element):
         
 
         # Propriétés
+        self.nom = "Unknown"
         self.map = 0
         self.id_porte = 0
         self.vie = 6
@@ -54,12 +56,16 @@ class Perso(Element):
         item = Item(1, 1)
         self.inv.add(item)
 
+        self.color = []
+
         # changer_image
+
         self.sens = True
         self.changement = 0
         self.angle_arm = 0
         self.changement_angle = 0
         self.rang_image = 0
+        self.set_org_color()
         self.anim(False)
         self.rect.width = 20
         self.rect.height = 40
@@ -102,7 +108,7 @@ class Perso(Element):
         elif self.inv.get_item().id == 6:
             rect = pygame.Rect(150,50, 50,50)"""
 
-        image.blit(const.sprite_arm, (0,0), rect)
+        image.blit(self.sprite_arm, (0,0), rect)
         if self.angle_arm != 0:
 
             image = pygame.transform.rotate(image, self.angle_arm)
@@ -125,7 +131,7 @@ class Perso(Element):
             rect = pygame.Rect(0,0, 50,50)
         elif self.isingrav:
             rect = pygame.Rect(100,0, 50,50)
-        image.blit(const.sprite_perso, (0,0), rect)
+        image.blit(self.sprite_perso, (0,0), rect)
         if not self.sens:
             image = pygame.transform.flip(image, True, False)
         if self.vie <= 0:
@@ -151,6 +157,48 @@ class Perso(Element):
             if time()-self.last_dommage_ur > 15:
                 self.subir_degats(1)
                 self.last_dommage_ur = time()
+
+    def set_org_color(self, id_color=-1):
+        if id_color == -1:
+            self.color = []
+            self.color.append(pygame.Color(0,128,0,255))
+            self.color.append(pygame.Color(0,93,0,255))
+            self.color.append(pygame.Color(0,0,0,255))
+            self.color.append(pygame.Color(255,221,212,255))
+            self.color.append(pygame.Color(145,72,0,255))
+        elif id_color == 0:
+            self.color[0] = pygame.Color(0,128,0,255)
+        elif id_color == 1:
+            self.color[1] = pygame.Color(0,93,0,255)
+        elif id_color == 2:
+            self.color[2] = pygame.Color(0,0,0,255)
+        elif id_color == 3:
+            self.color[3] = pygame.Color(255,221,212,255)
+        elif id_color == 4:
+            self.color[4] = pygame.Color(145,72,0,255)
+        self.update_color()
+
+    def set_color(self, surface):
+        new_surface = copy.copy(surface)
+        for x in range(surface.get_width()):
+            for y in range(surface.get_height()):
+                # corps
+                if str(surface.get_at((x,y))) == "(0, 255, 0, 255)":
+                    new_surface.set_at((x,y), self.color[0])
+                # pants
+                elif str(surface.get_at((x,y))) == "(0, 0, 255, 255)":
+                    new_surface.set_at((x,y), self.color[1])
+                # cheveux
+                elif str(surface.get_at((x,y))) == "(255, 0, 0, 255)":
+                    new_surface.set_at((x,y), self.color[2])
+                # skin
+                elif str(surface.get_at((x,y))) == "(255, 220, 220, 255)":
+                    new_surface.set_at((x,y), self.color[3])
+                # other
+                elif str(surface.get_at((x,y))) == "(150, 100, 0, 255)":
+                    new_surface.set_at((x,y), self.color[4])
+        return new_surface
+        
         
     def hit(self):
         self.last_hit = time()
@@ -160,6 +208,56 @@ class Perso(Element):
             else:
                 self.angle_arm = 70
             self.changement_angle = time()
+
+    def get_char(self):
+        buffer = self.nom+"\n"
+        for i in self.color:
+            buffer += str(i.r)+","
+            buffer += str(i.g)+","
+            buffer += str(i.b)
+            buffer += "\n"
+        return buffer
+
+    def save(self):
+        if not os.path.isdir("data/perso"):
+            os.mkdir("data/perso")
+        file = open("data/perso/"+self.nom, "w")
+        file.write(self.get_char())
+        file.close()
+
+    def load(self, nom):
+        file = open("data/perso/"+nom, 'r')
+        buffer = file.read()
+        buffer = buffer.split("\n")
+        self.nom = buffer[0]
+        buffer.remove(buffer[0])
+        for i in range(5):
+            rgb = buffer[i].split(",")
+            self.color[i] = pygame.Color(int(rgb[0]), int(rgb[1]), int(rgb[2]), 255)
+        self.update_color()
+    
+    def update_color(self, fast=False):
+        self.vie = 6
+        self.sprite_perso = self.set_color(const.sprite_perso)
+        if not fast:
+            self.sprite_arm = self.set_color(const.sprite_arm) 
+        self.anim(False)
+
+    def reset(self):
+        self.move_el(-self.x, -self.y)
+        self.map = 0
+        self.id_porte = 0
+        self.vie = 6
+        self.last_dommage = time()
+        self.last_dommage_ur = time()
+        self.last_hit = 0
+        self.inv = Inventaire()
+        item = Item(1, 1)
+        self.inv.add(item)
+
+        self.v_y = 0
+        self.v_x = 0
+        self.isingrav = True
             
 
 

@@ -126,9 +126,9 @@ def jeu(app, map, perso):
             fps = int(1/(time() - prev))
 
         info_b_txt = []
-        info_b_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 4, 4)
+        info_b_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0]+"\nPlayer : "+perso.nom, 4, 4)
         info_w_txt = []
-        info_w_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 0, 0, (255,255,255))
+        info_w_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0]+"\nPlayer : "+perso.nom, 0, 0, (255,255,255))
         prev = time()
 
         b_text_item.changer_text(perso.inv.get_item().nom, app.font_petit)
