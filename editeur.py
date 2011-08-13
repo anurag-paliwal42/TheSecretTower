@@ -87,7 +87,7 @@ def editeur(app, map, nom):
         if input.mousebuttons[1]:
             input.mousebuttons[1] = 0
             for i in map:
-                if (i.x == input.get_mouse_bloc()[0] and i.y == input.get_mouse_bloc()[1]):
+                if (i.x == input.get_mouse_bloc()[0] and i.y == input.get_mouse_bloc()[1]) and choix != 6:
                     map.remove(i)
             bloc = copy.copy(blocs[choix])
             bloc.move_el(-bloc.x+input.get_mouse_bloc()[0], -bloc.y+input.get_mouse_bloc()[1])

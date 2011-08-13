@@ -68,6 +68,7 @@ class App:
         const.sprite_item = pygame.image.load("img/item.png").convert_alpha()
         const.sprite_mobs = pygame.image.load("img/mobs.png").convert_alpha()
         const.sprite_degats = pygame.image.load("img/degats.png").convert_alpha()
+        const.sprite_fire = pygame.image.load("img/fire.png").convert_alpha()
         const.vide = pygame.image.load("img/vide.png").convert_alpha()
 
         self.perso = Perso()
@@ -131,6 +132,7 @@ class App:
                             
 
                         elif cmd == 2:
+                            self.perso.reset()
                             self.partie = ["Gen", 0]
                             self.perso.map = 0
                             cmd = jeu(self, open_map("map/custom/" + ask(self, "Load Level] Level's name :")), self.perso)

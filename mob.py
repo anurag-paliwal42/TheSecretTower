@@ -24,6 +24,8 @@ from element import *
 from bloc import *
 import const
 
+from time import *
+
 # Pygame
 import pygame
 from pygame.locals import *
@@ -52,7 +54,9 @@ class Mob(Element):
         self.rang_image = 0
         self.last_degats = 0
 
-
+        self.fired = False
+        self.fired_time_stop = 0
+        self.last_dommage_fire = time()
 
         self.isingrav=False
         self.v_y = 0
@@ -92,6 +96,17 @@ class Mob(Element):
 
     def anim(self):
         image = copy.copy(const.vide)
+
+        # fire
+        if self.fired:
+            rect = pygame.Rect(0,random.randint(0, 3)*50, 50,50)
+            image.blit(const.sprite_fire, (0,0), rect)
+            if time()-self.last_dommage_fire > 4:
+                self.subir_degats(5)
+                self.last_dommage_fire = time()
+            if time() > self.fired_time_stop:
+                self.fired = False
+
         rect = pygame.Rect(self.rang_image*50,self.id*50, 50,50)
 
         if time() - self.changement > 0.1 and not self.isingrav:
@@ -192,7 +207,10 @@ class Mob(Element):
                     if i.atk >= 10:
                         self.subir_degats(i.atk)
                     collided=True
-                elif not isinstance(i, Porte) and not isinstance(i, Echelle) and not isinstance(i, Deco):
+                elif isinstance(i, Lava):
+                    self.fired = True
+                    self.fired_time_stop = time()+(i.unit*0.4)
+                elif not isinstance(i, Porte) and not isinstance(i, Echelle) and not isinstance(i, Deco) and not isinstance(i, Liquid):
                     collided=True
             
         return collided

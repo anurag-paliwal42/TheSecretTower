@@ -48,5 +48,6 @@ global sprite_item
 global sprite_mobs
 global sprite_torch
 global sprite_degats
+global sprite_fire
 global vide
 

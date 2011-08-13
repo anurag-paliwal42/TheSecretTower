@@ -257,6 +257,7 @@ def jeu(app, map, perso):
         if input.key[K_RETURN]:
             if perso.vie <= 0:
                 perso.vie = 6
+                perso.fired = False
                 for i in map:
                     if isinstance(i, Porte):
                         if i.id == perso.id_porte:

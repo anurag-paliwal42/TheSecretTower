@@ -51,10 +51,13 @@ class Perso(Element):
         self.vie = 6
         self.last_dommage = time()
         self.last_dommage_ur = time()
+        self.last_dommage_fire = time()
         self.last_hit = 0
         self.inv = Inventaire()
         item = Item(1, 1)
         self.inv.add(item)
+        self.fired = False
+        self.fired_time_stop = 0
 
         self.color = []
 
@@ -90,6 +93,7 @@ class Perso(Element):
     def anim(self, etat):
 
         image = copy.copy(const.vide)
+
         # Bras
         rect = pygame.Rect(0,0, 50,50)
         if self.inv.get_item().id%5 !=0 and self.inv.get_item().id < 30:
@@ -118,6 +122,12 @@ class Perso(Element):
                 else:
                     self.angle_arm = 0
                 self.changement_angle = time()
+
+
+        # fire
+        if self.fired:
+            rect = pygame.Rect(0,random.randint(0, 3)*50, 50,50)
+            image.blit(const.sprite_fire, (0,0), rect)
         # corps
         rect = pygame.Rect(self.rang_image*50,0, 50,50)
         if time() - self.changement > 0.1 and etat and not self.isingrav:
@@ -149,9 +159,16 @@ class Perso(Element):
             image = copy.copy(const.vide)
             image.blit(const.sprite_degats, (0,0), rect)
 
-        
+
         self.changer_image(image)
 
+        # fire
+        if self.fired:
+            if time()-self.last_dommage_fire > 5:
+                self.subir_degats(1)
+                self.last_dommage_fire = time()
+            if time() > self.fired_time_stop:
+                self.fired = False
         # Uranium
         if self.inv.get_item().id in [26,27,28,29,30]:
             if time()-self.last_dommage_ur > 15:
@@ -254,6 +271,8 @@ class Perso(Element):
         self.inv = Inventaire()
         item = Item(1, 1)
         self.inv.add(item)
+        self.fired = False
+        self.fired_time_stop = 0
 
         self.v_y = 0
         self.v_x = 0
@@ -360,7 +379,10 @@ class Perso(Element):
                 elif isinstance(i, BlocDanger):
                     self.subir_degats(i.atk)
                     collided=True
-                elif not isinstance(i, Porte) and not isinstance(i, Echelle) and not isinstance(i, Deco):
+                elif isinstance(i, Lava):
+                    self.fired = True
+                    self.fired_time_stop = time()+(i.unit*0.4)
+                elif not isinstance(i, Porte) and not isinstance(i, Echelle) and not isinstance(i, Deco) and not isinstance(i,Liquid):
                     collided=True
             
         return collided

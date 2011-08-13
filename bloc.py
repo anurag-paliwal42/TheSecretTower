@@ -417,7 +417,6 @@ class Liquid(Bloc):
                     map.append(bloc)
   
 
-class Lava(BlocDanger, Liquid):
+class Lava(Liquid):
     def __init__(self, picture=2):
-        BlocDanger.__init__(self, picture, 10)
         Liquid.__init__(self, picture)

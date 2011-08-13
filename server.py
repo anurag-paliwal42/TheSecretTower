@@ -111,13 +111,34 @@ class Server:
                 print self.get_client(client).adr, buffer
                 if buffer == "exit":
                     self.runned = False
-                buffer = buffer.split("/s")
+                buffer = buffer.split(";")
                 if buffer[0] == "get_map":
-                    nbr_map=int(buffer[1])
-                    buffer_ret=map.map2char(self.get_map(nbr_map))
+                    buffer_ret=map.map2char(self.get_map(self.get_client(client).map))
                 elif buffer[0] == "co_perso":
                     self.get_client(client).nom = buffer[1]
-                    self.
+                    self.get_client(client).color.append(buffer[2])
+                    self.get_client(client).color.append(buffer[3])
+                    self.get_client(client).color.append(buffer[4])
+                    self.get_client(client).color.append(buffer[5])
+                    self.get_client(client).color.append(buffer[6])
+                elif buffer[0] == "get_perso":
+                    for i in self.clients:
+                        if i != self.get_clients(client):
+                            buffer_ret = i.get_char()
+                elif buffer[0] == "get_pos_perso":
+                    for i in self.clients:
+                        if i != self.get_clients(client) and i.map == self.get_clients(client).map:
+                            buffer_ret = i.nom+";"+str(i.x)+";"+str(i.y)
+                elif buffer[0] == "set_pos":
+                    self.get_client(client).x = int(buffer[1])
+                    self.get_client(client).y = int(buffer[2])
+                elif buffer[0] == "set_map_perso":
+                    self.get_client(client).map = int(buffer[1])
+                    self.get_client(client).id_porte = int(buffer[2])
+                elif buffer[0] == "set_vie":
+                    self.get_client(client).vie = int(buffer[1])
+                elif buffer[0] == "nbr_player":
+                    buffer_ret = str(len(self.clients))
                 try:
                     client.send(buffer_ret)
                 except socket.error:
@@ -231,14 +252,20 @@ class Client():
         self.adr = adr
         
         self.nom = "Unknown"
+        self.x = 0
+        self.y = 0
         self.map = 0
         self.id_porte = 0
         self.vie = 6
-        self.last_dommage = time()
-        self.last_dommage_ur = time()
-        self.last_hit = 0
         self.inv = item.Inventaire()
         self.inv.add(item.Item(1,1))
+        self.color = []
+
+    def get_char(self):
+        buffer = i.nom+str(self.map)+";"+str(self.id_porte)+";"+str(self.vie)+";"+self.inv.save()+";"+str(self.inv.item_sel)
+        for i in self.color:
+            buffer += ";"+i
+        return buffer
         
 
 
