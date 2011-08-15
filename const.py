@@ -54,16 +54,20 @@ global vide
 # Thread
 port = 234
 global host
+global output
 global input
 global input_udp
 global map
+global events
 global persos
 global runned
 runned = False
 input = []
+output = ""
 input_udp = ""
 map = []
 persos = []
+events = []
 
 
 

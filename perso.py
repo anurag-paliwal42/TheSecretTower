@@ -46,7 +46,7 @@ class Perso(Element):
 
         # Propriétés
         self.nom = "Unknown"
-        self.ctlr = True
+
         self.map = 0
         self.id_porte = 0
         self.vie = 6
@@ -61,6 +61,10 @@ class Perso(Element):
         self.fired_time_stop = 0
 
         self.color = []
+
+        # Multi-joueur
+        self.ctrl = True
+        self.hitting = False
 
         # changer_image
 
@@ -222,12 +226,11 @@ class Perso(Element):
         
         
     def hit(self):
+        if self.ctrl:
+            self.hitting = True
         self.last_hit = time()
         if self.angle_arm == 0:
-            if self.sens:
-                self.angle_arm = 70
-            else:
-                self.angle_arm = 70
+            self.angle_arm = 70
             self.changement_angle = time()
 
     def get_char(self, sep="\n"):

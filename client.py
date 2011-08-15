@@ -28,21 +28,36 @@ from perso import *
 
 def connect():
     stop = False
+    id_last_event = 0
     tcp = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     udp = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
  
-    tcp.connect((const.host,const.port))
-    
-    send(tcp, "get_perso")
-    while const.runned:
+    try:
+        tcp.connect((const.host,const.port))
         for i in const.input:
             send(tcp,i);
+            const.input = []
         const.input = []
+    except socket.error:
+        const.output = const.host+":"+str(const.port)+" : Connection Refused"
+    else:
         if const.input_udp != "":
             send_udp(udp,const.input_udp)
             const.input_udp = ""
-        send_udp(udp, "get_map")
-        send_udp(udp, "get_pos", tcp)
+        const.output = "Connected"
+        send(tcp, "get_perso")
+        send(tcp, "get_map")
+        id_last_event = send(tcp, "get_last_event")
+        while const.runned:
+            for i in const.input:
+                send(tcp,i);
+                const.input = []
+            if const.input_udp != "":
+                send_udp(udp,const.input_udp)
+                const.input_udp = ""
+
+            send_udp(udp, "get_pos", tcp)
+            id_last_event = send(tcp,"get_event;"+str(id_last_event));
 
         
 
@@ -50,8 +65,6 @@ def send_udp(sock, cmd, tcp=None):
     sock.sendto(cmd, (const.host, const.port))
     buffer = sock.recv(2048)
 
-    if cmd == "get_map":
-        const.map = map.char2map(buffer) 
     if cmd == "get_pos":
         for i in buffer.split("\n"):
             if i != " " and i != "":
@@ -68,14 +81,15 @@ def send_udp(sock, cmd, tcp=None):
                         perso.v_y = int(char_perso[5])
                         perso.sens = bool(int(char_perso[6]))
                         perso.isingrav = bool(int(char_perso[7]))
-                        perso.fired = bool(int(char_perso[8]))
+                        perso.hitting = bool(int(char_perso[8]))
+                        perso.fired = bool(int(char_perso[9]))
 
                 if not found:
                     send(tcp, "get_perso")
             
 def send(sock, cmd):
     sock.send(cmd)
-    buffer = sock.recv(2048)
+    buffer = sock.recv(4096)
 
     if cmd == "get_perso":
         for i in buffer.split("\n"):
@@ -100,5 +114,20 @@ def send(sock, cmd):
                         new_perso.char2color(char_perso[nbr+7], nbr)
                     new_perso.update_color()
                     const.persos.append(new_perso)
+    if cmd == "get_map":
+        const.map = map.char2map(buffer, True) 
+
+    if cmd == "get_last_event":
+        return int(buffer)
+
+    if cmd.split(";")[0] == "get_event":
+        buffer = buffer.split("\n")
+        id_last_event = buffer[0]
+        buffer.remove(id_last_event)
+        if buffer != [""]:
+            print buffer
+            const.events.extend(buffer)
+        return id_last_event
+    return True
 
 

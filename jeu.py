@@ -125,15 +125,26 @@ def jeu(app, map, perso):
     prev = time()+1
 
     if app.partie[0] == "Multi":
-        last_update_map = 0
+        map = const.map
 
     while not input.quit:
         if app.partie[0] == "Multi":
             
-            const.input_udp="set_pos;"+str(perso.x)+";"+str(perso.y)+";"+str(perso.v_x+perso.tend_x)+";"+str(perso.v_y)+";"+str(int(perso.sens))
-            if time() - last_update_map > 5:
-                map = const.map
-                last_update_map = time()
+            const.input_udp="set_pos;"+str(perso.x)+";"+str(perso.y)+";"+str(perso.v_x+perso.tend_x)+";"+str(perso.v_y)+";"+str(int(perso.sens))+";"+str(int(perso.hitting))
+            for event in const.events:
+                buffer = event.split(";")
+                const.events.remove(event)
+                if len(buffer) > 1:
+                    print buffer
+                    if buffer[1] == "hit_block":
+                        x = int(buffer[2])
+                        y = int(buffer[3])
+                        damage = float(buffer[4])
+                        for i in map:
+                            if i.x == x and i.y == y:
+                                if i.hit(damage, False):
+                                    map.remove(i)
+                    
 
         # controle fps
         fps = int(1/(time() - prev))
@@ -239,7 +250,8 @@ def jeu(app, map, perso):
                 else:
                     perso.collided_utils(-perso.x+coord[0],-perso.y+coord[1],map, app, input)
 
-
+        if not input.mousebuttons[1] and not input.mousebuttons[3]:
+            perso.hitting = False
         if input.mousebuttons[4]:
             perso.inv.changer_select(-1)
             input.mousebuttons[4] = 0
@@ -325,6 +337,8 @@ def jeu(app, map, perso):
             for i in const.persos:
                 if i.map == perso.map:
                     i.tendance(map)
+                    if i.hitting:
+                        i.hit()
                     app.blit(i)
         app.blit(perso)
 

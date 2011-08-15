@@ -182,9 +182,20 @@ class App:
         const.input_udp = "set_adr_udp;"+self.perso.nom
         thread.start()
         tps_connect = 0
-        while const.map == []:
+        cmd = 0
+        while const.output == "":
             tps_connect +=1
-        cmd = jeu(self, const.map, self.perso)
+        if const.output == "Connected":
+            const.output = ""
+
+            while const.map == []:
+                tps_connect +=1
+            
+            cmd = jeu(self, const.map, self.perso)
+        else:
+            cmd = menu(self, const.output, ["Ok"])
+
+        return cmd
 
     def blit(self, element, coef=1):
         """Ajoute Element à l'écran"""

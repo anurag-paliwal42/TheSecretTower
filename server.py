@@ -91,6 +91,7 @@ class Server:
 
         buffer_ret = ""
         if buffer[0] == "set_adr_udp":
+            print buffer
             self.get_client_nom(buffer[1]).adr_udp = adr
         elif buffer[0] == "set_pos":
             self.get_client_adr(adr).x = int(buffer[1])
@@ -98,12 +99,11 @@ class Server:
             self.get_client_adr(adr).v_x = int(buffer[3])
             self.get_client_adr(adr).v_y = int(buffer[4])
             self.get_client_adr(adr).sens = int(buffer[5])
-        elif buffer[0] == "get_map":
-            buffer_ret=map.map2char(self.get_map(self.get_client_adr(adr).map))
+            self.get_client_adr(adr).hitting = int(buffer[6])
         elif buffer[0] == "get_pos":
             for i in self.clients:
                 if i != self.get_client_adr(adr):
-                    buffer_ret += i.nom+";"+str(i.map)+";"+str(i.x)+";"+str(i.y)+";"+str(i.v_x)+";"+str(i.v_y)+";"+str(int(i.sens))+";"+str(int(i.isingrav))+";"+str(int(i.fired))+"\n"
+                    buffer_ret += i.nom+";"+str(i.map)+";"+str(i.x)+";"+str(i.y)+";"+str(i.v_x)+";"+str(i.v_y)+";"+str(int(i.sens))+";"+str(int(i.isingrav))+";"+str(int(i.hitting))+";"+str(int(i.fired))+"\n"
         
         sock.sendto(buffer_ret,adr)        
 
@@ -136,7 +136,7 @@ class Server:
     def get_map(self, id):
         for i in self.maps:
            if i.id == id:
-               return i.map
+               return i
 
     def read(self):
         clients_to_read = []
@@ -146,11 +146,11 @@ class Server:
             pass
         else:
             for client in clients_to_read: 
-                buffer = client.recv(1024)
+                pbuffer = client.recv(1024)
                 buffer_ret = " "
-                if buffer == "exit":
+                if pbuffer == "exit":
                     self.runned = False
-                buffer = buffer.split(";")
+                buffer = pbuffer.split(";")
                 if buffer[0] == "co_perso":
                     self.get_client(client).nom = buffer[1]
                     self.get_client(client).color = []
@@ -160,30 +160,39 @@ class Server:
                     self.get_client(client).color.append(buffer[5])
                     self.get_client(client).color.append(buffer[6])
                 elif buffer[0] == "get_perso":
-                    print buffer
                     for i in self.clients:
                         if i != self.get_client(client):
                             buffer_ret = i.get_char()
                 elif buffer[0] == "set_map_perso":
                     self.get_client(client).map = int(buffer[1])
                     self.get_client(client).id_porte = int(buffer[2])
+                elif buffer[0] == "get_map":
+                    buffer_ret=map.map2char(self.get_map(self.get_client(client).map).map)
                 elif buffer[0] == "set_vie":
                     self.get_client(client).vie = int(buffer[1])
                 elif buffer[0] == "nbr_player":
                     buffer_ret = str(len(self.clients))
+                elif buffer[0] == "get_last_event":
+                    buffer_ret=str(len(self.get_map(self.get_client(client).map).event))
+                elif buffer[0] == "get_event":
+                    #print "----------------"
+                    #print self.get_map(self.get_client(client).map).event
+                    buffer_ret=self.get_map(self.get_client(client).map).send_event(int(buffer[1]), self.get_client(client).nom)
+                    #print "RET > "+buffer_ret
                 elif buffer[0] == "jump":
                     self.get_client(client).isingrav = True
                 elif buffer[0] == "stop_jump":
                     self.get_client(client).isingrav = False
                 elif buffer[0] == "hit_block":
-                    buffer_ret = str(len(self.clients))
+                    print self.get_client(client).nom+";"+pbuffer
+                    self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
                     x = int(buffer[1])
                     y = int(buffer[2])
                     damage = float(buffer[3])
-                    for i in self.get_map(self.get_client(client).map):
+                    for i in self.get_map(self.get_client(client).map).map:
                         if i.x == x and i.y == y:
                             if i.hit(damage):
-                                self.get_map(self.get_client(client).map).remove(i)
+                                self.get_map(self.get_client(client).map).map.remove(i)
                             
                 try:
                     client.send(buffer_ret)
@@ -314,6 +323,7 @@ class Client():
         self.color.append("145,72,0")
         self.sens = True
         self.fired = False
+        self.hitting = False
 
         # Gravité
         self.v_y = 0
