@@ -250,14 +250,15 @@ class Item():
         self.atk = 0
         self.element = Element()
         if (id != 0):
-            image = copy.copy(const.vide)
-            if id%5 != 0:
-                rect = pygame.Rect((id%5)*50-50,int(id/5)*50, 50,50)
-            else:
-                rect = pygame.Rect(200,int(id/5)*50-50, 50,50)
-            image.blit(const.sprite_item, (0,0), rect)
-            self.element.changer_image(image)
-            self.element.move_el(320,540)
+            if const.display:
+                image = copy.copy(const.vide)
+                if id%5 != 0:
+                    rect = pygame.Rect((id%5)*50-50,int(id/5)*50, 50,50)
+                else:
+                    rect = pygame.Rect(200,int(id/5)*50-50, 50,50)
+                image.blit(const.sprite_item, (0,0), rect)
+                self.element.changer_image(image)
+                self.element.move_el(320,540)
             self.atk = 1
             self.damage = 0
         if id == 1:

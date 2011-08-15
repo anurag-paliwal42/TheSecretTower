@@ -46,6 +46,7 @@ class Perso(Element):
 
         # Propriétés
         self.nom = "Unknown"
+        self.ctlr = True
         self.map = 0
         self.id_porte = 0
         self.vie = 6
@@ -78,17 +79,19 @@ class Perso(Element):
         # Gravité
         self.v_y = 0
         self.v_x = 0
+        self.tend_x = 0
         self.isingrav = True
     
 
     def subir_degats(self, degat):
-        if (self.vie > 0 and time()-self.last_dommage > 1):
-            self.last_dommage = time()
-            self.vie = self.vie - degat
-            self.sauter(0,-5, True)
-            return True
-        if (self.vie <= 0):
-            return False
+        if self.ctrl:
+            if (self.vie > 0 and time()-self.last_dommage > 1):
+                self.last_dommage = time()
+                self.vie = self.vie - degat
+                self.sauter(0,-5, True)
+                return True
+            if (self.vie <= 0):
+                return False
 
     def anim(self, etat):
 
@@ -163,17 +166,18 @@ class Perso(Element):
         self.changer_image(image)
 
         # fire
-        if self.fired:
+        if self.fired and self.ctrl:
             if time()-self.last_dommage_fire > 5:
                 self.subir_degats(1)
                 self.last_dommage_fire = time()
             if time() > self.fired_time_stop:
                 self.fired = False
         # Uranium
-        if self.inv.get_item().id in [26,27,28,29,30]:
+        if self.inv.get_item().id in [26,27,28,29,30] and self.ctrl:
             if time()-self.last_dommage_ur > 15:
                 self.subir_degats(1)
                 self.last_dommage_ur = time()
+
 
     def set_org_color(self, id_color=-1):
         if id_color == -1:
@@ -226,14 +230,26 @@ class Perso(Element):
                 self.angle_arm = 70
             self.changement_angle = time()
 
-    def get_char(self):
-        buffer = self.nom+"\n"
+    def get_char(self, sep="\n"):
+        buffer = self.nom+sep
         for i in self.color:
             buffer += str(i.r)+","
             buffer += str(i.g)+","
             buffer += str(i.b)
-            buffer += "\n"
+            buffer += sep
         return buffer
+
+    def from_char(self, buffer, sep="\n"):
+        buffer = buffer.split(sep)
+        self.nom = buffer[0]
+        buffer.remove(buffer[0])
+        for i in range(5):
+            self.char2color(buffer[i], i)
+            
+    def char2color(self, buffer, nbr_color):
+        rgb = buffer.split(",")
+        self.color[nbr_color] = pygame.Color(int(rgb[0]), int(rgb[1]), int(rgb[2]), 255)
+
 
     def save(self):
         if not os.path.isdir("data/perso"):
@@ -244,14 +260,9 @@ class Perso(Element):
 
     def load(self, nom):
         file = open("data/perso/"+nom, 'r')
-        buffer = file.read()
-        buffer = buffer.split("\n")
-        self.nom = buffer[0]
-        buffer.remove(buffer[0])
-        for i in range(5):
-            rgb = buffer[i].split(",")
-            self.color[i] = pygame.Color(int(rgb[0]), int(rgb[1]), int(rgb[2]), 255)
+        self.from_char(file.read())
         self.update_color()
+
     
     def update_color(self, fast=False):
         self.vie = 6
@@ -277,8 +288,16 @@ class Perso(Element):
         self.v_y = 0
         self.v_x = 0
         self.isingrav = True
-            
 
+    def tendance(self, map):
+        if self.v_x != 0:
+            self.anim(True)
+        else:
+            self.anim(False)
+        if self.isingrav:
+            self.move_el(0, self.v_y)
+        self.move_el(self.v_x, 0)
+            
 
     ################### Moteur Physique ###################
 
@@ -287,18 +306,20 @@ class Perso(Element):
     def tomber(self, map):
         if self.y < 550 or self.v_y < 0:
            if self.move(self.v_x, self.v_y, map):
-               if self.v_y <> 0:
+               if self.v_y != 0:
                    self.isingrav = True
                self.v_y = self.v_y + 1
 
 
            else:
                self.isingrav = False
+               const.input.append("stop_jump")
                self.v_y = 0
                self.v_x = 0
 
         else: 
             self.isingrav = False
+            const.input.append("stop_jump")
     
     # Fait sauter notre personnage
     # x : vitesse en x
@@ -308,6 +329,7 @@ class Perso(Element):
             self.v_y = y
             self.v_x = x
             self.isingrav = True
+            const.input.append("jump")
 
     # Déplacer le personnage avec collision
     # x : deplacement en x
@@ -340,6 +362,7 @@ class Perso(Element):
         if self.collided_type(0,0, map, Echelle):
                 self.move(0,-5, map)
                 self.isingrav = False
+                const.input.append("stop_jump")
                 self.v_y = 0
                 self.v_x = 0
 

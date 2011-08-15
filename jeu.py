@@ -28,6 +28,7 @@ from event import *
 from map import *
 from menu import *
 from char import *
+import const
 
 from time import *
 import random
@@ -57,20 +58,26 @@ def jeu(app, map, perso):
 
     # Noir
     shadow = []
-    shadow = set_shadow(shadow, map)
+    shadow = set_shadow(shadow, map, app.perso)
+    dark = Element()
+    dark.changer_image(pygame.Surface((50, 50)))
+    dark_middle = Element()
+    dark_middle.changer_image(pygame.Surface((50, 50)))
+    dark_middle.image.set_alpha(75)
 
     mobs = []
-    for i in shadow:
-        # pop monstre
-        if (i.image.get_alpha() == 75 or i.image.get_alpha() == None) and random.randint(1, 5) == 1:
-            creat = True
-            for bloc in map:
-                if bloc.x == i.x and bloc.y == i.y:
-                    creat = False
-            if creat:
-                mob = Mob(random.randint(0,2))
-                mob.move_el(i.x, i.y)
-                mobs.append(mob)
+    if app.partie[0] != "Multi":
+        for i in shadow:
+            # pop monstre
+            if random.randint(1, 5) == 1:
+                creat = True
+                for bloc in map:
+                    if bloc.x == i[0] and bloc.y == i[1]:
+                        creat = False
+                if creat:
+                    mob = Mob(random.randint(0,2))
+                    mob.move_el(i[0], i[1])
+                    mobs.append(mob)
 
 
     # interface 
@@ -117,8 +124,16 @@ def jeu(app, map, perso):
     cmd = 1
     prev = time()+1
 
+    if app.partie[0] == "Multi":
+        last_update_map = 0
+
     while not input.quit:
-        
+        if app.partie[0] == "Multi":
+            
+            const.input_udp="set_pos;"+str(perso.x)+";"+str(perso.y)+";"+str(perso.v_x+perso.tend_x)+";"+str(perso.v_y)+";"+str(int(perso.sens))
+            if time() - last_update_map > 5:
+                map = const.map
+                last_update_map = time()
 
         # controle fps
         fps = int(1/(time() - prev))
@@ -141,9 +156,8 @@ def jeu(app, map, perso):
             w_text_item2.changer_text("" , app.font_petit, (255,255,255))
 
         # Shadow
-        for i in shadow:
-            if i.image.get_alpha() == 0:
-                i.image.set_alpha(255)
+        shadow = []
+        shadow = set_shadow(shadow, map, app.perso)
 
         # Physique Liquide
         for i in map:
@@ -197,8 +211,7 @@ def jeu(app, map, perso):
                     perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Terre)
                     perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Stone)
                     perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Wood)
-                    if perso.collided_type(-perso.x+coord[0],-perso.y+coord[1], map, Deco):
-                        shadow = set_shadow(shadow, map)
+                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1], map, Deco)
                     perso.collided_mob(mobs)
 
                 
@@ -222,7 +235,6 @@ def jeu(app, map, perso):
  
                         if not collided:
                             map.append(bloc) 
-                            shadow = set_shadow(shadow, map)
                             perso.inv.delete()
                 else:
                     perso.collided_utils(-perso.x+coord[0],-perso.y+coord[1],map, app, input)
@@ -248,12 +260,15 @@ def jeu(app, map, perso):
                 perso.monter_echelle(map)
             if input.key[K_a]:
                 perso.move(-5,0, map)
+                perso.tend_x = -5
                 perso.anim(True)
             if input.key[K_d]:
                 perso.move(5,0, map)
+                perso.tend_x = 5
                 perso.anim(True)
         if not input.key[K_a] and not input.key[K_d]:
             perso.anim(False)
+            perso.tend_x = 0
         if input.key[K_RETURN]:
             if perso.vie <= 0:
                 perso.vie = 6
@@ -265,7 +280,7 @@ def jeu(app, map, perso):
                             perso.move_el(i.x,i.y)
         if input.key[K_ESCAPE]:
             input.key[K_ESCAPE] = 0
-            if app.partie[0] != "Gen":
+            if app.partie[0] != "Gen" and app.partie[0] != "Multi":
                 cmd = menu(app, "Break", ["Resume", "Save game", "Quit"])
             else:
                 cmd = menu(app, "Break", ["Resume", "Quit"])
@@ -298,28 +313,28 @@ def jeu(app, map, perso):
         for i in mobs:
             i.update(map)
             creat = True
-            for dark in shadow:
-                if (int(i.x/50) == int(dark.x/50) and int(i.y/50) == int(dark.y/50)):
-                    if dark.image.get_alpha() < 255:
+            for coord_dark in shadow:
+                if (int(i.x/50) == int(coord_dark[0]/50) and int(i.y/50) == int(coord_dark[1]/50)):
+                    if coord_dark[2]:
                         creat = False
             if creat and i.vie > 0:
                 i.update(map)
                 app.blit(i)
  
+        if app.partie[0] == "Multi":
+            for i in const.persos:
+                if i.map == perso.map:
+                    i.tendance(map)
+                    app.blit(i)
         app.blit(perso)
 
-        src_x = app.perso.x
-        src_y = app.perso.y
-        intens = 4
-        if app.perso.inv.get_item().id == 0:
-            if app.perso.inv.get_item().bloc.picture == 13:
-                intens = 6
-        for dark in shadow:
-            if math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < (intens-2)*50:
-                dark.image.set_alpha(0)
-            elif math.fabs(src_x-dark.x)+math.fabs(src_y-dark.y) < intens*50 and dark.image.get_alpha != 75:
-                dark.image.set_alpha(75)
-            app.blit(dark)
+        for coord_dark in shadow:
+            if coord_dark[2]:
+                dark_middle.move_el(-dark_middle.x+coord_dark[0], -dark_middle.y+coord_dark[1])
+                app.blit(dark_middle)
+            else:
+                dark.move_el(-dark.x+coord_dark[0], -dark.y+coord_dark[1])
+                app.blit(dark)
 
         if app.coef > 1:
             app.scale(app.coef)
@@ -378,15 +393,21 @@ def jeu(app, map, perso):
 
 
         if perso.map != app.partie[1]:
-            if app.partie[0] != "Gen":
+            if app.partie[0] != "Gen" and app.partie[0] != "Multi":
                 save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
             return 1
 
-    app.save_partie()
-    save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
+
+    if app.partie[0] != "Gen" and app.partie[0] != "Multi":
+        app.save_partie()
+        save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
     return 0
 
-def set_shadow(shadow, map):
+def set_shadow(shadow, map, perso):
+    intens_perso = 4
+    if perso.inv.get_item().id == 0:
+        if perso.inv.get_item().bloc.picture == 13:
+            intens_perso = 6
     shadow_new = []
     for x in range(16):
         for y in range(12):
@@ -394,22 +415,25 @@ def set_shadow(shadow, map):
             for i in shadow:
                 if i.x == x*50 and i.y == y*50:
                     alpha = i.image.get_alpha()
-            dark = Element()
-            dark.changer_image(pygame.Surface((50, 50)))
-            dark.move_el(x*50,y*50)
+            coord_dark = [x*50,y*50, False]
             if alpha == 75:
-                dark.image.set_alpha(75)
+                coord_dark[2]=True
             delete = False
+            if math.fabs(perso.x-coord_dark[0])+math.fabs(perso.y-coord_dark[1]) < (intens_perso-2)*50:
+                delete = True
+            elif math.fabs(perso.x-coord_dark[0])+math.fabs(perso.y-coord_dark[1]) < intens_perso*50:
+                coord_dark[2] = True
             for i in map:
                 intens = 0
                 if i.picture == 2:
                     intens = 4
                 if i.picture == 13:
                     intens = 6
-                if math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < (intens-2)*50:
-                    delete = True
-                elif math.fabs(i.x-dark.x)+math.fabs(i.y-dark.y) < intens*50:
-                    dark.image.set_alpha(75)
+                if intens !=0:
+                    if math.fabs(i.x-coord_dark[0])+math.fabs(i.y-coord_dark[1]) < (intens-2)*50:
+                        delete = True
+                    elif math.fabs(i.x-coord_dark[0])+math.fabs(i.y-coord_dark[1]) < intens*50:
+                        coord_dark[2] = True
             if delete == False:
-                shadow_new.append(dark)                        
+                shadow_new.append(coord_dark)                        
     return shadow_new

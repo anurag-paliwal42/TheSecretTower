@@ -194,6 +194,15 @@ class Input:
         elif self.key[K_9]:
             preponse += "9"
             self.key[K_9] = 0
+        elif self.key[K_COMMA]:
+            preponse += "."
+            self.key[K_COMMA] = 0
+        elif self.key[K_PERIOD]:
+            preponse += "."
+            self.key[K_PERIOD] = 0
+        elif self.key[K_KP_PERIOD]:
+            preponse += "."
+            self.key[K_KP_PERIOD] = 0
         elif self.key[K_BACKSPACE]:
             preponse = preponse[0:-1]
             self.key[K_BACKSPACE] = 0

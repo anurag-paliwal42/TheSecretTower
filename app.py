@@ -26,6 +26,7 @@ import os
 import random
 import math
 import copy
+import threading
 
 # Pygame
 import pygame
@@ -36,6 +37,7 @@ import menu
 from jeu import *
 from map import *
 from editeur import *
+import client
 
 # Constante
 import const
@@ -82,7 +84,18 @@ class App:
         cmd = 1
         while cmd:
             cmd =  menu(self, "Main Menu", ["Play", "Edit Level", "Quit"])
-            if cmd == 1:
+            if cmd == 2:
+                self.perso.reset()
+                self.perso.set_org_color()
+                self.partie = ["Gen", 0]
+                self.perso.map = 0
+                cmd = menu(self, "Edit Level", ["New level", "Load level"])
+                if cmd == 1:
+                    cmd = editeur(self, [], "Unnamed")
+                elif cmd == 2:
+                    nom = ask(self, "Edit Level] Level's name :")
+                    cmd = editeur(self, open_map("map/custom/"+nom), nom)
+            elif cmd == 1:
                 if not os.path.isdir("data/perso/"):
                     os.mkdir("data/perso/")
                 characters = os.listdir("data/perso")[:5]
@@ -136,6 +149,8 @@ class App:
                             self.partie = ["Gen", 0]
                             self.perso.map = 0
                             cmd = jeu(self, open_map("map/custom/" + ask(self, "Load Level] Level's name :")), self.perso)
+                    elif cmd == 2:
+                        cmd = self.multiplayer()
                     elif cmd == 3:
                         cmd =  menu(self, "Are you sure ?", ["Yes, delete "+self.perso.nom+" definitely !", "No, I want to keep "+self.perso.nom], self.perso)
                         if cmd == 1:
@@ -153,22 +168,24 @@ class App:
                                         menu_color(self, cmd-1, self.perso)
                         os.remove("data/perso/"+old_name)
                         self.perso.save()
-
-                                
-            elif cmd == 2:
-                self.perso.reset()
-                self.perso.set_org_color()
-                self.partie = ["Gen", 0]
-                self.perso.map = 0
-                cmd = menu(self, "Edit Level", ["New level", "Load level"])
-                if cmd == 1:
-                    cmd = editeur(self, [], "Unnamed")
-                elif cmd == 2:
-                    nom = ask(self, "Edit Level] Level's name :")
-                    cmd = editeur(self, open_map("map/custom/"+nom), nom)
-
+        const.runned = False
         pygame.quit()
-        
+
+    def multiplayer(self):
+        self.perso.reset()
+        self.partie = ["Multi", 0]
+        self.perso.map = 0
+        const.runned = True
+        const.host = ask(self, "Enter the IP of the server :")
+        thread=threading.Thread(target=client.connect)
+        const.input.append("co_perso;"+self.perso.get_char(";"))
+        const.input_udp = "set_adr_udp;"+self.perso.nom
+        thread.start()
+        tps_connect = 0
+        while const.map == []:
+            tps_connect +=1
+        cmd = jeu(self, const.map, self.perso)
+
     def blit(self, element, coef=1):
         """Ajoute Element à l'écran"""
         if isinstance(element, Perso):

@@ -57,11 +57,15 @@ class Server:
         self.new_game("test_srv")
         self.load_game("test_srv")
 
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def start(self):
-        self.sock.bind((self.host,self.port))
-        self.sock.listen(3)
+        self.tcp.bind((self.host,self.port))
+        self.tcp.listen(3)
+
+        self.udp.bind((self.host,self.port))
+
         self.runned = True
         self.main()
 
@@ -71,12 +75,38 @@ class Server:
             self.read()
 
     def check_connection(self):
-        asked, wlist, xlist = select.select([self.sock], [], [], 0.05)
+        asked, wlist, xlist = select.select([self.tcp,self.udp], [], [], 0.05)
         for i in asked:
-            connection, adresse = self.sock.accept() 
-            client = Client(connection, adresse)
-            self.clients.append(client)
-            print "L'adresse",client.adr,"vient de se connecter au serveur !", "\a"
+            if i == self.tcp:
+                connection, adresse = self.tcp.accept() 
+                client = Client(connection, adresse)
+                self.clients.append(client)
+                print "L'adresse",client.adr,"vient de se connecter au serveur !", "\a"
+            elif i == self.udp:
+                self.process_udp(i)
+
+    def process_udp(self, sock):
+        buffer,adr = sock.recvfrom(8000)
+        buffer = buffer.split(";")
+
+        buffer_ret = ""
+        if buffer[0] == "set_adr_udp":
+            self.get_client_nom(buffer[1]).adr_udp = adr
+        elif buffer[0] == "set_pos":
+            self.get_client_adr(adr).x = int(buffer[1])
+            self.get_client_adr(adr).y = int(buffer[2])
+            self.get_client_adr(adr).v_x = int(buffer[3])
+            self.get_client_adr(adr).v_y = int(buffer[4])
+            self.get_client_adr(adr).sens = int(buffer[5])
+        elif buffer[0] == "get_map":
+            buffer_ret=map.map2char(self.get_map(self.get_client_adr(adr).map))
+        elif buffer[0] == "get_pos":
+            for i in self.clients:
+                if i != self.get_client_adr(adr):
+                    buffer_ret += i.nom+";"+str(i.map)+";"+str(i.x)+";"+str(i.y)+";"+str(i.v_x)+";"+str(i.v_y)+";"+str(int(i.sens))+";"+str(int(i.isingrav))+";"+str(int(i.fired))+"\n"
+        
+        sock.sendto(buffer_ret,adr)        
+
 
     def break_connection(self, client):
                print self.get_client(client).adr," disconnected"
@@ -91,6 +121,16 @@ class Server:
     def get_client(self, client):
         for i in self.clients:
            if i.connection == client:
+               return i
+
+    def get_client_adr(self, adr):
+        for i in self.clients:
+           if i.adr_udp == adr:
+               return i
+
+    def get_client_nom(self, nom):
+        for i in self.clients:
+           if i.nom == nom:
                return i
 
     def get_map(self, id):
@@ -108,30 +148,22 @@ class Server:
             for client in clients_to_read: 
                 buffer = client.recv(1024)
                 buffer_ret = " "
-                print self.get_client(client).adr, buffer
                 if buffer == "exit":
                     self.runned = False
                 buffer = buffer.split(";")
-                if buffer[0] == "get_map":
-                    buffer_ret=map.map2char(self.get_map(self.get_client(client).map))
-                elif buffer[0] == "co_perso":
+                if buffer[0] == "co_perso":
                     self.get_client(client).nom = buffer[1]
+                    self.get_client(client).color = []
                     self.get_client(client).color.append(buffer[2])
                     self.get_client(client).color.append(buffer[3])
                     self.get_client(client).color.append(buffer[4])
                     self.get_client(client).color.append(buffer[5])
                     self.get_client(client).color.append(buffer[6])
                 elif buffer[0] == "get_perso":
+                    print buffer
                     for i in self.clients:
-                        if i != self.get_clients(client):
+                        if i != self.get_client(client):
                             buffer_ret = i.get_char()
-                elif buffer[0] == "get_pos_perso":
-                    for i in self.clients:
-                        if i != self.get_clients(client) and i.map == self.get_clients(client).map:
-                            buffer_ret = i.nom+";"+str(i.x)+";"+str(i.y)
-                elif buffer[0] == "set_pos":
-                    self.get_client(client).x = int(buffer[1])
-                    self.get_client(client).y = int(buffer[2])
                 elif buffer[0] == "set_map_perso":
                     self.get_client(client).map = int(buffer[1])
                     self.get_client(client).id_porte = int(buffer[2])
@@ -139,6 +171,20 @@ class Server:
                     self.get_client(client).vie = int(buffer[1])
                 elif buffer[0] == "nbr_player":
                     buffer_ret = str(len(self.clients))
+                elif buffer[0] == "jump":
+                    self.get_client(client).isingrav = True
+                elif buffer[0] == "stop_jump":
+                    self.get_client(client).isingrav = False
+                elif buffer[0] == "hit_block":
+                    buffer_ret = str(len(self.clients))
+                    x = int(buffer[1])
+                    y = int(buffer[2])
+                    damage = float(buffer[3])
+                    for i in self.get_map(self.get_client(client).map):
+                        if i.x == x and i.y == y:
+                            if i.hit(damage):
+                                self.get_map(self.get_client(client).map).remove(i)
+                            
                 try:
                     client.send(buffer_ret)
                 except socket.error:
@@ -250,6 +296,7 @@ class Client():
     def __init__(self, connection, adr):
         self.connection = connection
         self.adr = adr
+        self.adr_udp = None
         
         self.nom = "Unknown"
         self.x = 0
@@ -260,9 +307,21 @@ class Client():
         self.inv = item.Inventaire()
         self.inv.add(item.Item(1,1))
         self.color = []
+        self.color.append("0,128,0")
+        self.color.append("0,93,0")
+        self.color.append("0,0,0")
+        self.color.append("255,221,212")
+        self.color.append("145,72,0")
+        self.sens = True
+        self.fired = False
+
+        # Gravité
+        self.v_y = 0
+        self.v_x = 0
+        self.isingrav = True
 
     def get_char(self):
-        buffer = i.nom+str(self.map)+";"+str(self.id_porte)+";"+str(self.vie)+";"+self.inv.save()+";"+str(self.inv.item_sel)
+        buffer = self.nom+";"+str(self.map)+";"+str(self.id_porte)+";"+str(self.vie)+";"+str(int(self.fired))+";"+self.inv.save()+";"+str(self.inv.item_sel)
         for i in self.color:
             buffer += ";"+i
         return buffer

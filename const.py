@@ -51,3 +51,19 @@ global sprite_degats
 global sprite_fire
 global vide
 
+# Thread
+port = 234
+global host
+global input
+global input_udp
+global map
+global persos
+global runned
+runned = False
+input = []
+input_udp = ""
+map = []
+persos = []
+
+
+

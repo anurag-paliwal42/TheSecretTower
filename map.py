@@ -26,26 +26,34 @@ from item import *
 
 # Chargement carte
 def open_map(path):
-    pmap = [] 
     map = []
     try:
         file = open("data/"+ path, 'r')
         elements = []
-        tampon = file.read()
-        
-        elements = tampon.split("\n")
-        
-        for element in elements:
-            if element != "":
-                prop = element.split(",")
-                if int(prop[0]) == 11 or  int(prop[0])==22:
-                    for i in range(4):
-                        prop[i] = int(prop[i])
-                else:
-                    prop = [int(i) for i in prop]
-                pmap.append(prop)
+        map=char2map(file.read())
+      
+    except IOError:
+        print(path + " : Map introuvable !")
+
+    finally:
+        return map
+
+def char2map(tampon):
+      pmap = [] 
+      map = []
+      if isinstance(tampon,str):
+         elements = tampon.split("\n")
+         for element in elements:
+             if element != "":
+                 prop = element.split(",")
+                 if int(prop[0]) == 11 or  int(prop[0])==22:
+                     for i in range(4):
+                         prop[i] = int(prop[i])
+                 else:
+                     prop = [int(i) for i in prop]
+                 pmap.append(prop)
                 
-        for i in pmap:
+         for i in pmap:
             pbloc = i
             if pbloc[0] == 0:
                 bloc = Porte(pbloc[1], 0, pbloc[4])
@@ -171,12 +179,7 @@ def open_map(path):
                 bloc.set_unit(pbloc[3])
                 bloc.move_el(pbloc[1], pbloc[2])
                 map.append(bloc)
-
-    except IOError:
-        print(path + " : Map introuvable !")
-
-    finally:
-        return map
+      return map
 
     
 
