@@ -29,6 +29,7 @@ class Input:
         self.mouse = (0,0)
         self.mouserel = (0,0)
         self.mousebuttons= [0]*9
+        self.last_pressed = ""
         self.quit = False
 
     # Met Ã  jour les events
@@ -36,6 +37,7 @@ class Input:
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 self.key[event.key] = 1;
+                self.last_pressed = pygame.key.name(event.key)
             if event.type == KEYUP:
                 self.key[event.key] = 0;
             if event.type == MOUSEMOTION:
@@ -55,157 +57,84 @@ class Input:
 
         return True
 
-    def write(self, preponse):
-        if self.key[K_a]:
-            preponse += "a"
-            self.key[K_a] = 0
-        elif self.key[K_z]:
-            preponse +="z"
-            self.key[K_z] = 0
-        elif self.key[K_e]:
-            preponse +="e"
-            self.key[K_e] = 0
-        elif self.key[K_r]:
-            preponse += "r"
-            self.key[K_r] = 0
-        elif self.key[K_t]:
-            preponse += "t"
-            self.key[K_t] = 0
-        elif self.key[K_y]:
-            preponse += "y"
-            self.key[K_y] = 0
-        elif self.key[K_u]:
-            preponse += "u"
-            self.key[K_u] = 0
-        elif self.key[K_i]:
-            preponse += "i"
-            self.key[K_i] = 0
-        elif self.key[K_o]:
-            preponse += "o"
-            self.key[K_o] = 0
-        elif self.key[K_p]:
-            preponse += "p"
-            self.key[K_p] = 0
-        elif self.key[K_q]:
-            preponse += "q"
-            self.key[K_q] = 0
-        elif self.key[K_s]:
-            preponse += "s"
-            self.key[K_s] = 0
-        elif self.key[K_d]:
-            preponse += "d"
-            self.key[K_d] = 0
-        elif self.key[K_f]:
-            preponse += "f"
-            self.key[K_f] = 0
-        elif self.key[K_g]:
-            preponse += "g"
-            self.key[K_g] = 0
-        elif self.key[K_h]:
-            preponse += "h"
-            self.key[K_h] = 0
-        elif self.key[K_j]:
-            preponse += "j"
-            self.key[K_j] = 0
-        elif self.key[K_k]:
-            preponse += "k"
-            self.key[K_k] = 0
-        elif self.key[K_l]:
-            preponse += "l"
-            self.key[K_l] = 0
-        elif self.key[K_m]:
-            preponse += "m"
-            self.key[K_m] = 0
-        elif self.key[K_w]:
-            preponse += "w"
-            self.key[K_w] = 0
-        elif self.key[K_x]:
-            preponse += "x"
-            self.key[K_x] = 0
-        elif self.key[K_c]:
-            preponse += "c"
-            self.key[K_c] = 0
-        elif self.key[K_v]:
-            preponse += "v"
-            self.key[K_v] = 0
-        elif self.key[K_b]:
-            preponse += "b"
-            self.key[K_b] = 0
-        elif self.key[K_n]:
-            preponse += "n"
-            self.key[K_n] = 0
-        elif self.key[K_KP0]:
-            preponse += "0"
-            self.key[K_KP0] = 0
-        elif self.key[K_KP1]:
-            preponse += "1"
-            self.key[K_KP1] = 0
-        elif self.key[K_KP2]:
-            preponse += "2"
-            self.key[K_KP2] = 0
-        elif self.key[K_KP3]:
-            preponse += "3"
-            self.key[K_KP3] = 0
-        elif self.key[K_KP4]:
-            preponse += "4"
-            self.key[K_KP4] = 0
-        elif self.key[K_KP5]:
-            preponse += "5"
-            self.key[K_KP5] = 0
-        elif self.key[K_KP6]:
-            preponse += "6"
-            self.key[K_KP6] = 0
-        elif self.key[K_KP7]:
-            preponse += "7"
-            self.key[K_KP7] = 0
-        elif self.key[K_KP8]:
-            preponse += "8"
-            self.key[K_KP8] = 0
-        elif self.key[K_KP9]:
-            preponse += "9"
-            self.key[K_KP9] = 0
-        elif self.key[K_0]:
-            preponse += "0"
-            self.key[K_0] = 0
-        elif self.key[K_1]:
-            preponse += "1"
-            self.key[K_1] = 0
-        elif self.key[K_2]:
-            preponse += "2"
-            self.key[K_2] = 0
-        elif self.key[K_3]:
-            preponse += "3"
-            self.key[K_3] = 0
-        elif self.key[K_4]:
-            preponse += "4"
-            self.key[K_4] = 0
-        elif self.key[K_5]:
-            preponse += "5"
-            self.key[K_5] = 0
-        elif self.key[K_6]:
-            preponse += "6"
-            self.key[K_6] = 0
-        elif self.key[K_7]:
-            preponse += "7"
-            self.key[K_7] = 0
-        elif self.key[K_8]:
-            preponse += "8"
-            self.key[K_8] = 0
-        elif self.key[K_9]:
-            preponse += "9"
-            self.key[K_9] = 0
-        elif self.key[K_COMMA]:
-            preponse += "."
-            self.key[K_COMMA] = 0
-        elif self.key[K_PERIOD]:
-            preponse += "."
-            self.key[K_PERIOD] = 0
-        elif self.key[K_KP_PERIOD]:
-            preponse += "."
-            self.key[K_KP_PERIOD] = 0
-        elif self.key[K_BACKSPACE]:
+    def write(self, preponse, spec = False):
+        if self.key[K_BACKSPACE]:
             preponse = preponse[0:-1]
             self.key[K_BACKSPACE] = 0
+        buffer = ""
+        if (len(self.last_pressed) == 1 or self.last_pressed in ["space"]) and spec:
+            buffer = self.last_pressed.replace("space", " ").replace(";", ":")
+        elif (len(self.last_pressed) == 1) and not spec:
+            buffer = self.last_pressed.replace(";", ":")
+        if self.key[K_RALT] and spec:
+            if buffer == "e" or buffer == "2":
+                buffer = "é"
+            elif buffer == "a" or buffer == "0":
+                buffer = "à"
+            elif buffer == "q":
+                buffer = "â"
+            elif buffer == "r" or buffer == "7":
+                buffer = "è"
+            elif buffer == "f":
+                buffer = "ê"
+            elif buffer == "d":
+                buffer = "ë"
+            elif buffer == "h":
+                buffer = "ù"
+            elif buffer == "j":
+                buffer = "ü"
+            elif buffer == "k":
+                buffer = "ï"
+            elif buffer == "u":
+                buffer = "û"
+            elif buffer == "i":
+                buffer = "î"
+            elif buffer == "c" or buffer == "9":
+                buffer = "ç"
+        if self.key[K_LSHIFT] or self.key[K_RSHIFT]:
+            if buffer == "1":
+                buffer = "!"
+            elif buffer == "2":
+                buffer = "@"
+            elif buffer == "3":
+                buffer = "#"
+            elif buffer == "4":
+                buffer = "$"
+            elif buffer == "5":
+                buffer = "%"
+            elif buffer == "6":
+                buffer = "^"
+            elif buffer == "7":
+                buffer = "&"
+            elif buffer == "8":
+                buffer = "*"
+            elif buffer == "9":
+                buffer = "("
+            elif buffer == "0":
+                buffer = ")"
+            elif buffer == "-":
+                buffer = "_"
+            elif buffer == "=":
+                buffer = "+"
+            elif buffer == "[":
+                buffer = "{"
+            elif buffer == "]":
+                buffer = "}"
+            elif buffer == "'":
+                buffer = "\""
+            elif buffer == ",":
+                buffer = "<"
+            elif buffer == ".":
+                buffer = ">"
+            elif buffer == "/":
+                buffer = "?"
+            elif buffer == "`":
+                buffer = "~"
+            else:
+                buffer = buffer.upper()
+
+        preponse += buffer
+        self.last_pressed = ""
         return preponse
 
     def get_mouse(self, app):

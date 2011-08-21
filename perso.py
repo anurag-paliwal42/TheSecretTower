@@ -426,6 +426,8 @@ class Perso(Element):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
+                                if self.ctrl:
+                                    const.input.append("destroy_block;"+str(i.x)+";"+str(i.y))
                     elif type == Stone:
                         if (self.inv.get_item().id in [1,3,8,13,18,23,28]) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
@@ -434,15 +436,21 @@ class Perso(Element):
                                 else:
                                     self.inv.add(i)
                                 map.remove(i)
+                                if self.ctrl:
+                                    const.input.append("destroy_block;"+str(i.x)+";"+str(i.y))
                     elif type == Wood:
                         if (self.inv.get_item().id in [1,4,9,14,19,24,29]) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
+                                if self.ctrl:
+                                    const.input.append("destroy_block;"+str(i.x)+";"+str(i.y))
                     elif type == Deco:
                         if (self.inv.get_item().id in [2,3,4,7,8,9,12,13,14,17,18,19,22,23,24,27,28,29]) and not self.inv.isfull(i):
                             self.inv.add(i)
                             map.remove(i)
+                            if self.ctrl:
+                                const.input.append("destroy_block;"+str(i.x)+";"+str(i.y))
                     return True
             
         return False

@@ -182,19 +182,27 @@ class App:
         const.input_udp = "set_adr_udp;"+self.perso.nom
         thread.start()
         tps_connect = 0
-        cmd = 0
+        cmd = 1
         while const.output == "":
             tps_connect +=1
         if const.output == "Connected":
             const.output = ""
-
-            while const.map == []:
-                tps_connect +=1
+            while not cmd in [5,0]:
+                const.input.append("set_map;"+str(self.partie[1]))
+                const.input.append("get_map;"+str(self.partie[1]))
+                const.input.append("get_last_event_map;"+str(self.partie[1]))
+                const.input.append("get_last_event")
+                const.input.append("get_welcome")
+                while const.map == []:
+                    tps_connect +=1
             
-            cmd = jeu(self, const.map, self.perso)
+                cmd = jeu(self, const.map, self.perso)
+                const.map = []
+                self.partie[1] = self.perso.map
         else:
             cmd = menu(self, const.output, ["Ok"])
-
+            const.output = ""
+        const.runned = False
         return cmd
 
     def blit(self, element, coef=1):

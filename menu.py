@@ -253,16 +253,24 @@ def ask(app, ptitle):
     reponse.changer_text(preponse, app.font)
     reponse.move_el(100, 300)
 
+    last_blink = time()
+
     while 1:
-        preponse = input.write(preponse)
         input.update_event(app)
+        preponse = input.write(preponse)
 
         if input.key[K_RETURN]:
             if preponse != "":
                 return preponse
 
-        w_reponse.changer_text(preponse, app.font, (255,255,255))
-        reponse.changer_text(preponse, app.font)
+        if time() >= last_blink:
+            suffixe = "|"  
+        else:
+            suffixe = ""            
+        if time()-last_blink > 0.5:
+            last_blink = time()+0.5
+        w_reponse.changer_text(preponse+suffixe, app.font, (255,255,255))
+        reponse.changer_text(preponse+suffixe, app.font)
         app.blit(fond_menu)
         app.blit(w_title)
         app.blit(title)

@@ -100,10 +100,6 @@ def jeu(app, map, perso):
     w_text_item2 = Element()
     w_text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
     w_text_item2.move_el(380, 580)
-  
-    imgversion = Element()
-    imgversion.changer_text(str(const.version), app.font)
-    imgversion.move_el(0, 0)
     
     fps= 0
     info_b_txt = []
@@ -118,7 +114,13 @@ def jeu(app, map, perso):
     w_commandes = write(app, commandes, 20, 50, (255,255,255))
 
 
-    last_reset = time()
+    #>> Multi
+    # Chatbox
+    chatbox = Chatbox()
+    # Nom joueurs
+    nom_player_b = Element()
+    nom_player_w = Element()
+    #last_reset = time()
 
     
     cmd = 1
@@ -129,11 +131,13 @@ def jeu(app, map, perso):
 
     while not input.quit:
         if app.partie[0] == "Multi":
-            
+            for i in const.msg:
+                chatbox.add(i)
+            const.msg = []
             const.input_udp="set_pos;"+str(perso.x)+";"+str(perso.y)+";"+str(perso.v_x+perso.tend_x)+";"+str(perso.v_y)+";"+str(int(perso.sens))+";"+str(int(perso.hitting))
-            for event in const.events:
+            for event in const.events_map:
                 buffer = event.split(";")
-                const.events.remove(event)
+                const.events_map.remove(event)
                 if len(buffer) > 1:
                     print buffer
                     if buffer[1] == "hit_block":
@@ -144,6 +148,14 @@ def jeu(app, map, perso):
                             if i.x == x and i.y == y:
                                 if i.hit(damage, False):
                                     map.remove(i)
+                    if buffer[1] == "destroy_block":
+                        x = int(buffer[2])
+                        y = int(buffer[3])
+                        for i in map:
+                            if i.x == x and i.y == y:
+                                    map.remove(i)
+                    elif buffer[1] == "add_block":
+                        map.append(char2bloc(buffer[2]))
                     
 
         # controle fps
@@ -191,17 +203,19 @@ def jeu(app, map, perso):
 
         # Traitement events
         input.update_event(app)
-
+        
         pointeur.move_el(-pointeur.x+input.mouse[0], -pointeur.y+input.mouse[1])
-        if input.key[K_SPACE] and input.key[K_a] and  perso.vie > 0:
+        if chatbox.writing:
+            chatbox.input = input.write(chatbox.input, True)
+        if input.key[K_SPACE] and input.key[K_a] and  perso.vie > 0 and not chatbox.writing:
             perso.sauter(-5, -15)
             input.key[K_SPACE] = 0
 
-        elif input.key[K_SPACE] and input.key[K_d] and  perso.vie > 0:
+        elif input.key[K_SPACE] and input.key[K_d] and  perso.vie > 0 and not chatbox.writing:
             perso.sauter(5, -15)
             input.key[K_SPACE] = 0
 
-        elif input.key[K_SPACE] and  perso.vie > 0:
+        elif input.key[K_SPACE] and  perso.vie > 0 and not chatbox.writing:
             perso.sauter(0, -15)
             input.key[K_SPACE] = 0 
 
@@ -217,7 +231,7 @@ def jeu(app, map, perso):
                 coord = (int(input.mouse[0]/50)*50, int(input.mouse[1]/50)*50)
             else:
                 coord = (int((input.mouse[0]+app.pos_screen[0])/100)*50, int((input.mouse[1]+app.pos_screen[1])/100)*50)
-            if math.sqrt((coord[0]-perso.x)**2 + (coord[1]-perso.y)**2) < 200:
+            if math.sqrt((coord[0]-perso.x)**2 + (coord[1]-perso.y)**2) < 100:
                 if not isinstance(perso.inv.get_item(), Item_Bloc):
                     perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Terre)
                     perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Stone)
@@ -246,6 +260,7 @@ def jeu(app, map, perso):
  
                         if not collided:
                             map.append(bloc) 
+                            const.input.append("add_block;"+bloc2char(bloc))
                             perso.inv.delete()
                 else:
                     perso.collided_utils(-perso.x+coord[0],-perso.y+coord[1],map, app, input)
@@ -258,16 +273,16 @@ def jeu(app, map, perso):
         if input.mousebuttons[5]:
             perso.inv.changer_select(1)
             input.mousebuttons[5] = 0
-        if input.key[K_i]:
+        if input.key[K_i] and not chatbox.writing:
             atelier(app, perso, "Inventory")
             input.key[K_i] = 0
         # Zoom
-        if input.key[K_v]:
+        if input.key[K_v] and not chatbox.writing:
             app.coef+=1
             if app.coef > 2:
                 app.coef = 1
             input.key[K_v] = 0
-        if perso.vie > 0:
+        if perso.vie > 0 and not chatbox.writing:
             if input.key[K_w]:
                 perso.monter_echelle(map)
             if input.key[K_a]:
@@ -282,6 +297,7 @@ def jeu(app, map, perso):
             perso.anim(False)
             perso.tend_x = 0
         if input.key[K_RETURN]:
+            input.key[K_RETURN] = 0
             if perso.vie <= 0:
                 perso.vie = 6
                 perso.fired = False
@@ -290,6 +306,11 @@ def jeu(app, map, perso):
                         if i.id == perso.id_porte:
                             perso.move_el(-perso.x, -perso.y)
                             perso.move_el(i.x,i.y)
+            elif not chatbox.writing:
+                chatbox.writing = True
+            elif chatbox.writing:
+                chatbox.writing = False
+                chatbox.send()
         if input.key[K_ESCAPE]:
             input.key[K_ESCAPE] = 0
             if app.partie[0] != "Gen" and app.partie[0] != "Multi":
@@ -339,7 +360,10 @@ def jeu(app, map, perso):
                     i.tendance(map)
                     if i.hitting:
                         i.hit()
+
                     app.blit(i)
+
+
         app.blit(perso)
 
         for coord_dark in shadow:
@@ -352,6 +376,21 @@ def jeu(app, map, perso):
 
         if app.coef > 1:
             app.scale(app.coef)
+
+        if app.partie[0] == "Multi":
+            for i in const.persos:
+                if i.map == perso.map:
+                    nom_player_b.changer_text(i.nom, app.font_petit, (0,0,0))
+                    nom_player_w.changer_text(i.nom, app.font_petit, (255,255,255))
+                    if app.coef == 1:
+                        nom_player_b.move_el(-nom_player_b.x+i.x, -nom_player_b.y+i.y-8)
+                        nom_player_w.move_el(-nom_player_w.x+i.x-2, -nom_player_w.y+i.y-10)
+                    else:
+                        nom_player_b.move_el(-nom_player_b.x+i.x*2-app.pos_screen[0], -nom_player_b.y+(i.y-8)*2-app.pos_screen[1])
+                        nom_player_w.move_el(-nom_player_w.x+(i.x-2)*2-app.pos_screen[0], -nom_player_w.y+(i.y-10)*2-app.pos_screen[1])
+
+                    app.blit(nom_player_b)
+                    app.blit(nom_player_w)
 
         for i in range(6):
             if i < perso.vie:
@@ -390,6 +429,8 @@ def jeu(app, map, perso):
                     for i in w_txt:
                         app.blit(i)
 
+        chatbox.blit_on(app)
+
         if perso.vie <= 0:
             b_txt = []
             b_txt = write(app, "Hard luck ! You are dead...\n\n      Press [RETURN] to respawn", 204, 204)
@@ -399,6 +440,7 @@ def jeu(app, map, perso):
                 app.blit(i)
             for i in w_txt:
                 app.blit(i)
+
 
         app.blit(pointeur)
 

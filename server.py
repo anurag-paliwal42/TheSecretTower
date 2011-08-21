@@ -49,10 +49,12 @@ class Server:
         self.runned = False
         self.clients = []
         self.maps = []
+        self.event = []
 
         # Network
         self.host = '127.0.0.1'
         self.port = 234
+        self.msg_welcome = "*************************Welcome to this Server !    Version 0.2.0            www.secrettower.net   *************************\n"
         
         self.new_game("test_srv")
         self.load_game("test_srv")
@@ -91,15 +93,15 @@ class Server:
 
         buffer_ret = ""
         if buffer[0] == "set_adr_udp":
-            print buffer
             self.get_client_nom(buffer[1]).adr_udp = adr
         elif buffer[0] == "set_pos":
-            self.get_client_adr(adr).x = int(buffer[1])
-            self.get_client_adr(adr).y = int(buffer[2])
-            self.get_client_adr(adr).v_x = int(buffer[3])
-            self.get_client_adr(adr).v_y = int(buffer[4])
-            self.get_client_adr(adr).sens = int(buffer[5])
-            self.get_client_adr(adr).hitting = int(buffer[6])
+            if self.get_client_adr(adr) != None:
+                self.get_client_adr(adr).x = int(buffer[1])
+                self.get_client_adr(adr).y = int(buffer[2])
+                self.get_client_adr(adr).v_x = int(buffer[3])
+                self.get_client_adr(adr).v_y = int(buffer[4])
+                self.get_client_adr(adr).sens = int(buffer[5])
+                self.get_client_adr(adr).hitting = int(buffer[6])
         elif buffer[0] == "get_pos":
             for i in self.clients:
                 if i != self.get_client_adr(adr):
@@ -145,59 +147,103 @@ class Server:
         except select.error:
             pass
         else:
-            for client in clients_to_read: 
-                pbuffer = client.recv(1024)
-                buffer_ret = " "
-                if pbuffer == "exit":
-                    self.runned = False
-                buffer = pbuffer.split(";")
-                if buffer[0] == "co_perso":
-                    self.get_client(client).nom = buffer[1]
-                    self.get_client(client).color = []
-                    self.get_client(client).color.append(buffer[2])
-                    self.get_client(client).color.append(buffer[3])
-                    self.get_client(client).color.append(buffer[4])
-                    self.get_client(client).color.append(buffer[5])
-                    self.get_client(client).color.append(buffer[6])
-                elif buffer[0] == "get_perso":
-                    for i in self.clients:
-                        if i != self.get_client(client):
-                            buffer_ret = i.get_char()
-                elif buffer[0] == "set_map_perso":
-                    self.get_client(client).map = int(buffer[1])
-                    self.get_client(client).id_porte = int(buffer[2])
-                elif buffer[0] == "get_map":
-                    buffer_ret=map.map2char(self.get_map(self.get_client(client).map).map)
-                elif buffer[0] == "set_vie":
-                    self.get_client(client).vie = int(buffer[1])
-                elif buffer[0] == "nbr_player":
-                    buffer_ret = str(len(self.clients))
-                elif buffer[0] == "get_last_event":
-                    buffer_ret=str(len(self.get_map(self.get_client(client).map).event))
-                elif buffer[0] == "get_event":
-                    #print "----------------"
-                    #print self.get_map(self.get_client(client).map).event
-                    buffer_ret=self.get_map(self.get_client(client).map).send_event(int(buffer[1]), self.get_client(client).nom)
-                    #print "RET > "+buffer_ret
-                elif buffer[0] == "jump":
-                    self.get_client(client).isingrav = True
-                elif buffer[0] == "stop_jump":
-                    self.get_client(client).isingrav = False
-                elif buffer[0] == "hit_block":
-                    print self.get_client(client).nom+";"+pbuffer
-                    self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
-                    x = int(buffer[1])
-                    y = int(buffer[2])
-                    damage = float(buffer[3])
-                    for i in self.get_map(self.get_client(client).map).map:
-                        if i.x == x and i.y == y:
-                            if i.hit(damage):
-                                self.get_map(self.get_client(client).map).map.remove(i)
-                            
+            for client in clients_to_read:
                 try:
+                    pbuffer = client.recv(1024)
+                    
+                    buffer_ret = " "
+                    if pbuffer == "exit":
+                        self.runned = False
+                    buffer = pbuffer.split(";")
+                    if buffer[0] == "co_perso":
+                        founded = False
+                        for i in self.clients:
+                            if i.nom == buffer[1]:
+                                founded = True
+                                break
+                        if not founded:
+                            self.get_client(client).nom = buffer[1]
+                            self.get_client(client).color = []
+                            self.get_client(client).color.append(buffer[2])
+                            self.get_client(client).color.append(buffer[3])
+                            self.get_client(client).color.append(buffer[4])
+                            self.get_client(client).color.append(buffer[5])
+                            self.get_client(client).color.append(buffer[6])
+                            self.event.append("connect;"+self.get_client(client).nom)
+                            self.event.append("say;"+self.get_client(client).nom+" connected")
+                            buffer_ret = "Connected"
+                        else:
+                            buffer_ret = "Pseudo already used"
+                    elif buffer[0] == "get_welcome":
+                        buffer_ret="say;"+self.msg_welcome
+                    elif buffer[0] == "get_persos":
+                        buffer_ret = ""
+                        for i in self.clients:
+                            if i != self.get_client(client):
+                                buffer_ret += i.get_char()+"\n"
+                        buffer_ret+= " "
+                    elif buffer[0] == "get_perso":
+                        if buffer[1] != self.get_client(client).nom and self.get_client_nom(buffer[1]) != None:
+                            buffer_ret = self.get_client_nom(buffer[1]).get_char()
+                    elif buffer[0] == "set_map_perso":
+                        self.get_client(client).map = int(buffer[1])
+                        self.get_client(client).id_porte = int(buffer[2])
+                    elif buffer[0] == "get_map":
+                        buffer_ret=map.map2char(self.get_map(int(buffer[1])).map)
+                    elif buffer[0] == "set_map":
+                        print pbuffer
+                        self.get_client(client).map = int(buffer[1])
+                    elif buffer[0] == "set_vie":
+                        self.get_client(client).vie = int(buffer[1])
+                    elif buffer[0] == "nbr_player":
+                        buffer_ret = str(len(self.clients))
+                    elif buffer[0] == "get_last_event":
+                        buffer_ret=str(len(self.event))
+                    elif buffer[0] == "get_last_event_map":
+                        print buffer[0]
+                        buffer_ret=str(len(self.get_map(int(buffer[1])).event))
+                        print buffer_ret
+                    elif buffer[0] == "get_event_map":
+                        buffer_ret=self.get_map(self.get_client(client).map).send_event(int(buffer[1]), self.get_client(client).nom)
+                    elif buffer[0] == "get_event":
+                        buffer_ret=self.send_event(int(buffer[1]))
+                    elif buffer[0] == "jump":
+                        self.get_client(client).isingrav = True
+                    elif buffer[0] == "stop_jump":
+                        self.get_client(client).isingrav = False
+                    elif buffer[0] == "destroy_block":
+                        print self.get_client(client).nom+";"+pbuffer
+                        self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
+                        x = int(buffer[1])
+                        y = int(buffer[2])
+                        for i in self.get_map(self.get_client(client).map).map:
+                            if i.x == x and i.y == y:
+                                self.get_map(self.get_client(client).map).map.remove(i)
+                    elif buffer[0] == "hit_block":
+                        print self.get_client(client).nom+";"+pbuffer
+                        self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
+                        x = int(buffer[1])
+                        y = int(buffer[2])
+                        damage = float(buffer[3])
+                        for i in self.get_map(self.get_client(client).map).map:
+                            if i.x == x and i.y == y:
+                                if i.hit(damage):
+                                    self.get_map(self.get_client(client).map).map.remove(i)
+                    elif buffer[0] == "add_block":
+                        print self.get_client(client).nom+";"+pbuffer
+                        self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
+                        bloc = map.char2bloc(buffer[1])
+                        self.get_map(self.get_client(client).map).map.append(bloc)
+                    elif buffer[0] == "say":
+                        print self.get_client(client).nom+"> "+buffer[1]
+                        self.event.append("say;"+self.get_client(client).nom+"> "+buffer[1])
+                     
                     client.send(buffer_ret)
                 except socket.error:
+                    self.event.append("disconnect;"+self.get_client(client).nom)
+                    self.event.append("say;"+self.get_client(client).nom+" disconnected")
                     self.break_connection(client)
+
                     
 
     def close(self):
@@ -297,6 +343,12 @@ class Server:
 
 
         return map
+
+    def send_event(self, id):
+        buffer = str(len(self.event))+"\n"
+        for i in range(id, len(self.event)):
+            buffer += self.event[i]+"\n"
+        return buffer
         
 
         

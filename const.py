@@ -26,7 +26,7 @@ from pygame.locals import *
 
 """Constantes du jeu The Scret of Tower"""
 
-version = "Beta 0.1.1"
+version = "Beta 0.2.0"
 
 # Constante de fps
 fps = 30
@@ -58,9 +58,13 @@ global output
 global input
 global input_udp
 global map
+global events_map
 global events
 global persos
 global runned
+global msg
+global id_last_event_map
+global id_last_event
 runned = False
 input = []
 output = ""
@@ -68,6 +72,10 @@ input_udp = ""
 map = []
 persos = []
 events = []
+events_map = []
+msg = []
+id_last_event_map = 0
+id_last_event = 0
 
 
 
