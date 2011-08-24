@@ -87,6 +87,22 @@ def jeu(app, map, perso):
     coeur_vide = Element()
     coeur_vide.changer_image(pygame.image.load("img/coeur_vide.png").convert_alpha())
     coeur_vide.y = 540
+
+    b_fond_barre_energie = Element()
+    b_fond_barre_energie.changer_image(pygame.Surface((102,12)))
+    b_fond_barre_energie.image.fill(pygame.Color(0,0,0, 255))
+    b_fond_barre_energie.move_el(369,568)
+    fond_barre_energie = Element()
+    fond_barre_energie.changer_image(pygame.Surface((100,10)))
+    fond_barre_energie.image.fill(pygame.Color(255,255,255, 255))
+    fond_barre_energie.move_el(370,569)
+    barre_energie = Element()
+    barre_energie.changer_image(pygame.Surface((100,10)))
+    barre_energie.image.fill(pygame.Color(255,180,40, 255))
+    barre_energie.move_el(370,569)
+    energie = Element()
+    energie.changer_image(pygame.image.load("img/energie.png").convert_alpha())
+    energie.move_el(380,569)
     
     b_text_item = Element()
     b_text_item.changer_text(perso.inv.get_item().nom , app.font_petit)
@@ -115,8 +131,6 @@ def jeu(app, map, perso):
 
 
     #>> Multi
-    # Chatbox
-    chatbox = Chatbox()
     # Nom joueurs
     nom_player_b = Element()
     nom_player_w = Element()
@@ -132,9 +146,9 @@ def jeu(app, map, perso):
     while not input.quit:
         if app.partie[0] == "Multi":
             for i in const.msg:
-                chatbox.add(i)
+                const.chatbox.add(i)
             const.msg = []
-            const.input_udp="set_pos;"+str(perso.x)+";"+str(perso.y)+";"+str(perso.v_x+perso.tend_x)+";"+str(perso.v_y)+";"+str(int(perso.sens))+";"+str(int(perso.hitting))
+            const.input_udp="set_pos;"+str(perso.x)+";"+str(perso.y)+";"+str(perso.v_x+perso.tend_x)+";"+str(perso.v_y)+";"+str(int(perso.sens))+";"+str(int(perso.hitting))+";"+str(int(perso.fired))+";"+str(int(perso.issprinting))+";"+str(perso.bras[0])+";"+str(perso.bras[1])
             for event in const.events_map:
                 buffer = event.split(";")
                 const.events_map.remove(event)
@@ -154,6 +168,20 @@ def jeu(app, map, perso):
                         for i in map:
                             if i.x == x and i.y == y:
                                     map.remove(i)
+                    if buffer[1] == "set_block":
+                        x = int(buffer[2])
+                        y = int(buffer[3])
+                        for i in map:
+                            if i.x == x and i.y == y:
+                                    map.remove(i)
+                        map.append(char2bloc(buffer[4]))            
+                    if buffer[1] == "lock_chest":
+                        x = int(buffer[2])
+                        y = int(buffer[3])
+                        for i in map:
+                            if i.x == x and i.y == y:
+                                if isinstance(i, Coffre):
+                                    i.lock = bool(int(buffer[4]))
                     elif buffer[1] == "add_block":
                         map.append(char2bloc(buffer[2]))
                     
@@ -169,8 +197,7 @@ def jeu(app, map, perso):
         info_w_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0]+"\nPlayer : "+perso.nom, 0, 0, (255,255,255))
         prev = time()
 
-        b_text_item.changer_text(perso.inv.get_item().nom, app.font_petit)
-        w_text_item.changer_text(perso.inv.get_item().nom, app.font_petit, (255,255,255))
+        barre_energie.image = pygame.transform.scale(barre_energie.image, (int(perso.energie),10))
         if perso.inv.get_item().nbr > 1:
             b_text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit)
             w_text_item2.changer_text("x" + str(perso.inv.get_item().nbr) , app.font_petit, (255,255,255))
@@ -205,17 +232,24 @@ def jeu(app, map, perso):
         input.update_event(app)
         
         pointeur.move_el(-pointeur.x+input.mouse[0], -pointeur.y+input.mouse[1])
-        if chatbox.writing:
-            chatbox.input = input.write(chatbox.input, True)
-        if input.key[K_SPACE] and input.key[K_a] and  perso.vie > 0 and not chatbox.writing:
+        if const.chatbox.writing:
+            const.chatbox.input = input.write(const.chatbox.input, True)
+            
+        # Sprint
+        if  input.key[K_LSHIFT]:
+            if time() > perso.sprint_lock:
+                perso.issprinting = True
+        else:
+            perso.issprinting = False 
+        if input.key[K_SPACE] and input.key[K_a] and perso.issprinting and  perso.vie > 0 and not const.chatbox.writing:
             perso.sauter(-5, -15)
             input.key[K_SPACE] = 0
 
-        elif input.key[K_SPACE] and input.key[K_d] and  perso.vie > 0 and not chatbox.writing:
+        elif input.key[K_SPACE] and input.key[K_d] and perso.issprinting and  perso.vie > 0 and not const.chatbox.writing:
             perso.sauter(5, -15)
             input.key[K_SPACE] = 0
 
-        elif input.key[K_SPACE] and  perso.vie > 0 and not chatbox.writing:
+        if input.key[K_SPACE] and  perso.vie > 0 and not const.chatbox.writing:
             perso.sauter(0, -15)
             input.key[K_SPACE] = 0 
 
@@ -273,26 +307,37 @@ def jeu(app, map, perso):
         if input.mousebuttons[5]:
             perso.inv.changer_select(1)
             input.mousebuttons[5] = 0
-        if input.key[K_i] and not chatbox.writing:
+        if input.key[K_i] and not const.chatbox.writing:
             atelier(app, perso, "Inventory")
+            const.input.append("set_inv;"+perso.inv.save())
             input.key[K_i] = 0
         # Zoom
-        if input.key[K_v] and not chatbox.writing:
+        if input.key[K_v] and not const.chatbox.writing:
             app.coef+=1
             if app.coef > 2:
                 app.coef = 1
             input.key[K_v] = 0
-        if perso.vie > 0 and not chatbox.writing:
+        if perso.vie > 0 and not const.chatbox.writing:
             if input.key[K_w]:
                 perso.monter_echelle(map)
-            if input.key[K_a]:
-                perso.move(-5,0, map)
-                perso.tend_x = -5
-                perso.anim(True)
-            if input.key[K_d]:
-                perso.move(5,0, map)
-                perso.tend_x = 5
-                perso.anim(True)
+            if perso.issprinting:
+                if input.key[K_a]:
+                    perso.move(-10,0, map)
+                    perso.tend_x = -10
+                    perso.anim(True)
+                if input.key[K_d]:
+                    perso.move(10,0, map)
+                    perso.tend_x = 10
+                    perso.anim(True)
+            else:
+                if input.key[K_a]:
+                    perso.move(-5,0, map)
+                    perso.tend_x = -5
+                    perso.anim(True)
+                if input.key[K_d]:
+                    perso.move(5,0, map)
+                    perso.tend_x = 5
+                    perso.anim(True)
         if not input.key[K_a] and not input.key[K_d]:
             perso.anim(False)
             perso.tend_x = 0
@@ -306,11 +351,11 @@ def jeu(app, map, perso):
                         if i.id == perso.id_porte:
                             perso.move_el(-perso.x, -perso.y)
                             perso.move_el(i.x,i.y)
-            elif not chatbox.writing:
-                chatbox.writing = True
-            elif chatbox.writing:
-                chatbox.writing = False
-                chatbox.send()
+            elif not const.chatbox.writing and app.partie[0] == "Multi":
+                const.chatbox.writing = True
+            elif const.chatbox.writing and app.partie[0] == "Multi":
+                const.chatbox.writing = False
+                const.chatbox.send()
         if input.key[K_ESCAPE]:
             input.key[K_ESCAPE] = 0
             if app.partie[0] != "Gen" and app.partie[0] != "Multi":
@@ -402,9 +447,13 @@ def jeu(app, map, perso):
 
 
         app.blit(perso.inv.get_element())
-        app.blit(b_text_item)
+        app.blit(b_fond_barre_energie)
+        app.blit(fond_barre_energie)
+        app.blit(barre_energie)
+        app.blit(energie)
+        #app.blit(b_text_item)
         app.blit(b_text_item2)
-        app.blit(w_text_item)
+        #app.blit(w_text_item)
         app.blit(w_text_item2)
         for i in info_b_txt:
             app.blit(i)
@@ -429,7 +478,8 @@ def jeu(app, map, perso):
                     for i in w_txt:
                         app.blit(i)
 
-        chatbox.blit_on(app)
+        if  app.partie[0] == "Multi":
+            const.chatbox.blit_on(app)
 
         if perso.vie <= 0:
             b_txt = []
@@ -479,6 +529,11 @@ def set_shadow(shadow, map, perso):
                 delete = True
             elif math.fabs(perso.x-coord_dark[0])+math.fabs(perso.y-coord_dark[1]) < intens_perso*50:
                 coord_dark[2] = True
+            for i in const.persos:
+                if math.fabs(i.x-coord_dark[0])+math.fabs(i.y-coord_dark[1]) < (4-2)*50:
+                    delete = True
+                elif math.fabs(i.x-coord_dark[0])+math.fabs(i.y-coord_dark[1]) < 4*50:
+                    coord_dark[2] = True
             for i in map:
                 intens = 0
                 if i.picture == 2:

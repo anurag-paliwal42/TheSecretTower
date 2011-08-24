@@ -29,7 +29,6 @@ def open_map(path):
     map = []
     try:
         file = open("data/"+ path, 'r')
-        elements = []
         map=char2map(file.read())
       
     except IOError:

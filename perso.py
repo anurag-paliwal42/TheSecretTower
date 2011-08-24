@@ -25,6 +25,7 @@ from bloc import *
 from atelier import *
 import const
 from item import *
+from map import *
 
 from time import *
 import os
@@ -54,11 +55,15 @@ class Perso(Element):
         self.last_dommage_ur = time()
         self.last_dommage_fire = time()
         self.last_hit = 0
-        self.inv = Inventaire()
+        self.inv = Inventaire(20,True)
         item = Item(1, 1)
         self.inv.add(item)
         self.fired = False
         self.fired_time_stop = 0
+        self.issprinting = False
+        self.sprint_lock = 0
+        self.energie = 100.0
+        self.bras = [0,0]
 
         self.color = []
 
@@ -103,21 +108,18 @@ class Perso(Element):
 
         # Bras
         rect = pygame.Rect(0,0, 50,50)
-        if self.inv.get_item().id%5 !=0 and self.inv.get_item().id < 30:
+        if self.ctrl:
+            self.bras = [0,0]
+        if not self.ctrl:
+            rect = pygame.Rect(self.bras[0]*50,self.bras[1]*50, 50,50)
+        elif self.inv.get_item().id%5 !=0 and self.inv.get_item().id < 30 and self.ctrl:
             rect = pygame.Rect((self.inv.get_item().id%5)*50-50,(self.inv.get_item().id/5)*50+50, 50,50)
+            self.bras = [(self.inv.get_item().id%5)-1, (self.inv.get_item().id/5)+1]
         elif self.inv.get_item().id == 0:
             if self.inv.get_item().bloc.picture == 13:
                 rect = pygame.Rect(50,0, 50,50)
-        """if self.inv.get_item().id == 1:
-            rect = pygame.Rect(0,50, 50,50)
-        elif self.inv.get_item().id == 2:
-            rect = pygame.Rect(50,50, 50,50)
-        elif self.inv.get_item().id == 3:
-            rect = pygame.Rect(100,50, 50,50)
-        elif self.inv.get_item().id == 4:
-            rect = pygame.Rect(150,50, 50,50)
-        elif self.inv.get_item().id == 6:
-            rect = pygame.Rect(150,50, 50,50)"""
+                self.bras = [1,0]
+
 
         image.blit(self.sprite_arm, (0,0), rect)
         if self.angle_arm != 0:
@@ -137,7 +139,7 @@ class Perso(Element):
             image.blit(const.sprite_fire, (0,0), rect)
         # corps
         rect = pygame.Rect(self.rang_image*50,0, 50,50)
-        if time() - self.changement > 0.1 and etat and not self.isingrav:
+        if ((time() - self.changement > 0.1) or self.issprinting) and etat and not self.isingrav:
             self.changement = time()
             if self.rang_image < 2:
                 self.rang_image += 1
@@ -149,6 +151,8 @@ class Perso(Element):
         elif self.isingrav:
             rect = pygame.Rect(100,0, 50,50)
         image.blit(self.sprite_perso, (0,0), rect)
+        if self.issprinting and self.energie > 3:
+            image = pygame.transform.rotate(image, -5)
         if not self.sens:
             image = pygame.transform.flip(image, True, False)
         if self.vie <= 0:
@@ -169,6 +173,9 @@ class Perso(Element):
 
         self.changer_image(image)
 
+        if self.ctrl:
+            self.update_energie()
+
         # fire
         if self.fired and self.ctrl:
             if time()-self.last_dommage_fire > 5:
@@ -182,6 +189,17 @@ class Perso(Element):
                 self.subir_degats(1)
                 self.last_dommage_ur = time()
 
+
+    def update_energie(self):
+        if self.issprinting:
+            if self.energie>2:
+                self.energie-=0.5
+            else:
+                self.issprinting = False
+                self.sprint_lock = time()+2
+        else:
+            if self.energie < 100:
+                self.energie+=0.3
 
     def set_org_color(self, id_color=-1):
         if id_color == -1:
@@ -282,7 +300,7 @@ class Perso(Element):
         self.last_dommage = time()
         self.last_dommage_ur = time()
         self.last_hit = 0
-        self.inv = Inventaire()
+        self.inv = Inventaire(20,True)
         item = Item(1, 1)
         self.inv.add(item)
         self.fired = False
@@ -471,16 +489,26 @@ class Perso(Element):
                     self.id_porte = i.id
                 elif isinstance(i, Forge):
                     atelier(app, self, "Forge")
+                    const.input.append("set_inv;"+self.inv.save())
                     input.reset()
                 elif isinstance(i, Furnace):
                     atelier(app, self, "Furnace", i)
+                    const.input.append("set_inv;"+self.inv.save())
                     input.reset()
                 elif isinstance(i, Atelier):
                     atelier(app, self, "Workbench")
+                    const.input.append("set_inv;"+self.inv.save())
                     input.reset()
                 elif isinstance(i, Coffre):
-                    atelier(app, self, "Chest", i)
-                    input.reset()
+                    if not i.lock:
+                        const.input.append("lock_chest;"+str(i.x)+";"+str(i.y)+";1")
+                        atelier(app, self, "Chest", i)
+                        const.input.append("set_inv;"+self.inv.save())
+                        const.input.append("set_block;"+str(i.x)+";"+str(i.y)+";"+bloc2char(i))
+                        const.input.append("lock_chest;"+str(i.x)+";"+str(i.y)+";0")
+                        input.reset()
+                    else:
+                        const.msg.append("This chest is used by another player")
 
 
     def collided_bloc(self, dep_x, dep_y, element):

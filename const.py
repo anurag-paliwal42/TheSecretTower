@@ -40,6 +40,12 @@ path_fond1 = "img/fond1.png"
 path_fond2 = "img/fond2.png"
 path_choix = "img/choix.png"
 display = True
+
+# chatbox
+color_basic = (255,255,255)
+color_annonce = (255,180,40)
+color_important = (255,60,60)
+
 global sprite_bloc
 global sprite_lave
 global sprite_perso
@@ -52,7 +58,7 @@ global sprite_fire
 global vide
 
 # Thread
-port = 234
+port = 2345
 global host
 global output
 global input
@@ -76,6 +82,10 @@ events_map = []
 msg = []
 id_last_event_map = 0
 id_last_event = 0
+
+global chatbox
+
+
 
 
 

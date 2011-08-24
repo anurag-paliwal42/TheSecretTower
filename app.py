@@ -34,6 +34,7 @@ from pygame.locals import *
 
 import element
 import menu
+import char
 from jeu import *
 from map import *
 from editeur import *
@@ -78,6 +79,8 @@ class App:
         self.coef = 2
 
         self.pos_screen = (0,0)
+
+        const.chatbox = char.Chatbox()
         
         
     def main(self):
@@ -176,6 +179,8 @@ class App:
         self.partie = ["Multi", 0]
         self.perso.map = 0
         const.runned = True
+        const.input = []
+        const.output == ""
         const.host = ask(self, "Enter the IP of the server :")
         thread=threading.Thread(target=client.connect)
         const.input.append("co_perso;"+self.perso.get_char(";"))
@@ -185,23 +190,30 @@ class App:
         cmd = 1
         while const.output == "":
             tps_connect +=1
-        if const.output == "Connected":
+        if const.output != "Connected":
+            cmd = menu(self, const.output, ["Ok"])
             const.output = ""
+        else:
+            const.output = ""
+            const.input.append("get_inv")
+            while const.output == "":
+                tps_connect +=1
+            self.perso.inv.empty()
+            self.perso.inv.load(const.output)
+            const.output = ""
+            const.input.append("get_welcome")
             while not cmd in [5,0]:
                 const.input.append("set_map;"+str(self.partie[1]))
                 const.input.append("get_map;"+str(self.partie[1]))
                 const.input.append("get_last_event_map;"+str(self.partie[1]))
                 const.input.append("get_last_event")
-                const.input.append("get_welcome")
                 while const.map == []:
                     tps_connect +=1
             
                 cmd = jeu(self, const.map, self.perso)
                 const.map = []
                 self.partie[1] = self.perso.map
-        else:
-            cmd = menu(self, const.output, ["Ok"])
-            const.output = ""
+
         const.runned = False
         return cmd
 
@@ -228,13 +240,15 @@ class App:
             y = 600*coef-600
 
         self.pos_screen = (x,y)
-        self.fenetre.blit(pygame.transform.scale(self.fenetre, (800*coef, 600*coef)), (0,0), (x,y, 800, 600))
+        self.fenetre.blit(pygame.transform.scale(self.fenetre, (800*coef, 600*coef)), (0,0), (x,y, self.size[0],self.size[1]))
             
 
     def flip(self):
         """Rafraichissement"""
-        """if self.size[0] != 800 or self.size[1] != 600:
-            self.fenetre.blit(pygame.transform.scale(self.fenetre, (self.size[0], self.size[1])), (0,0))"""
+        if self.size[0] != 800 or self.size[1] != 600:
+            new_size = (self.size[0]*(float(self.size[0])/800.0),self.size[1]*(float(self.size[1])/600.0))
+            print new_size, self.size
+            self.fenetre.blit(pygame.transform.scale(self.fenetre, new_size), (0,0))
         pygame.display.flip()
 
     def save_screen(self):
@@ -317,9 +331,7 @@ class App:
 
     def set_size(self,new_size):
         self.size = new_size
-        print new_size
-        print self.size
-        self.fenetre = pygame.display.set_mode((self.size[0], self.size[1]), pygame.RESIZABLE)
+        self.fenetre = pygame.display.set_mode(self.size, pygame.DOUBLEBUF | pygame.RESIZABLE)
 
 
     def gen_map(self, level):

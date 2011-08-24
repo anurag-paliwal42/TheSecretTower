@@ -30,10 +30,11 @@ import pygame
 from pygame.locals import *
  
 class Inventaire():
-    def __init__(self, limit=20):
+    def __init__(self, limit=20, ctrl=False):
         self.data = []
         self.item_sel = 0
         self.limit = limit
+        self.ctrl = ctrl
 
     def add(self,objet, nbr = 0):
         if isinstance(objet, Item_Bloc):
@@ -76,6 +77,7 @@ class Inventaire():
                         return True
 
         self.data.append(item)
+
         return True
     def delete(self):
 
@@ -180,6 +182,8 @@ class Inventaire():
                         bloc = Tin(20)
                     elif param[1] == 17:
                         bloc = Uranium(21)
+                    elif param[1] == 18:
+                        bloc = Sign(22)
                     new_item = Item_Bloc(bloc)
 
                     new_item.nbr = param[2]
@@ -228,6 +232,8 @@ class Inventaire():
                     buffer += "16"
                 elif i.type == Uranium:
                     buffer += "17"
+                elif i.type == Sign:
+                    buffer += "18"
 
             else:
                 buffer += str(i.id)
@@ -242,6 +248,7 @@ class Coffre(Wood):
     def __init__(self, picture):
         Bloc.__init__(self, picture)
         self.inv = Inventaire()
+        self.lock = False
   
 class Item():
     
@@ -416,7 +423,8 @@ class Item_Bloc(Item):
     
     def __init__(self, bloc):
         Item.__init__(self,0, 1)
-        self.element.changer_image(bloc.image)
+        if const.display:
+            self.element.changer_image(bloc.image)
         self.bloc = bloc
         self.type = bloc.__class__
         self.element.move_el(320,540)
@@ -436,6 +444,8 @@ class Item_Bloc(Item):
             self.nom = "Chest"
         elif self.type == Torch:
             self.nom = "Torch"
+        elif self.type == Sign:
+            self.nom = "Sign"
         elif self.type == Coal:
             self.nom = "Coal"
         elif self.type == Copper:

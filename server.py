@@ -35,6 +35,7 @@ import select
 import os
 import math
 from time import *
+import threading
 
 import jeu
 import map
@@ -45,19 +46,33 @@ from bloc import *
 
 class Server:
     def __init__(self):
+
+        # Proprietes
+        self.host = '127.0.0.1'
+        self.port = 2345
+        self.msg_welcome = "*************************\n"+\
+            "Welcome to this Server !\n"+\
+            "Version "+const.version+"\n"+\
+            "www.secrettower.net\n"+\
+            "*************************\n"+\
+            "Type \"/help\" for help\n"
+        self.world = "world"
+        
+        
         const.display = False
         self.runned = False
         self.clients = []
+        self.clients_saved = []
         self.maps = []
         self.event = []
 
-        # Network
-        self.host = '127.0.0.1'
-        self.port = 234
-        self.msg_welcome = "*************************Welcome to this Server !    Version 0.2.0            www.secrettower.net   *************************\n"
-        
-        self.new_game("test_srv")
-        self.load_game("test_srv")
+        self.out("***Server TheSecretTower***"+\
+                     "\n\tVersion: "+const.version+\
+                     "\n\tWorld: "+self.world+\
+                     "\n\tWelcome msg:\n"+self.msg_welcome)
+
+        while not self.load_game(self.world):
+            self.new_game(self.world)            
 
         self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -69,30 +84,85 @@ class Server:
         self.udp.bind((self.host,self.port))
 
         self.runned = True
+        thread_input=threading.Thread(target=self.input)
+        thread_udp=threading.Thread(target=self.check_connection)
+        thread_udp.start()
+        self.out("Ready !\a")
+        thread_input.start()
         self.main()
+        thread_udp.join()
+
+    def input(self):
+        while self.runned:
+            cmd = raw_input("> ").lower().strip()
+            if len(cmd) > 0:
+                cmd = cmd.split()
+                if cmd[0] == "help" or cmd[0] == "?":
+                    self.out("Commands help :"\
+                                 "\nhelp or ?: Shows a list of server commands"\
+                                 "\nkick player: Disconnects player from the server"\
+                                 #"\nban player:  Bans player from the server"\
+                                 #"\npardon player:  Pardons a banned player"\
+                                 #"\nban-ip ip:  Bans IP address from the server"\
+                                 #"\npardon-ip ip:  Pardons a banned IP address"\
+                                 "\nlist or ls: list all connected players"\
+                                 "\nsave: Save map and players"\
+                                 "\nsay message: Broadcasts message"+\
+                                 "\nstop: Save and stop the server")
+                elif cmd[0] == "kick":
+                    del cmd[0]
+                    cmd = " ".join(cmd)
+                    if self.get_client_nom(cmd) != None:
+                        self.break_connection(self.get_client_nom(cmd).connection, "kick")
+                    else:
+                        self.out(cmd + " isn't connected")
+                elif cmd[0] == "list" or cmd[0] == "ls":
+                    if len(self.clients) > 0:
+                        for i in self.clients:
+                            self.out("-"+str(i.adr)+i.nom)
+                    else:
+                        self.out("The server is empty :'-(")
+                elif cmd[0] == "say":
+                    del cmd[0]
+                    cmd = " ".join(cmd).capitalize()
+                    self.event.append("say;[Server] "+cmd)
+                elif cmd[0] == "save":
+                    self.save_game(self.world)
+                elif cmd[0] == "stop":
+                    self.shutdown()
+
+                else:
+                    cmd = " ".join(cmd)
+                    self.out("Unknown command \""+cmd+"\". Type \"help\" for help")
+
+    def out(self, buffer):
+        buffer = buffer.split("\n")
+        t = localtime()
+        for i in buffer:
+            print "["+str(t.tm_hour)+":"+str(t.tm_min)+":"+str(t.tm_sec)+"] "+ i
 
     def main(self):
         while self.runned:
-            self.check_connection()
             self.read()
 
     def check_connection(self):
-        asked, wlist, xlist = select.select([self.tcp,self.udp], [], [], 0.05)
-        for i in asked:
-            if i == self.tcp:
-                connection, adresse = self.tcp.accept() 
-                client = Client(connection, adresse)
-                self.clients.append(client)
-                print "L'adresse",client.adr,"vient de se connecter au serveur !", "\a"
-            elif i == self.udp:
-                self.process_udp(i)
+        while self.runned:
+            asked, wlist, xlist = select.select([self.tcp,self.udp], [], [], 0.05)
+            for i in asked:
+                if i == self.tcp:
+                    connection, adresse = self.tcp.accept() 
+                    client = Client(connection, adresse)
+                    self.clients.append(client)
+                    self.out(str(client.adr)+" is asking a connection...")
+                elif i == self.udp:
+                    self.process_udp(i)
 
     def process_udp(self, sock):
         buffer,adr = sock.recvfrom(8000)
         buffer = buffer.split(";")
-
+        
         buffer_ret = ""
-        if buffer[0] == "set_adr_udp":
+        if buffer[0] == "set_adr_udp" and self.get_client_nom(buffer[1]) != None:
             self.get_client_nom(buffer[1]).adr_udp = adr
         elif buffer[0] == "set_pos":
             if self.get_client_adr(adr) != None:
@@ -102,17 +172,28 @@ class Server:
                 self.get_client_adr(adr).v_y = int(buffer[4])
                 self.get_client_adr(adr).sens = int(buffer[5])
                 self.get_client_adr(adr).hitting = int(buffer[6])
+                self.get_client_adr(adr).fired = int(buffer[7])
+                self.get_client_adr(adr).issprinting = int(buffer[8])
+                self.get_client_adr(adr).bras[0] = int(buffer[9])
+                self.get_client_adr(adr).bras[1] = int(buffer[10])
         elif buffer[0] == "get_pos":
             for i in self.clients:
                 if i != self.get_client_adr(adr):
-                    buffer_ret += i.nom+";"+str(i.map)+";"+str(i.x)+";"+str(i.y)+";"+str(i.v_x)+";"+str(i.v_y)+";"+str(int(i.sens))+";"+str(int(i.isingrav))+";"+str(int(i.hitting))+";"+str(int(i.fired))+"\n"
+                    buffer_ret += i.nom+";"+str(i.map)+";"+str(i.x)+";"+str(i.y)+";"+str(i.v_x)+";"+str(i.v_y)+";"+str(int(i.sens))+";"+str(int(i.isingrav))+";"+str(int(i.hitting))+";"+str(int(i.fired))+";"+str(int(i.issprinting))+";"+str(i.bras[0])+";"+str(i.bras[1])+"\n"
         
         sock.sendto(buffer_ret,adr)        
 
 
-    def break_connection(self, client):
-               print self.get_client(client).adr," disconnected"
-               self.clients.remove(self.get_client(client))
+    def break_connection(self, client, tag = ""):
+        self.event.append("disconnect;"+self.get_client(client).nom)
+        if tag == "kick":
+            self.event.append("say;"+self.get_client(client).nom+" has been kicked")
+            self.out(str(self.get_client(client).adr)+self.get_client(client).nom+" has been kicked")
+        else:
+            self.event.append("say;"+self.get_client(client).nom+" disconnected")
+            self.out(str(self.get_client(client).adr)+self.get_client(client).nom+" disconnected")
+        self.clients_saved.append(self.get_client(client))
+        self.clients.remove(self.get_client(client))
 
     def get_clients(self):
         clients = []
@@ -124,21 +205,25 @@ class Server:
         for i in self.clients:
            if i.connection == client:
                return i
+        return Client()
 
     def get_client_adr(self, adr):
         for i in self.clients:
            if i.adr_udp == adr:
                return i
+        return Client()
 
     def get_client_nom(self, nom):
         for i in self.clients:
            if i.nom == nom:
                return i
+        return Client()
 
     def get_map(self, id):
         for i in self.maps:
            if i.id == id:
                return i
+        return Map()
 
     def read(self):
         clients_to_read = []
@@ -162,6 +247,13 @@ class Server:
                                 founded = True
                                 break
                         if not founded:
+                            founded = False
+                            for i in self.clients_saved:
+                                if i.nom == buffer[1]:
+                                    self.get_client(client).inv.empty()
+                                    self.get_client(client).inv.load(i.inv.save())
+                                    self.clients_saved.remove(i)
+                                    break
                             self.get_client(client).nom = buffer[1]
                             self.get_client(client).color = []
                             self.get_client(client).color.append(buffer[2])
@@ -172,6 +264,7 @@ class Server:
                             self.event.append("connect;"+self.get_client(client).nom)
                             self.event.append("say;"+self.get_client(client).nom+" connected")
                             buffer_ret = "Connected"
+                            self.out(str(self.get_client(client).adr)+self.get_client(client).nom+" connected !\a")
                         else:
                             buffer_ret = "Pseudo already used"
                     elif buffer[0] == "get_welcome":
@@ -185,14 +278,25 @@ class Server:
                     elif buffer[0] == "get_perso":
                         if buffer[1] != self.get_client(client).nom and self.get_client_nom(buffer[1]) != None:
                             buffer_ret = self.get_client_nom(buffer[1]).get_char()
-                    elif buffer[0] == "set_map_perso":
-                        self.get_client(client).map = int(buffer[1])
-                        self.get_client(client).id_porte = int(buffer[2])
+
+
+                    # Inventory
+                    elif buffer[0] == "set_inv":
+                        self.get_client(client).inv.empty()
+                        self.get_client(client).inv.load(buffer[1])
+                    elif buffer[0] == "get_inv":
+                        buffer_ret=self.get_client(client).inv.save()
+
+                    # Map
                     elif buffer[0] == "get_map":
                         buffer_ret=map.map2char(self.get_map(int(buffer[1])).map)
                     elif buffer[0] == "set_map":
-                        print pbuffer
                         self.get_client(client).map = int(buffer[1])
+                    elif buffer[0] == "set_map_perso":
+                        self.get_client(client).map = int(buffer[1])
+                        self.get_client(client).id_porte = int(buffer[2])
+
+
                     elif buffer[0] == "set_vie":
                         self.get_client(client).vie = int(buffer[1])
                     elif buffer[0] == "nbr_player":
@@ -200,9 +304,7 @@ class Server:
                     elif buffer[0] == "get_last_event":
                         buffer_ret=str(len(self.event))
                     elif buffer[0] == "get_last_event_map":
-                        print buffer[0]
                         buffer_ret=str(len(self.get_map(int(buffer[1])).event))
-                        print buffer_ret
                     elif buffer[0] == "get_event_map":
                         buffer_ret=self.get_map(self.get_client(client).map).send_event(int(buffer[1]), self.get_client(client).nom)
                     elif buffer[0] == "get_event":
@@ -212,15 +314,19 @@ class Server:
                     elif buffer[0] == "stop_jump":
                         self.get_client(client).isingrav = False
                     elif buffer[0] == "destroy_block":
-                        print self.get_client(client).nom+";"+pbuffer
                         self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
                         x = int(buffer[1])
                         y = int(buffer[2])
                         for i in self.get_map(self.get_client(client).map).map:
                             if i.x == x and i.y == y:
+                                if isinstance(i, Coal):
+                                    self.get_client(client).inv.add(item.Item(34, 4))
+                                else:
+                                    self.get_client(client).inv.add(i)
                                 self.get_map(self.get_client(client).map).map.remove(i)
+                                
+                    # hit block
                     elif buffer[0] == "hit_block":
-                        print self.get_client(client).nom+";"+pbuffer
                         self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
                         x = int(buffer[1])
                         y = int(buffer[2])
@@ -228,40 +334,129 @@ class Server:
                         for i in self.get_map(self.get_client(client).map).map:
                             if i.x == x and i.y == y:
                                 if i.hit(damage):
+                                    if isinstance(i, Coal):
+                                        self.get_client(client).inv.add(item.Item(34, 4))
+                                    else:
+                                        self.get_client(client).inv.add(i)
                                     self.get_map(self.get_client(client).map).map.remove(i)
+
+                    # Set Block
+                    elif buffer[0] == "set_block":
+                        self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
+                        x = int(buffer[1])
+                        y = int(buffer[2])
+                        for i in self.get_map(self.get_client(client).map).map:
+                            if i.x == x and i.y == y:
+                                self.get_map(self.get_client(client).map).map.remove(i)
+                        self.get_map(self.get_client(client).map).map.append(map.char2bloc(buffer[3]))
+
+                    # Add block
                     elif buffer[0] == "add_block":
-                        print self.get_client(client).nom+";"+pbuffer
                         self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
                         bloc = map.char2bloc(buffer[1])
+                        self.get_client(client).inv.changer_select(self.get_client(client).inv.search(item.Item_Bloc(bloc)))
+                        self.get_client(client).inv.delete()
                         self.get_map(self.get_client(client).map).map.append(bloc)
+                    elif buffer[0] == "lock_chest":
+                        self.get_map(self.get_client(client).map).event.append(self.get_client(client).nom+";"+pbuffer)
                     elif buffer[0] == "say":
-                        print self.get_client(client).nom+"> "+buffer[1]
-                        self.event.append("say;"+self.get_client(client).nom+"> "+buffer[1])
+                        self.out(self.get_client(client).nom+"> "+buffer[1])
+                        buffer_unspaced = buffer[1].split()
+                        if buffer_unspaced[0] == "/me" and len(buffer_unspaced)>1:
+                            del buffer_unspaced[0]
+                            buffer[1] = " ".join(buffer_unspaced)
+                            self.event.append("say;"+self.get_client(client).nom+" "+buffer[1])
+                        elif buffer_unspaced[0] == "/help":
+                            buffer_ret = "say;"+\
+                                "Commands help : "+\
+                                "\n/help : Shows a list of server commands"+\
+                                "\n/welcome :  Shows welcome message"+\
+                                "\n/list or /ls : list all connected players"+\
+                                "\n/me action : Sends a message as an action"
+                        elif buffer_unspaced[0] == "/list" or buffer_unspaced[0] == "/ls":
+                            buffer_ret = "say;"+str(len(self.clients))+" player(s) connected :"
+                            for i in self.clients:
+                                buffer_ret += "\n-"+i.nom
+                        elif buffer_unspaced[0] == "/welcome":
+                            buffer_ret="say;"+self.msg_welcome
+                        elif buffer_unspaced[0] == "/sign":
+                            map_temp = self.get_map(self.get_client(client).map).map[:]
+                            map_temp.reverse()
+                            for i in map_temp:
+                                if isinstance(i, Sign):
+                                    del buffer_unspaced[0]
+                                    buffer[1] = " ".join(buffer_unspaced)
+                                    i.txt = buffer[1]
+                                    self.get_map(self.get_client(client).map).event.append("server;set_block;"+str(i.x)+";"+str(i.y)+";"+map.bloc2char(i))
+                                    break
+                            map_temp = None
+                        else:
+                            self.event.append("say;"+self.get_client(client).nom+"> "+buffer[1])
                      
                     client.send(buffer_ret)
                 except socket.error:
-                    self.event.append("disconnect;"+self.get_client(client).nom)
-                    self.event.append("say;"+self.get_client(client).nom+" disconnected")
                     self.break_connection(client)
 
                     
+    def shutdown(self):
+        self.out("Stopping server...")
+        self.save_game(self.world)
+        self.runned = False 
 
     def close(self):
         for client in self.clients:
             client.connection.close()
-        self.sock.close()
+        self.tcp.close()
+        self.udp.close()
 
     def load_game(self, nom):
-        i = 0
-        while map.open_map("save_srv/"+nom+"/map"+str(i)) != []:
-            self.maps.append(map.Map(map.open_map("save_srv/"+nom+"/map"+str(i)),i))
-            i = i+1
-        i = -1
-        while map.open_map("save_srv/"+nom+"/map"+str(i)) != []:
-            self.maps.append(map.Map(map.open_map("save_srv/"+nom+"/map"+str(i)),i))
-            i = i-1
+        if os.path.isdir("data/save_srv/"+nom):
+            self.out("Loading characters...")
+            file = open("data/save_srv/"+nom+"/char" , 'r')
+            buffer = file.read().split("\n")
+            for i in buffer:
+                i=i.split(";")
+                if len(i)>1:
+                    new_client = Client()
+                    new_client.nom = i[0]
+                    new_client.inv.empty()
+                    new_client.inv.load(i[1])
+                    self.clients_saved.append(new_client)
+                    self.out(new_client.nom+" loaded ")
+
+            self.out("Loading "+nom+"...")
+            i = 0
+            while map.open_map("save_srv/"+nom+"/map"+str(i)) != []:
+                self.maps.append(map.Map(map.open_map("save_srv/"+nom+"/map"+str(i)),i))
+                i = i+1
+            i = -1
+            while map.open_map("save_srv/"+nom+"/map"+str(i)) != []:
+                self.maps.append(map.Map(map.open_map("save_srv/"+nom+"/map"+str(i)),i))
+                i = i-1
+            return True
+        else:
+            return False
+
+
+
+    def save_game(self, nom):
+        # Map
+        self.out("Saving "+nom+"...")
+        for i in self.maps:
+           map.save_map("save_srv/"+nom+"/map"+str(i.id), i.map) 
+        # Perso
+        for i in self.clients:
+            self.clients_saved.append(i)
+            
+        file = open("data/save_srv/"+nom+"/char", "w")
+        buffer  = ""
+        for i in self.clients_saved:
+            buffer += i.nom+";"+i.inv.save()+"\n"
+        file.write(buffer)
+        file.close()
 
     def new_game(self, nom):
+        self.out("Generating "+nom+"...")
         # Copie map std
         i = 0
 
@@ -278,7 +473,7 @@ class Server:
         map.save_map("save_srv/"+nom+"/map-1", self.gen_map(-1))
        
         # Fichier global
-        file = open("data/save_srv/"+nom+"/perso", "w")
+        file = open("data/save_srv/"+nom+"/char", "w")
         file.write("")
         file.close()
 
@@ -354,7 +549,7 @@ class Server:
         
 
 class Client():
-    def __init__(self, connection, adr):
+    def __init__(self, connection = None, adr = None):
         self.connection = connection
         self.adr = adr
         self.adr_udp = None
@@ -376,6 +571,8 @@ class Client():
         self.sens = True
         self.fired = False
         self.hitting = False
+        self.issprinting = False
+        self.bras = [0,0]
 
         # Gravité
         self.v_y = 0

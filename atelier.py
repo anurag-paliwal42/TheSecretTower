@@ -48,6 +48,14 @@ def load_craft(type):
         item.set_prix(prix)
         craft.append(item)
 
+        # Sign
+        bloc = Sign(22)
+        item = Item_Bloc(bloc)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Wood(6))
+        item.set_prix(Item(5,1))
+        craft.append(item)
+
         # Forge
         bloc = Forge(10)
         item = Item_Bloc(bloc)

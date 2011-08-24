@@ -257,11 +257,11 @@ def ask(app, ptitle):
 
     while 1:
         input.update_event(app)
-        preponse = input.write(preponse)
+        preponse = input.write(preponse).capitalize()
 
         if input.key[K_RETURN]:
             if preponse != "":
-                return preponse
+                return preponse.strip()
 
         if time() >= last_blink:
             suffixe = "|"  

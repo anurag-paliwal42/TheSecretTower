@@ -23,6 +23,8 @@
 import pygame
 from pygame.locals import *
 
+import re
+
 class Input:
     def __init__(self):
         self.key = [0]*1000
@@ -31,6 +33,8 @@ class Input:
         self.mousebuttons= [0]*9
         self.last_pressed = ""
         self.quit = False
+
+        self.regex_NUMPAD = re.compile("^\[.\]$")
 
     # Met Ã  jour les events
     def update_event(self, app):
@@ -62,10 +66,12 @@ class Input:
             preponse = preponse[0:-1]
             self.key[K_BACKSPACE] = 0
         buffer = ""
-        if (len(self.last_pressed) == 1 or self.last_pressed in ["space"]) and spec:
+        if self.regex_NUMPAD.search(self.last_pressed):
+            buffer = self.last_pressed.replace("[","").replace("]","")
+        elif (len(self.last_pressed) == 1 or self.last_pressed in ["space"]) and spec:
             buffer = self.last_pressed.replace("space", " ").replace(";", ":")
         elif (len(self.last_pressed) == 1) and not spec:
-            buffer = self.last_pressed.replace(";", ":")
+            buffer = self.last_pressed.replace(";", "m")
         if self.key[K_RALT] and spec:
             if buffer == "e" or buffer == "2":
                 buffer = "é"

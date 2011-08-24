@@ -93,6 +93,9 @@ def send_udp(sock, cmd, tcp=None):
                         perso.isingrav = bool(int(char_perso[7]))
                         perso.hitting = bool(int(char_perso[8]))
                         perso.fired = bool(int(char_perso[9]))
+                        perso.issprinting = bool(int(char_perso[10]))
+                        perso.bras[0] = int(char_perso[11])
+                        perso.bras[1] = int(char_perso[12])
 
             
 def send(sock, cmd):
@@ -109,7 +112,8 @@ def send(sock, cmd):
                         found = True
                 if not found:
                     new_perso = Perso()
-                    new_perso.ctlr = False
+                    new_perso.ctrl = False
+                    new_perso.inv.ctrl = False
                     char_perso = i.split(";")
                     new_perso.nom = char_perso[0]
                     new_perso.map = int(char_perso[1])
@@ -123,6 +127,9 @@ def send(sock, cmd):
                     new_perso.update_color()
                     const.persos.append(new_perso)
     elif cmd.split(";")[0] == "co_perso":
+        const.output=buffer
+
+    elif cmd == "get_inv":
         const.output=buffer
 
     elif cmd.split(";")[0] == "get_map":
@@ -144,7 +151,10 @@ def send(sock, cmd):
         if buffer != [""]:
             const.events_map.extend(buffer)
         return id_last_event
-    
+
+    elif cmd.split(";")[0] == "say":
+        if cmd.split(";")[1] in ["/help", "/list", "/ls", "/welcome"]:
+            const.events.append(buffer)
 
     elif cmd.split(";")[0] == "get_event":
         buffer = buffer.split("\n")

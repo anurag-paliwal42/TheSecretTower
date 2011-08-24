@@ -304,7 +304,7 @@ class Torch(Deco):
         Bloc.__init__(self, picture)
 
 class Sign(Deco):
-    def __init__(self, picture, txt):
+    def __init__(self, picture, txt="_"):
         Bloc.__init__(self, picture)
         self.txt = txt
 

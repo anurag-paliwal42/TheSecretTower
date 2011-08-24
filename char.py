@@ -26,13 +26,32 @@ import pygame
 from pygame.locals import *
 
 from time import *
+import re
 
-def write(app, string, x, y, color = (0,0,0), pas=15):
+last_color = (-1,-1,-1)
+
+def write(app, string, x, y, pcolor = (0,0,0), pas=15):
+    global last_color
     strings = string.split("\n")
     texte = []
     for i in strings:
         temp = Element()
+        if pcolor == "Auto": 
+            if re.search(".*>.", i):
+                color = const.color_basic
+            elif re.search("\[Server\].", i):
+                color = const.color_important
+            elif last_color != (-1,-1,-1):
+                color = last_color
+                last_color = (-1,-1,-1)
+            else:
+                color = const.color_annonce
+            if re.search("-$", i):
+                last_color = color
+        else:
+            color = pcolor
         temp.changer_text(i, app.font_petit, color)
+
         temp.move_el(x, y)
         texte.append(temp)
         y += pas
@@ -49,10 +68,10 @@ class Chatbox():
         
         self.line_b = []
         self.line_w = []
-        self.output = ""
         self.input_line_w = Element()
         self.input_line_b = Element()
         self.input = ""
+        self.output = ""
         self.writing = False
         self.time_line = [0]*10
         self.last_blink = time()
@@ -60,7 +79,7 @@ class Chatbox():
         # Background
         self.background = Element()
         self.background.changer_image(pygame.Surface((350, 205)))
-        self.background.image.set_alpha(75)
+        self.background.image.set_alpha(200)
         self.background.move_el(0,395)
 
         self.add(" \n \n \n \n \n \n \n \n \n \n")
@@ -83,7 +102,10 @@ class Chatbox():
 
     def add(self,buffer):
         if buffer != "":
-            buffer = self.split(buffer)
+            if len(buffer) > self.len:
+                buffer_s = buffer.split("\n")
+                buffer_s = [self.split(i) for i in buffer_s]
+                buffer = "\n".join(buffer_s)
             self.output += "\n"+buffer
         line = self.output.split("\n")
         while len(line)>10:
@@ -95,11 +117,11 @@ class Chatbox():
  
     def split(self, buffer):
         if len(buffer) > self.len:
-            buffer = buffer[:self.len]+"\n"+self.split(buffer[self.len:])
+            buffer = buffer[:self.len]+"-\n"+self.split(buffer[self.len:])
         return buffer
 
     def draw(self, app):
-        self.line_w = write(app, self.output, self.x, self.y, (255,255,255))
+        self.line_w = write(app, self.output, self.x, self.y, "Auto")
         self.line_b = write(app, self.output, self.x+2, self.y+2, (0,0,0))
         if time() >= self.last_blink:
             suffixe = "|"  
