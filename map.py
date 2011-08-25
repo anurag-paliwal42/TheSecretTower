@@ -158,7 +158,7 @@ def char2bloc(buffer, vie = False):
         bloc.set_unit(pbloc[3])
         bloc.move_el(pbloc[1], pbloc[2])
     if vie:
-        bloc.vie = pbloc[-1]
+        bloc.vie = float(pbloc[-1])
     return bloc
 
 def save_map(nom, map):

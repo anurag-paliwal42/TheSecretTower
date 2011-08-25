@@ -131,6 +131,8 @@ def send(sock, cmd):
 
     elif cmd == "get_inv":
         const.output=buffer
+    elif cmd == "get_mobs":
+        const.mobs=bool(int(buffer))
 
     elif cmd.split(";")[0] == "get_map":
         const.map = map.char2map(buffer, True) 

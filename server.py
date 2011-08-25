@@ -57,6 +57,7 @@ class Server:
             "*************************\n"+\
             "Type \"/help\" for help\n"
         self.world = "world"
+        self.mobs = True
         
         
         const.display = False
@@ -223,7 +224,7 @@ class Server:
         for i in self.maps:
            if i.id == id:
                return i
-        return Map()
+        return map.Map()
 
     def read(self):
         clients_to_read = []
@@ -278,6 +279,8 @@ class Server:
                     elif buffer[0] == "get_perso":
                         if buffer[1] != self.get_client(client).nom and self.get_client_nom(buffer[1]) != None:
                             buffer_ret = self.get_client_nom(buffer[1]).get_char()
+                    elif buffer[0] == "get_mobs":
+                        buffer_ret=str(int(self.mobs))
 
 
                     # Inventory
@@ -291,7 +294,16 @@ class Server:
                     elif buffer[0] == "get_map":
                         buffer_ret=map.map2char(self.get_map(int(buffer[1])).map)
                     elif buffer[0] == "set_map":
-                        self.get_client(client).map = int(buffer[1])
+                        id_map = int(buffer[1])
+                        self.get_client(client).map = id_map
+                        found = False
+                        for i in self.maps:
+                            if i.id == id_map:
+                                found = True
+                        if not found:
+                            map.save_map("save_srv/"+self.world+"/map"+str(id_map), self.gen_map(id_map))
+                            self.maps.append(map.Map(map.open_map("save_srv/"+self.world+"/map"+str(id_map)),id_map))
+                            
                     elif buffer[0] == "set_map_perso":
                         self.get_client(client).map = int(buffer[1])
                         self.get_client(client).id_porte = int(buffer[2])
@@ -513,19 +525,19 @@ class Server:
                         rand = random.randint(0,200)
                         if rand < 20:
                             bloc = Coal(14)
-                        elif rand < 40 and level >= -10:
+                        elif rand < 40:
                             bloc =Tin(20)
-                        elif rand < 60 and level >= -10:
+                        elif rand < 60:
                             bloc = Copper(15)
-                        elif rand < 70 and level < -10:
+                        elif rand < 70 and level < -5:
                             bloc = Iron(16)
-                        elif rand < 75 and level < -20:
+                        elif rand < 75 and level < -10:
                             bloc = Gold(18)
-                        elif rand < 80 and level < -30:
+                        elif rand < 80 and level < -20:
                             bloc = Diamond(19)
-                        elif rand < 90 and level < -20:
+                        elif rand < 90 and level < -10:
                             bloc = Titanium(17)
-                        elif rand < 95 and level < -30:
+                        elif rand < 95 and level < -20:
                             bloc = Uranium(21)
                         else:
                             bloc = Stone(1)

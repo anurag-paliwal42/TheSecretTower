@@ -80,9 +80,9 @@ class Bloc(Element):
                 
 
     def hit(self, damage, cause=True):
+        self.vie -= damage
         if cause:
             const.input.append("hit_block;"+str(self.x)+";"+str(self.y)+";"+str(damage))
-        self.vie -= damage
         if const.display:
             self.set_image()
         if self.vie > 0:

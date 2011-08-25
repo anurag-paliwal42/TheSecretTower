@@ -33,6 +33,7 @@ class Input:
         self.mousebuttons= [0]*9
         self.last_pressed = ""
         self.quit = False
+        self.qwerty = False
 
         self.regex_NUMPAD = re.compile("^\[.\]$")
 
@@ -65,6 +66,12 @@ class Input:
         if self.key[K_BACKSPACE]:
             preponse = preponse[0:-1]
             self.key[K_BACKSPACE] = 0
+        if self.key[K_F1]:
+            if self.qwerty:
+                self.qwerty = False
+            else:
+                self.qwerty = True
+            self.key[K_F1] = 0
         buffer = ""
         if self.regex_NUMPAD.search(self.last_pressed):
             buffer = self.last_pressed.replace("[","").replace("]","")
@@ -72,6 +79,17 @@ class Input:
             buffer = self.last_pressed.replace("space", " ").replace(";", ":")
         elif (len(self.last_pressed) == 1) and not spec:
             buffer = self.last_pressed.replace(";", "m")
+
+        if not self.qwerty:
+            if buffer == "a":
+                buffer="q"
+            elif buffer == "q":
+                buffer="a"
+            elif buffer == "w":
+                buffer="z"
+            elif buffer == "z":
+                buffer="w"
+        
         if self.key[K_RALT] and spec:
             if buffer == "e" or buffer == "2":
                 buffer = "é"

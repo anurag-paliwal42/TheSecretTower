@@ -40,6 +40,7 @@ path_fond1 = "img/fond1.png"
 path_fond2 = "img/fond2.png"
 path_choix = "img/choix.png"
 display = True
+mob = True
 
 # chatbox
 color_basic = (255,255,255)

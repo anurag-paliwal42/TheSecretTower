@@ -181,7 +181,7 @@ class App:
         const.runned = True
         const.input = []
         const.output == ""
-        const.host = ask(self, "Enter the IP of the server :")
+        const.host = ask(self, "Enter the IP of the server :").lower()
         thread=threading.Thread(target=client.connect)
         const.input.append("co_perso;"+self.perso.get_char(";"))
         const.input_udp = "set_adr_udp;"+self.perso.nom
@@ -196,6 +196,7 @@ class App:
         else:
             const.output = ""
             const.input.append("get_inv")
+            const.input.append("get_mobs")
             while const.output == "":
                 tps_connect +=1
             self.perso.inv.empty()
@@ -215,6 +216,7 @@ class App:
                 self.partie[1] = self.perso.map
 
         const.runned = False
+        const.mobs = True
         return cmd
 
     def blit(self, element, coef=1):

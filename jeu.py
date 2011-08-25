@@ -66,7 +66,7 @@ def jeu(app, map, perso):
     dark_middle.image.set_alpha(75)
 
     mobs = []
-    if app.partie[0] != "Multi":
+    if const.mobs:
         for i in shadow:
             # pop monstre
             if random.randint(1, 5) == 1:
