@@ -97,7 +97,7 @@ class Perso(Element):
             if (self.vie > 0 and time()-self.last_dommage > 1):
                 self.last_dommage = time()
                 self.vie = self.vie - degat
-                self.sauter(0,-5, True)
+                self.sauter(0,-5, [], True)
                 return True
             if (self.vie <= 0):
                 return False
@@ -345,8 +345,8 @@ class Perso(Element):
     # Fait sauter notre personnage
     # x : vitesse en x
     # y : vitesse en y
-    def sauter(self, x, y, force = False):
-        if self.isingrav == False or force:
+    def sauter(self, x, y, map = [], force = False):
+        if self.isingrav == False or force or self.collided_map(0,15,map):
             self.v_y = y
             self.v_x = x
             self.isingrav = True
@@ -440,14 +440,14 @@ class Perso(Element):
             if future_rect.colliderect(i.rect):
                 if isinstance(i, type):
                     if type == Terre:
-                        if (self.inv.get_item().id in [1,2,7,12,17,22,27]) and not self.inv.isfull(i):
+                        if (self.inv.get_item().id in [1,2,6,7,11,12,16,17,21,22,26,27]) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
                                 if self.ctrl:
                                     const.input.append("destroy_block;"+str(i.x)+";"+str(i.y))
                     elif type == Stone:
-                        if (self.inv.get_item().id in [1,3,8,13,18,23,28]) and not self.inv.isfull(i):
+                        if (self.inv.get_item().id in [1,3,6,8,11,13,16,18,21,23,26,28]) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
                                 if isinstance(i, Coal):
                                     self.inv.add(Item(34, 4))
@@ -457,7 +457,7 @@ class Perso(Element):
                                 if self.ctrl:
                                     const.input.append("destroy_block;"+str(i.x)+";"+str(i.y))
                     elif type == Wood:
-                        if (self.inv.get_item().id in [1,4,9,14,19,24,29]) and not self.inv.isfull(i):
+                        if (self.inv.get_item().id in [1,4,6,9,11,14,16,19,21,24,26,29]) and not self.inv.isfull(i):
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)

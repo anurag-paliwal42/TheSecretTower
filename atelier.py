@@ -92,6 +92,15 @@ def load_craft(type):
         item.set_prix(Item(5,2))
         craft.append(item)
 
+        # Epee
+        item = Item(1,1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Stone(1))
+        item.set_prix(Stone(1))
+        item.set_prix(Stone(1))
+        item.set_prix(Item(5,1))
+        craft.append(item)
+
         # Pioche
         item = Item(3,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)

@@ -290,7 +290,7 @@ class Item():
         elif id == 6:
             self.nom = "Bronze Sword"
             self.atk = 5
-            self.damage = 0.2
+            self.damage = 0.4
         elif id == 7:
             self.nom = "Bronze Shovel"
             self.atk = 2
@@ -308,7 +308,7 @@ class Item():
         elif id == 11:
             self.nom = "Iron Sword"
             self.atk = 8
-            self.damage = 0.2
+            self.damage = 0.5
         elif id == 12:
             self.nom = "Iron Shovel"
             self.atk = 3
@@ -326,7 +326,7 @@ class Item():
         elif id == 16:
             self.nom = "Steel Sword"
             self.atk = 10
-            self.damage = 0.2
+            self.damage = 0.7
         elif id == 17:
             self.nom = "Steel Shovel"
             self.atk = 4
@@ -344,7 +344,7 @@ class Item():
         elif id == 21:
             self.nom = "Titanium Sword"
             self.atk = 15
-            self.damage = 0.2
+            self.damage = 1
         elif id == 22:
             self.nom = "Titanium Shovel"
             self.atk = 5
@@ -362,7 +362,7 @@ class Item():
         elif id == 26:
             self.nom = "Uranium Sword"
             self.atk = 50
-            self.damage = 0.2
+            self.damage = 1.5
         elif id == 27:
             self.nom = "Uranium Shovel"
             self.atk = 6

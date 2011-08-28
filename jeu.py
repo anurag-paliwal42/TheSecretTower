@@ -91,18 +91,18 @@ def jeu(app, map, perso):
     b_fond_barre_energie = Element()
     b_fond_barre_energie.changer_image(pygame.Surface((102,12)))
     b_fond_barre_energie.image.fill(pygame.Color(0,0,0, 255))
-    b_fond_barre_energie.move_el(369,568)
+    b_fond_barre_energie.move_el(372,568)
     fond_barre_energie = Element()
     fond_barre_energie.changer_image(pygame.Surface((100,10)))
     fond_barre_energie.image.fill(pygame.Color(255,255,255, 255))
-    fond_barre_energie.move_el(370,569)
+    fond_barre_energie.move_el(373,569)
     barre_energie = Element()
     barre_energie.changer_image(pygame.Surface((100,10)))
     barre_energie.image.fill(pygame.Color(255,180,40, 255))
-    barre_energie.move_el(370,569)
+    barre_energie.move_el(373,569)
     energie = Element()
     energie.changer_image(pygame.image.load("img/energie.png").convert_alpha())
-    energie.move_el(380,569)
+    energie.move_el(383,569)
     
     b_text_item = Element()
     b_text_item.changer_text(perso.inv.get_item().nom , app.font_petit)
@@ -123,11 +123,11 @@ def jeu(app, map, perso):
     info_w_txt = []
     info_w_txt = write(app, "V. "+str(const.version)+"\nFPS : "+str(fps)+"\nGame : "+app.partie[0], 0, 0, (255,255,255))
 
-    commandes =  "(Space) : Jump\n(Mouse Left) : Hit\n(Mouse Right) : Use/Put a bloc\n(Mouse scroll) : Scroll inventory\n(i) : Inventory \n(v) : Change View\n(ESC) : Break"
+    commandes =  "(Space) : Jump\n(Mouse Left) : Hit\n(TAB) : Sprint\n(Mouse Right) : Use/Put a bloc\n(Mouse scroll) : Scroll inventory\n(i) : Inventory \n(v) : Change View\n(ESC) : Break"
     b_commandes = []
-    b_commandes = write(app,commandes, 24, 54)
+    b_commandes = write(app,commandes, 24, 64)
     w_commandes = []
-    w_commandes = write(app, commandes, 20, 50, (255,255,255))
+    w_commandes = write(app, commandes, 20, 60, (255,255,255))
 
 
     #>> Multi
@@ -242,15 +242,15 @@ def jeu(app, map, perso):
         else:
             perso.issprinting = False 
         if input.key[K_SPACE] and input.key[K_a] and perso.issprinting and  perso.vie > 0 and not const.chatbox.writing:
-            perso.sauter(-5, -15)
+            perso.sauter(-5, -15, map)
             input.key[K_SPACE] = 0
 
         elif input.key[K_SPACE] and input.key[K_d] and perso.issprinting and  perso.vie > 0 and not const.chatbox.writing:
-            perso.sauter(5, -15)
+            perso.sauter(5, -15, map)
             input.key[K_SPACE] = 0
 
         if input.key[K_SPACE] and  perso.vie > 0 and not const.chatbox.writing:
-            perso.sauter(0, -15)
+            perso.sauter(0, -15, map)
             input.key[K_SPACE] = 0 
 
         if input.get_mouse(app)[0] >= perso.x+25:
@@ -530,9 +530,9 @@ def set_shadow(shadow, map, perso):
             elif math.fabs(perso.x-coord_dark[0])+math.fabs(perso.y-coord_dark[1]) < intens_perso*50:
                 coord_dark[2] = True
             for i in const.persos:
-                if math.fabs(i.x-coord_dark[0])+math.fabs(i.y-coord_dark[1]) < (4-2)*50:
+                if math.fabs(i.x-coord_dark[0])+math.fabs(i.y-coord_dark[1]) < (4-2)*50 and i.map == perso.map:
                     delete = True
-                elif math.fabs(i.x-coord_dark[0])+math.fabs(i.y-coord_dark[1]) < 4*50:
+                elif math.fabs(i.x-coord_dark[0])+math.fabs(i.y-coord_dark[1]) < 4*50 and i.map == perso.map:
                     coord_dark[2] = True
             for i in map:
                 intens = 0

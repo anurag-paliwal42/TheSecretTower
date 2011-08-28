@@ -48,15 +48,15 @@ class Server:
     def __init__(self):
 
         # Proprietes
-        self.host = '127.0.0.1'
-        self.port = 2345
+        self.host = '0.0.0.0'
+        self.port = 2346
         self.msg_welcome = "*************************\n"+\
             "Welcome to this Server !\n"+\
             "Version "+const.version+"\n"+\
             "www.secrettower.net\n"+\
             "*************************\n"+\
             "Type \"/help\" for help\n"
-        self.world = "world"
+        self.world = "hugo"
         self.mobs = True
         
         
