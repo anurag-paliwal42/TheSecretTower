@@ -258,7 +258,7 @@ def jeu(app, map, perso):
         else:
             perso.sens = False
 
-        if input.mousebuttons[1] and time()-perso.last_hit > 0.3:
+        if input.mousebuttons[1] and time()-perso.last_hit > 0.3 and perso.vie >0:
             last_hit = time()
             perso.hit()
             if app.coef == 1:
@@ -274,7 +274,7 @@ def jeu(app, map, perso):
                     perso.collided_mob(mobs)
 
                 
-        if input.mousebuttons[3]:
+        if input.mousebuttons[3] and perso.vie >0:
             perso.hit()
             input.mousebuttons[3] = 0
             if app.coef == 1:
@@ -389,14 +389,14 @@ def jeu(app, map, perso):
                 app.blit(i)
 
         for i in mobs:
-            i.update(map)
+            i.update(map, perso)
             creat = True
             for coord_dark in shadow:
                 if (int(i.x/50) == int(coord_dark[0]/50) and int(i.y/50) == int(coord_dark[1]/50)):
                     if coord_dark[2]:
                         creat = False
-            if creat and i.vie > 0:
-                i.update(map)
+            if creat:
+                i.update(map, perso)
                 app.blit(i)
  
         if app.partie[0] == "Multi":

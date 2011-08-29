@@ -1,0 +1,63 @@
+Freesound Attribution Form
+
+    This form below lists all the samples you downloaded from freesound with some data.
+    You can use this form to attribute samples to users when you use them.
+    If there are files you didn't use, you can delete them from the list.
+
+    The list is sorted from the last file you downloaded to your first download ever...
+
+    There's also an html version of this list.
+    
+Samples used from Freesound
+
+    August 29, 2011
+        By Michel88 (http://www.freesound.org/usersViewSingle.php?id=1193759)
+            pains.wav (http://www.freesound.org/samplesViewSingle.php?id=76972)
+            paine.wav (http://www.freesound.org/samplesViewSingle.php?id=76967)
+            deaths.wav (http://www.freesound.org/samplesViewSingle.php?id=76962)
+        By snaginneb (http://www.freesound.org/usersViewSingle.php?id=1467945)
+            gruntsound.wav (http://www.freesound.org/samplesViewSingle.php?id=90164)
+        By Robinhood76 (http://www.freesound.org/usersViewSingle.php?id=321967)
+            00826 zombie hit 1.wav (http://www.freesound.org/samplesViewSingle.php?id=66134)
+        By m_O_m (http://www.freesound.org/usersViewSingle.php?id=829608)
+            onion_break_hit_flesh_vegetable_blood_07.wav (http://www.freesound.org/samplesViewSingle.php?id=107772)
+   ---------------------------------------
+    August 28, 2011
+        By qubodup (http://www.freesound.org/usersViewSingle.php?id=71257)
+            swosh-19.flac (http://www.freesound.org/samplesViewSingle.php?id=60006)
+        By nextmaking (http://www.freesound.org/usersViewSingle.php?id=1275451)
+            Jump from the sand ground 2.aif (http://www.freesound.org/samplesViewSingle.php?id=85999)
+        By Michel88 (http://www.freesound.org/usersViewSingle.php?id=1193759)
+            grunt2.wav (http://www.freesound.org/samplesViewSingle.php?id=76964)
+            paind.wav (http://www.freesound.org/samplesViewSingle.php?id=76966)
+            deathd.wav (http://www.freesound.org/samplesViewSingle.php?id=76958)
+            deathh.wav (http://www.freesound.org/samplesViewSingle.php?id=76960)
+            paino.wav (http://www.freesound.org/samplesViewSingle.php?id=76969)
+            painh.wav (http://www.freesound.org/samplesViewSingle.php?id=76968)
+        By wildweasel (http://www.freesound.org/usersViewSingle.php?id=54676)
+            wood3.wav (http://www.freesound.org/samplesViewSingle.php?id=39044)
+        By martian (http://www.freesound.org/usersViewSingle.php?id=84709)
+            footstep on wood foley.wav (http://www.freesound.org/samplesViewSingle.php?id=19292)
+            classic double swwosh .wav (http://www.freesound.org/samplesViewSingle.php?id=19312)
+        By ice9ine (http://www.freesound.org/usersViewSingle.php?id=103578)
+            left foot.wav (http://www.freesound.org/samplesViewSingle.php?id=21692)
+            right foot.wav (http://www.freesound.org/samplesViewSingle.php?id=21695)
+        By TicTacShutUp (http://www.freesound.org/usersViewSingle.php?id=196)
+            click 1 d.wav (http://www.freesound.org/samplesViewSingle.php?id=406)
+        By swuing (http://www.freesound.org/usersViewSingle.php?id=15613)
+            footstep-concrete.wav (http://www.freesound.org/samplesViewSingle.php?id=38873)
+        By j1987 (http://www.freesound.org/usersViewSingle.php?id=367313)
+            leafpilehit.wav (http://www.freesound.org/samplesViewSingle.php?id=106130)
+        By FreqMan (http://www.freesound.org/usersViewSingle.php?id=92661)
+            concrete block 3.wav (http://www.freesound.org/samplesViewSingle.php?id=25843)
+            concrete block 2.wav (http://www.freesound.org/samplesViewSingle.php?id=25842)
+            concrete block 1.wav (http://www.freesound.org/samplesViewSingle.php?id=25841)
+        By adcbicycle (http://www.freesound.org/usersViewSingle.php?id=33634)
+            5.wav (http://www.freesound.org/samplesViewSingle.php?id=13957)
+            6.wav (http://www.freesound.org/samplesViewSingle.php?id=13958)
+            7.wav (http://www.freesound.org/samplesViewSingle.php?id=13959)
+        By m_O_m (http://www.freesound.org/usersViewSingle.php?id=829608)
+            cabbage_hit_iron rod_08.wav (http://www.freesound.org/samplesViewSingle.php?id=117771)
+        By Erdie (http://www.freesound.org/usersViewSingle.php?id=118241)
+            sword04.wav (http://www.freesound.org/samplesViewSingle.php?id=27858)
+            sword01.wav (http://www.freesound.org/samplesViewSingle.php?id=27826)

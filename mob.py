@@ -25,6 +25,7 @@ from bloc import *
 import const
 
 from time import *
+import random
 
 # Pygame
 import pygame
@@ -66,9 +67,19 @@ class Mob(Element):
         self.rect.height = 40
         self.rect = self.rect.move(15, 10)
 
-    def update(self, map):
+    def update(self, map, perso):
+        self.tomber(map)
         if self.vie > 0:
-            self.tomber(map)
+            if self.id == 1:
+                if self.sens and perso.x+50 <= self.x:
+                    self.sens = False
+                elif not self.sens and perso.x-50 > self.x:
+                    self.sens = True
+            elif self.id == 0:
+                if self.sens and perso.x+100 <= self.x and perso.vie > 0:
+                    self.sens = False
+                elif not self.sens and perso.x-100 > self.x and perso.vie > 0:
+                    self.sens = True
             if self.sens:
                 if self.move(self.vitesse, 0, map) != True:
                     if random.randint(0,3) == 0 and not self.isingrav:
@@ -81,7 +92,8 @@ class Mob(Element):
                         self.sens = True
                     else:
                         self.sauter(-10)
-            self.anim()
+        self.anim()
+
             
 
     def subir_degats(self, degat):
@@ -89,6 +101,12 @@ class Mob(Element):
             self.vie = self.vie - degat
             self.sauter(-5)
             self.last_degats = time()
+            if self.id == 0:
+                const.keeper[random.randint(0,2)].play()
+            elif self.id == 1:
+                const.zombie[random.randint(0,1)].play()
+            elif self.id == 2:
+                const.goblin[random.randint(0,1)].play()
             return True
         if (self.vie <= 0):
             return False
@@ -118,7 +136,8 @@ class Mob(Element):
             rect = pygame.Rect(self.rang_image*50,self.id*50, 50,50)
         elif self.isingrav:
             rect = pygame.Rect(100, self.id*50, 50,50)
-        
+        if self.vie <= 0:
+            rect = pygame.Rect(150,self.id*50, 50,50)
         image.blit(const.sprite_mobs, (0,0), rect)
         if not self.sens:
             image = pygame.transform.flip(image, True, False)
@@ -208,6 +227,8 @@ class Mob(Element):
                         self.subir_degats(i.atk)
                     collided=True
                 elif isinstance(i, Lava):
+                    if not self.fired:
+                        const.fire.play()
                     self.fired = True
                     self.fired_time_stop = time()+(i.unit*0.4)
                 elif not isinstance(i, Porte) and not isinstance(i, Echelle) and not isinstance(i, Deco) and not isinstance(i, Liquid):

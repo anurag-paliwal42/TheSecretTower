@@ -74,6 +74,20 @@ class App:
         const.sprite_fire = pygame.image.load("img/fire.png").convert_alpha()
         const.vide = pygame.image.load("img/vide.png").convert_alpha()
 
+        const.click = pygame.mixer.Sound("sound/click.wav")
+        const.step = (pygame.mixer.Sound("sound/step1.wav"), pygame.mixer.Sound("sound/step2.wav"))
+        const.door = pygame.mixer.Sound("sound/door.wav")
+        const.wood = (pygame.mixer.Sound("sound/wood1.wav"), pygame.mixer.Sound("sound/wood2.wav"))
+        const.stone = (pygame.mixer.Sound("sound/stone1.wav"), pygame.mixer.Sound("sound/stone2.wav"), pygame.mixer.Sound("sound/stone3.wav"))
+        const.dirt = pygame.mixer.Sound("sound/dirt.wav")
+        const.hurt = (pygame.mixer.Sound("sound/hurt1.wav"), pygame.mixer.Sound("sound/hurt2.wav"))
+        const.sword = (pygame.mixer.Sound("sound/sword1.wav"), pygame.mixer.Sound("sound/sword2.wav"))
+        const.zombie = (pygame.mixer.Sound("sound/zombie1.wav"), pygame.mixer.Sound("sound/zombie2.wav"), pygame.mixer.Sound("sound/zombie3.wav"))
+        const.goblin = (pygame.mixer.Sound("sound/goblin1.wav"), pygame.mixer.Sound("sound/goblin2.wav"))
+        const.keeper = (pygame.mixer.Sound("sound/keeper1.wav"), pygame.mixer.Sound("sound/keeper2.wav"), pygame.mixer.Sound("sound/keeper3.wav"))
+        const.fire = pygame.mixer.Sound("sound/fire.wav")
+        pygame.mixer.fadeout(300)
+
         self.perso = Perso()
         self.partie = []
         self.coef = 2

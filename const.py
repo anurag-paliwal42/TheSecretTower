@@ -58,6 +58,19 @@ global sprite_degats
 global sprite_fire
 global vide
 
+# Sound
+global click
+global step
+global door
+global wood
+global stone
+global hurt
+global sword
+global zombie
+global goblin
+global keeper
+global fire
+
 # Thread
 port = 2346
 global host

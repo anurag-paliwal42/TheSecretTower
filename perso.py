@@ -31,6 +31,7 @@ from time import *
 import os
 import copy
 import math
+import random
 
 # Pygame
 import pygame
@@ -78,6 +79,7 @@ class Perso(Element):
         self.angle_arm = 0
         self.changement_angle = 0
         self.rang_image = 0
+        self.son_pied = False
         self.set_org_color()
         self.anim(False)
         self.rect.width = 20
@@ -95,6 +97,7 @@ class Perso(Element):
     def subir_degats(self, degat):
         if self.ctrl:
             if (self.vie > 0 and time()-self.last_dommage > 1):
+                const.hurt[random.randint(0,1)].play()
                 self.last_dommage = time()
                 self.vie = self.vie - degat
                 self.sauter(0,-5, [], True)
@@ -145,7 +148,14 @@ class Perso(Element):
                 self.rang_image += 1
             else:
                 self.rang_image = 0
+                if self.son_pied:
+                    const.step[0].play()
+                    self.son_pied = False
+                else:
+                    const.step[1].play()
+                    self.son_pied = True
             rect = pygame.Rect(self.rang_image*50,0, 50,50)
+
         elif not etat:
             rect = pygame.Rect(0,0, 50,50)
         elif self.isingrav:
@@ -156,19 +166,9 @@ class Perso(Element):
         if not self.sens:
             image = pygame.transform.flip(image, True, False)
         if self.vie <= 0:
-            ecart_mod = 0.4
-            coef = 1
-            ecart = time() -self.last_dommage
-            if ecart < 0.1:
-                rect = pygame.Rect(50,0, 50,50)
-            elif ecart < 0.2:
-                rect = pygame.Rect(50,50, 50,50)
-            elif ecart < 0.3:
-                rect = pygame.Rect(50,100, 50,50)
-            else:
-                rect = pygame.Rect(50,150, 50,50)
             image = copy.copy(const.vide)
-            image.blit(const.sprite_degats, (0,0), rect)
+            rect = pygame.Rect(150,0, 50,50)
+            image.blit(self.sprite_perso, (0,0), rect)
 
 
         self.changer_image(image)
@@ -351,6 +351,7 @@ class Perso(Element):
             self.v_x = x
             self.isingrav = True
             const.input.append("jump")
+            
 
     # Déplacer le personnage avec collision
     # x : deplacement en x
@@ -424,6 +425,8 @@ class Perso(Element):
                     self.subir_degats(i.atk)
                     collided=True
                 elif isinstance(i, Lava):
+                    if not self.fired:
+                        const.fire.play()
                     self.fired = True
                     self.fired_time_stop = time()+(i.unit*0.4)
                 elif not isinstance(i, Porte) and not isinstance(i, Echelle) and not isinstance(i, Deco) and not isinstance(i,Liquid):
@@ -438,9 +441,12 @@ class Perso(Element):
         # Vérification pour chaques éléments de la map
         for i in map:
             if future_rect.colliderect(i.rect):
+                if i.picture == 5:
+                    const.sword[random.randint(0,1)].play()
                 if isinstance(i, type):
                     if type == Terre:
                         if (self.inv.get_item().id in [1,2,6,7,11,12,16,17,21,22,26,27]) and not self.inv.isfull(i):
+                            const.dirt.play()
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
@@ -448,6 +454,7 @@ class Perso(Element):
                                     const.input.append("destroy_block;"+str(i.x)+";"+str(i.y))
                     elif type == Stone:
                         if (self.inv.get_item().id in [1,3,6,8,11,13,16,18,21,23,26,28]) and not self.inv.isfull(i):
+                            const.stone[random.randint(0,2)].play()
                             if i.hit(self.inv.get_item().damage):
                                 if isinstance(i, Coal):
                                     self.inv.add(Item(34, 4))
@@ -458,6 +465,7 @@ class Perso(Element):
                                     const.input.append("destroy_block;"+str(i.x)+";"+str(i.y))
                     elif type == Wood:
                         if (self.inv.get_item().id in [1,4,6,9,11,14,16,19,21,24,26,29]) and not self.inv.isfull(i):
+                            const.wood[random.randint(0,1)].play()
                             if i.hit(self.inv.get_item().damage):
                                 self.inv.add(i)
                                 map.remove(i)
@@ -480,6 +488,7 @@ class Perso(Element):
         for i in map:
             if future_rect.colliderect(i.rect):
                 if isinstance(i,Porte):
+                    const.door.play()
                     if i.etat == 1:
                         self.map = self.map+1
                     elif i.etat == 0:

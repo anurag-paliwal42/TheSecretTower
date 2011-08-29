@@ -80,6 +80,7 @@ def menu(app, ptitle, pmenu, perso=None):
                 cmd = i
                 img_choix.y= 250+(cmd*50)
         if input.key[K_SPACE] or input.key[K_RETURN] or input.mousebuttons[1]:
+            const.click.play()
             if pmenu[cmd-1] == "Quit":
                 return 0
             return cmd
