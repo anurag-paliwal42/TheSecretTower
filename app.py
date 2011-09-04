@@ -33,9 +33,9 @@ import pygame
 from pygame.locals import *
 
 import element
-import menu
 import char
 from jeu import *
+import menu
 from map import *
 from editeur import *
 import client
@@ -86,6 +86,7 @@ class App:
         const.goblin = (pygame.mixer.Sound("sound/goblin1.wav"), pygame.mixer.Sound("sound/goblin2.wav"))
         const.keeper = (pygame.mixer.Sound("sound/keeper1.wav"), pygame.mixer.Sound("sound/keeper2.wav"), pygame.mixer.Sound("sound/keeper3.wav"))
         const.fire = pygame.mixer.Sound("sound/fire.wav")
+        const.fireworks = (pygame.mixer.Sound("sound/fireworks1.wav"),pygame.mixer.Sound("sound/fireworks2.wav"))
         pygame.mixer.fadeout(300)
 
         self.perso = Perso()
@@ -116,8 +117,9 @@ class App:
                 if not os.path.isdir("data/perso/"):
                     os.mkdir("data/perso/")
                 characters = os.listdir("data/perso")[:5]
+                characters = ["[ "+i+" ]" for i in characters]
                 while len(characters) < 5:
-                    characters.append("Empty")
+                    characters.append("--Empty--")
                 characters.append("Cancel")
                 cmd = menu(self, "Choose a Character", characters)
                 
@@ -139,8 +141,9 @@ class App:
                             if not os.path.isdir("data/save"):
                                 os.mkdir("data/save/")
                             saves = os.listdir("data/save")[:5]
+                            saves = ["[ "+i+" ]" for i in saves]
                             while len(saves) < 5:
-                                saves.append("Empty")
+                                saves.append("--Empty--")
                             saves.append("Cancel")
                             cmd = menu(self, "Choose a Game", saves)
                             if cmd < 6:
@@ -237,11 +240,13 @@ class App:
         """Ajoute Element à l'écran"""
         if isinstance(element, Perso):
             if not element.sens:
-                self.fenetre.blit(pygame.transform.scale(element.image, (element.image.get_width()*coef,element.image.get_height()*coef)), (element.x-(element.image.get_width()-50), element.y))
+                self.fenetre.blit(pygame.transform.scale(element.image, (int(element.image.get_width()*coef),int(element.image.get_height()*coef))), (element.x-(element.image.get_width()-50), element.y))
             else:
-                self.fenetre.blit(pygame.transform.scale(element.image, (element.image.get_width()*coef,element.image.get_height()*coef)), (element.x,element.y))
-        elif isinstance(element, Element):
+                self.fenetre.blit(pygame.transform.scale(element.image, (int(element.image.get_width()*coef),int(element.image.get_height()*coef))), (element.x,element.y))
+        elif isinstance(element, Element) and coef == 1:
             self.fenetre.blit(element.image, (element.x,element.y))
+        elif isinstance(element, Element):
+            self.fenetre.blit(pygame.transform.scale(element.image, (int(element.image.get_width()*coef),int(element.image.get_height()*coef))), (element.x,element.y))
     
     def scale(self, coef):
         x = self.perso.x*coef-((800-50*coef)/2)
@@ -254,9 +259,26 @@ class App:
             y = 0
         if y+600 >600*coef:
             y = 600*coef-600
+        # Mouvement camera
+        x_dep = 0
+        y_dep = 0
+        pas = 30
+        if self.pos_screen[0]+pas < x:
+            x_dep = self.pos_screen[0]+pas
+        elif self.pos_screen[0]-pas > x:
+            x_dep = self.pos_screen[0]-pas
+        else:
+            x_dep = x  
+        if self.pos_screen[1]+pas < y:
+            y_dep = self.pos_screen[1]+pas
+        elif self.pos_screen[1]-pas > y:
+            y_dep = self.pos_screen[1]-pas
+        else:
+            y_dep = y 
+        self.pos_screen = (x_dep,y_dep)
 
-        self.pos_screen = (x,y)
-        self.fenetre.blit(pygame.transform.scale(self.fenetre, (800*coef, 600*coef)), (0,0), (x,y, self.size[0],self.size[1]))
+
+        self.fenetre.blit(pygame.transform.scale(self.fenetre, (800*coef, 600*coef)), (0,0), (self.pos_screen[0],self.pos_screen[1], self.size[0],self.size[1]))
             
 
     def flip(self):
@@ -304,6 +326,7 @@ class App:
         file = open("data/save/"+nom+"/"+nom, "w")
         file.write("map=0\nid=0\n")
         file.close()
+        cine(self, 1)
         return partie
 
     def charger_partie(self, nom):

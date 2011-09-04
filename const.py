@@ -70,6 +70,7 @@ global zombie
 global goblin
 global keeper
 global fire
+global fireworks
 
 # Thread
 port = 2346

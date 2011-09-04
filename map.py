@@ -157,6 +157,10 @@ def char2bloc(buffer, vie = False):
         bloc = Lava()
         bloc.set_unit(pbloc[3])
         bloc.move_el(pbloc[1], pbloc[2])
+        # Pop Mob
+    elif pbloc[0] == 25:
+        bloc = PopMob()
+        bloc.move_el(pbloc[1], pbloc[2])
     if vie:
         bloc.vie = float(pbloc[-1])
     return bloc
@@ -224,6 +228,8 @@ def bloc2char(i):
         tampon = tampon + "22," + str(i.picture) +","+str(i.x)+","+str(i.y)+","+i.txt.replace("\n", "/n").replace(",", "/c")+","+str(i.vie)+"\n"
     elif isinstance(i, Furnace):
         tampon = tampon + "23," + str(i.picture) +","+str(i.x)+","+str(i.y)+","+str(i.vie)+"\n"
+    elif isinstance(i, PopMob):
+        tampon = tampon + "25,"+str(i.x)+","+str(i.y)+","+str(i.vie)+"\n"
     elif isinstance(i, Bloc):
         tampon = tampon + "1," + str(i.picture) +","+str(i.x)+","+str(i.y)+","+str(i.vie)+"\n"
 

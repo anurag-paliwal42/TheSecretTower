@@ -97,7 +97,6 @@ def load_craft(type):
         item.element.move_el(-item.element.x+500,-item.element.y+310)
         item.set_prix(Stone(1))
         item.set_prix(Stone(1))
-        item.set_prix(Stone(1))
         item.set_prix(Item(5,1))
         craft.append(item)
 
@@ -129,7 +128,7 @@ def load_craft(type):
         # Epee
         item = Item(6,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(10,3))
+        item.set_prix(Item(10,2))
         item.set_prix(Item(5,1))
         craft.append(item)
 
@@ -159,7 +158,7 @@ def load_craft(type):
         # Epee
         item = Item(11,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(15,3))
+        item.set_prix(Item(15,2))
         item.set_prix(Item(5,1))
         craft.append(item)
 
@@ -189,7 +188,7 @@ def load_craft(type):
         # Epee
         item = Item(16,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(20,3))
+        item.set_prix(Item(20,2))
         item.set_prix(Item(5,1))
         craft.append(item)
 
@@ -219,7 +218,7 @@ def load_craft(type):
         # Epee
         item = Item(21,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(25,3))
+        item.set_prix(Item(25,2))
         item.set_prix(Item(5,1))
         craft.append(item)
 
@@ -249,7 +248,7 @@ def load_craft(type):
         # Epee
         item = Item(26,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(30,3))
+        item.set_prix(Item(30,2))
         item.set_prix(Item(5,1))
         craft.append(item)
 
@@ -492,6 +491,7 @@ def atelier(app, perso, type, chest = None):
                     chest.last = time() + 120
                     symb.last = time() + 120
             input.key[K_b] = 0
+            input.mousebuttons[3] = 0
 
         if (input.key[K_s] or input.key[K_TAB]):
             if type == "Chest":

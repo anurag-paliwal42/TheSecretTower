@@ -23,11 +23,17 @@
 import pygame
 from pygame.locals import *
 
+
 import app
 import element
 import const
 import event
+import char
+import bloc
+import mob
+import particule
 
+import random
 from time import *
 
 
@@ -80,6 +86,7 @@ def menu(app, ptitle, pmenu, perso=None):
                 cmd = i
                 img_choix.y= 250+(cmd*50)
         if input.key[K_SPACE] or input.key[K_RETURN] or input.mousebuttons[1]:
+            input.key[K_RETURN] = 0
             const.click.play()
             if pmenu[cmd-1] == "Quit":
                 return 0
@@ -179,6 +186,7 @@ def menu_color(app, id_color, perso):
                 cmd = i
                 img_choix.y= 250+(cmd*50)
         if input.key[K_SPACE] or input.key[K_RETURN] or input.mousebuttons[1]:
+            input.key[K_RETURN] = 0
             if cmd == 4:
                 perso.update_color()
             if cmd == 5:
@@ -261,6 +269,7 @@ def ask(app, ptitle):
         preponse = input.write(preponse).capitalize()
 
         if input.key[K_RETURN]:
+            input.key[K_RETURN] = 0
             if preponse != "":
                 return preponse.strip()
 
@@ -279,3 +288,140 @@ def ask(app, ptitle):
         app.blit(reponse)
 
         app.flip()
+
+def cine(app, id):
+    input = event.Input()
+
+    fond = element.Element()
+    if id == 1:
+        fond.changer_image(pygame.image.load(const.path_fond_menu).convert())
+    elif id == 2:
+        fond.changer_image(pygame.image.load(const.path_fond1).convert())
+    img_choix = element.Element()
+    img_choix.changer_image(pygame.image.load(const.path_choix).convert_alpha())
+    img_choix.x = 30
+    img_choix.y = 300
+
+    pointeur = element.Element()
+    pointeur.changer_image(pygame.image.load("img/pointeur.png").convert_alpha())
+    fps= 0
+    prev = time()+1
+    pos_txt = (0,0)
+
+    if id==1:
+        txt = "dfgdgdfgdgdf\ngfdgfdfgfg\nfdgfdgfdgfgdfg\n"
+        app.perso.move_el(-app.perso.x+10, -app.perso.y+500)
+        pos_txt = (80,200)
+    elif id == 2:
+        txt = "\n\nThank you for playing !\nPlease, send me your feedback !\n\n-Ptishell (programer)\npierre.surply@gmail.com"
+        pos_txt = (80,50)
+        bloc_stone = bloc.Stone(1)
+        bloc_stone.move_el(0,500)
+        app.perso.move_el(-app.perso.x+10, -app.perso.y+400)
+        mobs = []
+        for i in range(20):
+            new_mob = mob.Mob(random.randint(0, 2))
+            new_mob.move_el(random.randint(100,700),500)
+            new_mob.sens = False
+            mobs.append(new_mob)
+        fireworks = []
+        txt_mobs = []
+
+    coef = 2
+    rang_txt = 0
+    app.perso.isingrav = False
+    app.perso.sens = True
+    while 1:
+        fps = int(1/(time() - prev))
+        while fps > const.fps: 
+            fps = int(1/(time() - prev))
+        # Evenement
+        input.update_event(app)
+        if input.key[K_RETURN]:
+            break
+            input.key[K_RETURN] = 0
+        
+        
+        pointeur.move_el(-pointeur.x+input.mouse[0], -pointeur.y+input.mouse[1])
+
+
+        # White
+        sur_txt = char.write(app,txt[:rang_txt],pos_txt[0]+2,pos_txt[1]+2,(255,255,255))
+        # Black
+        sur_txt_b = char.write(app,txt[:rang_txt],pos_txt[0],pos_txt[1])
+
+        app.blit(fond)
+
+        for i in sur_txt:
+            app.blit(i)
+        for i in sur_txt_b:
+            app.blit(i)
+        app.perso.anim(False)
+        if rang_txt < len(txt):
+            rang_txt += 1
+        if id==1:
+            if coef > 0.5:
+                app.perso.anim(True)
+                if app.perso.x > 300:
+                    app.perso.move_el(int(2.5*coef),int(-1.4*coef))
+                    coef -= 0.012
+                else:
+                    app.perso.move_el(5,0)
+
+                app.blit(app.perso, coef)
+
+        if id==2:
+            app.blit(bloc_stone, 2)
+            for i in mobs:
+                i.anim()
+                app.blit(i,2)
+            app.blit(app.perso, 2)
+            for i in fireworks:
+                i.update()
+                app.blit(i)
+                if time()-i.time_creat > 3:
+                    fireworks.remove(i)
+            for i in txt_mobs:
+                app.blit(i)
+                if time()-i.time > 1:
+                    txt_mobs.remove(i)
+            if random.randint(1,20) == 1:
+                txt_mobs.append(TxtMob(app.perso.nom, app.font_petit))
+                rand = random.randint(1,3)
+                if rand==1:
+                    const.keeper[random.randint(0,2)].play()
+                elif rand==2:
+                    const.goblin[random.randint(0,1)].play()
+                else:
+                    const.zombie[0].play()
+            if random.randint(1,10) == 1:
+                x = random.randint(10,790)
+                y = random.randint(10,300)
+                for i in range(random.randint(10,50)):
+                    new_fire = particule.Particule(1)
+                    new_fire.move_el(x,y)
+                    fireworks.append(new_fire)
+                    const.fireworks[random.randint(0,1)].play()
+            
+        app.blit(pointeur)
+        app.flip()
+    if id == 1:
+        const.door.play()
+    app.perso.move_el(-app.perso.x, -app.perso.y)
+
+
+
+class TxtMob(element.Element):
+    def __init__(self, name, font):
+        element.Element.__init__(self)
+        rand = random.randint(1,3)
+        if rand == 1:
+            txt = "Long life the king "+name+" !"
+        elif rand == 2:
+            txt = "Glory to "+name+"  !"
+        else:
+            txt = "Hail "+name+"  !"
+        self.changer_text(txt, font)
+        self.move_el(random.randint(100, 700), random.randint(430, 480))
+        self.time = time()
+    

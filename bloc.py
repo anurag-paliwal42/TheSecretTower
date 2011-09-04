@@ -167,6 +167,9 @@ class Bloc(Element):
         elif picture == 23:
             rect = pygame.Rect(0,200, 50,50)
             image.blit(const.sprite_bloc, (0,0), rect)
+        elif picture == 24:
+            rect = pygame.Rect(0,250, 50,50)
+            image.blit(const.sprite_bloc, (0,0), rect)
         
         # Damage
         if self.vie != 5:
@@ -310,6 +313,10 @@ class Sign(Deco):
 
 class Furnace(Stone):
     def __init__(self, picture):
+        Bloc.__init__(self, picture)
+
+class PopMob(Stone):
+    def __init__(self, picture=24):
         Bloc.__init__(self, picture)
 
 class Liquid(Bloc):

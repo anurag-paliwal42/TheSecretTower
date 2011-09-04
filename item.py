@@ -21,7 +21,7 @@
 # Auteur : Pierre Surply
 
 from bloc import *
-
+from element import *
 import copy
 import const
 

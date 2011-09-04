@@ -26,6 +26,7 @@ from atelier import *
 import const
 from item import *
 from map import *
+import particule
 
 from time import *
 import os
@@ -51,7 +52,8 @@ class Perso(Element):
 
         self.map = 0
         self.id_porte = 0
-        self.vie = 6
+        self.vie_max = 6
+        self.vie = self.vie_max
         self.last_dommage = time()
         self.last_dommage_ur = time()
         self.last_dommage_fire = time()
@@ -296,7 +298,7 @@ class Perso(Element):
         self.move_el(-self.x, -self.y)
         self.map = 0
         self.id_porte = 0
-        self.vie = 6
+        self.vie = self.vie_max
         self.last_dommage = time()
         self.last_dommage_ur = time()
         self.last_hit = 0
@@ -435,7 +437,7 @@ class Perso(Element):
         return collided
 
 
-    def collided_type(self, dep_x, dep_y, map, type):
+    def collided_type(self, dep_x, dep_y, map, type, particules = []):
         future_rect = pygame.Rect(self.rect)
         future_rect = future_rect.move(dep_x, dep_y)
         # Vérification pour chaques éléments de la map
@@ -447,7 +449,15 @@ class Perso(Element):
                     if type == Terre:
                         if (self.inv.get_item().id in [1,2,6,7,11,12,16,17,21,22,26,27]) and not self.inv.isfull(i):
                             const.dirt.play()
+                            for it in range(random.randint(1,5)):
+                                new_particule = particule.Particule(5)
+                                new_particule.move_el(i.x+25,i.y+25)
+                                particules.append(new_particule)
                             if i.hit(self.inv.get_item().damage):
+                                for it in range(random.randint(10,20)):
+                                    new_particule = particule.Particule(5)
+                                    new_particule.move_el(i.x+25,i.y+25)
+                                    particules.append(new_particule)
                                 self.inv.add(i)
                                 map.remove(i)
                                 if self.ctrl:
@@ -455,7 +465,15 @@ class Perso(Element):
                     elif type == Stone:
                         if (self.inv.get_item().id in [1,3,6,8,11,13,16,18,21,23,26,28]) and not self.inv.isfull(i):
                             const.stone[random.randint(0,2)].play()
+                            for it in range(random.randint(1,5)):
+                                new_particule = particule.Particule(3)
+                                new_particule.move_el(i.x+25,i.y+25)
+                                particules.append(new_particule)
                             if i.hit(self.inv.get_item().damage):
+                                for it in range(random.randint(10,20)):
+                                    new_particule = particule.Particule(3)
+                                    new_particule.move_el(i.x+25,i.y+25)
+                                    particules.append(new_particule)
                                 if isinstance(i, Coal):
                                     self.inv.add(Item(34, 4))
                                 else:
@@ -466,7 +484,15 @@ class Perso(Element):
                     elif type == Wood:
                         if (self.inv.get_item().id in [1,4,6,9,11,14,16,19,21,24,26,29]) and not self.inv.isfull(i):
                             const.wood[random.randint(0,1)].play()
+                            for it in range(random.randint(1,5)):
+                                new_particule = particule.Particule(4)
+                                new_particule.move_el(i.x+25,i.y+25)
+                                particules.append(new_particule)
                             if i.hit(self.inv.get_item().damage):
+                                for it in range(random.randint(10,20)):
+                                    new_particule = particule.Particule(4)
+                                    new_particule.move_el(i.x+25,i.y+25)
+                                    particules.append(new_particule)
                                 self.inv.add(i)
                                 map.remove(i)
                                 if self.ctrl:
@@ -527,7 +553,7 @@ class Perso(Element):
             return True
         return False
 
-    def collided_mob(self, mob):
+    def collided_mob(self, mob, particules = []):
         future_rect = pygame.Rect(self.rect)
         future_rect.width = 100
         future_rect.height = 100
@@ -540,6 +566,11 @@ class Perso(Element):
         for i in mob:
             if future_rect.colliderect(i.rect):
                 i.subir_degats(self.inv.get_item().atk)
+                if i.vie > 0:
+                    for it in range(random.randint(5,20)):
+                        new_blood = particule.Particule(2)
+                        new_blood.move_el(i.x+25,i.y+25)
+                        particules.append(new_blood)
                 collided = True
 
         return collided

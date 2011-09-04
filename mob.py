@@ -49,6 +49,10 @@ class Mob(Element):
             self.vie = 10
             self.atk = 1
             self.vitesse = 2
+        if id == 3:
+            self.vie = 200
+            self.atk = 2
+            self.vitesse = 2
 
         self.sens = True
         self.changement = 0
@@ -80,6 +84,11 @@ class Mob(Element):
                     self.sens = False
                 elif not self.sens and perso.x-100 > self.x and perso.vie > 0:
                     self.sens = True
+            elif self.id == 3:
+                if self.sens and perso.x+25 <= self.x:
+                    self.sens = False
+                elif not self.sens and perso.x-25 > self.x:
+                    self.sens = True
             if self.sens:
                 if self.move(self.vitesse, 0, map) != True:
                     if random.randint(0,3) == 0 and not self.isingrav:
@@ -107,6 +116,9 @@ class Mob(Element):
                 const.zombie[random.randint(0,1)].play()
             elif self.id == 2:
                 const.goblin[random.randint(0,1)].play()
+            elif self.id == 3:
+                const.sword[random.randint(0,1)].play()
+                const.keeper[random.randint(1,2)].play()
             return True
         if (self.vie <= 0):
             return False
@@ -142,7 +154,7 @@ class Mob(Element):
         if not self.sens:
             image = pygame.transform.flip(image, True, False)
 
-
+        """
         ecart_mod = 0.2
         ecart = time() -self.last_degats
         if ecart < ecart_mod:
@@ -155,7 +167,7 @@ class Mob(Element):
             else:
                 rect = pygame.Rect(50,150, 50,50)
             image.blit(const.sprite_degats, (0,0), rect)
-                
+        """
         self.changer_image(image)
 
 

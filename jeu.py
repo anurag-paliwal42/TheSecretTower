@@ -66,18 +66,10 @@ def jeu(app, map, perso):
     dark_middle.image.set_alpha(75)
 
     mobs = []
-    if const.mobs:
-        for i in shadow:
-            # pop monstre
-            if random.randint(1, 5) == 1:
-                creat = True
-                for bloc in map:
-                    if bloc.x == i[0] and bloc.y == i[1]:
-                        creat = False
-                if creat:
-                    mob = Mob(random.randint(0,2))
-                    mob.move_el(i[0], i[1])
-                    mobs.append(mob)
+    mobs = popmobs(shadow, map)
+
+                    
+    particules = []
 
 
     # interface 
@@ -236,11 +228,13 @@ def jeu(app, map, perso):
             const.chatbox.input = input.write(const.chatbox.input, True)
             
         # Sprint
+        """
         if  input.key[K_LSHIFT]:
             if time() > perso.sprint_lock:
                 perso.issprinting = True
         else:
             perso.issprinting = False 
+            """
         if input.key[K_SPACE] and input.key[K_a] and perso.issprinting and  perso.vie > 0 and not const.chatbox.writing:
             perso.sauter(-5, -15, map)
             input.key[K_SPACE] = 0
@@ -267,11 +261,11 @@ def jeu(app, map, perso):
                 coord = (int((input.mouse[0]+app.pos_screen[0])/100)*50, int((input.mouse[1]+app.pos_screen[1])/100)*50)
             if math.sqrt((coord[0]-perso.x)**2 + (coord[1]-perso.y)**2) < 100:
                 if not isinstance(perso.inv.get_item(), Item_Bloc):
-                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Terre)
-                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Stone)
-                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Wood)
+                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Terre, particules)
+                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Stone, particules)
+                    perso.collided_type(-perso.x+coord[0],-perso.y+coord[1],map,Wood, particules)
                     perso.collided_type(-perso.x+coord[0],-perso.y+coord[1], map, Deco)
-                    perso.collided_mob(mobs)
+                    perso.collided_mob(mobs, particules)
 
                 
         if input.mousebuttons[3] and perso.vie >0:
@@ -320,16 +314,31 @@ def jeu(app, map, perso):
         if perso.vie > 0 and not const.chatbox.writing:
             if input.key[K_w]:
                 perso.monter_echelle(map)
-            if perso.issprinting:
+            if input.key[K_LSHIFT] and time() > perso.sprint_lock:
                 if input.key[K_a]:
+                    perso.issprinting = True
                     perso.move(-10,0, map)
                     perso.tend_x = -10
                     perso.anim(True)
-                if input.key[K_d]:
+                    if not perso.isingrav:
+                        for it in range(random.randint(1,5)):
+                            new_particule = particule.Particule(6)
+                            new_particule.move_el(perso.x+40,perso.y+50)
+                            particules.append(new_particule)
+                elif input.key[K_d]:
+                    perso.issprinting = True
                     perso.move(10,0, map)
                     perso.tend_x = 10
                     perso.anim(True)
+                    if not perso.isingrav:
+                        for it in range(random.randint(1,5)):
+                            new_particule = particule.Particule(7)
+                            new_particule.move_el(perso.x+10,perso.y+50)
+                            particules.append(new_particule)
+                else:
+                    perso.issprinting = False 
             else:
+                perso.issprinting = False
                 if input.key[K_a]:
                     perso.move(-5,0, map)
                     perso.tend_x = -5
@@ -344,13 +353,14 @@ def jeu(app, map, perso):
         if input.key[K_RETURN]:
             input.key[K_RETURN] = 0
             if perso.vie <= 0:
-                perso.vie = 6
+                perso.vie = perso.vie_max
                 perso.fired = False
                 for i in map:
                     if isinstance(i, Porte):
                         if i.id == perso.id_porte:
                             perso.move_el(-perso.x, -perso.y)
                             perso.move_el(i.x,i.y)
+                mobs = popmobs(shadow, map)
             elif not const.chatbox.writing and app.partie[0] == "Multi":
                 const.chatbox.writing = True
             elif const.chatbox.writing and app.partie[0] == "Multi":
@@ -398,6 +408,11 @@ def jeu(app, map, perso):
             if creat:
                 i.update(map, perso)
                 app.blit(i)
+        for i in particules:
+            i.update()
+            app.blit(i)
+            if time()-i.time_creat > 0.5:
+                particules.remove(i)
  
         if app.partie[0] == "Multi":
             for i in const.persos:
@@ -437,7 +452,7 @@ def jeu(app, map, perso):
                     app.blit(nom_player_b)
                     app.blit(nom_player_w)
 
-        for i in range(6):
+        for i in range(perso.vie_max):
             if i < perso.vie:
                 coeur.x = 370 + i*15
                 app.blit(coeur)
@@ -502,6 +517,10 @@ def jeu(app, map, perso):
             if app.partie[0] != "Gen" and app.partie[0] != "Multi":
                 save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
             return 1
+        if app.partie[1] == 19:
+            if mobs[0].vie <= 0:
+                cine(app, 2)
+                return 5
 
 
     if app.partie[0] != "Gen" and app.partie[0] != "Multi":
@@ -548,3 +567,27 @@ def set_shadow(shadow, map, perso):
             if delete == False:
                 shadow_new.append(coord_dark)                        
     return shadow_new
+
+
+def popmobs(shadow, map):
+    mobs = []
+    for bloc in map:
+        if isinstance(bloc, PopMob):
+            mob = Mob(3)
+            mob.move_el(bloc.x, bloc.y-50)
+            mobs.append(mob)
+            popmob = True
+            
+    if const.mobs and not popmob:
+        for i in shadow:
+            # pop monstre
+            if random.randint(1, 5) == 1:
+                creat = True
+                for bloc in map:
+                    if bloc.x == i[0] and bloc.y == i[1]:
+                        creat = False
+                if creat:
+                    mob = Mob(random.randint(0,2))
+                    mob.move_el(i[0], i[1])
+                    mobs.append(mob)
+    return mobs
