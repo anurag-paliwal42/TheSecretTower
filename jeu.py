@@ -343,10 +343,20 @@ def jeu(app, map, perso):
                     perso.move(-5,0, map)
                     perso.tend_x = -5
                     perso.anim(True)
+                    if not perso.isingrav:
+                        if random.randint(1,5) == 1:
+                            new_particule = particule.Particule(8)
+                            new_particule.move_el(perso.x+40,perso.y+50)
+                            particules.append(new_particule)
                 if input.key[K_d]:
                     perso.move(5,0, map)
                     perso.tend_x = 5
                     perso.anim(True)
+                    if not perso.isingrav:
+                        if random.randint(1,5) == 1:
+                            new_particule = particule.Particule(9)
+                            new_particule.move_el(perso.x+10,perso.y+50)
+                            particules.append(new_particule)
         if not input.key[K_a] and not input.key[K_d]:
             perso.anim(False)
             perso.tend_x = 0
@@ -571,6 +581,7 @@ def set_shadow(shadow, map, perso):
 
 def popmobs(shadow, map):
     mobs = []
+    popmob = False
     for bloc in map:
         if isinstance(bloc, PopMob):
             mob = Mob(3)

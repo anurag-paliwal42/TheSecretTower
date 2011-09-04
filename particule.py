@@ -76,6 +76,20 @@ class Particule(element.Element):
             self.color=pygame.Color(rand,rand,rand)
             self.v_x = random.randint(-5,0)
             self.v_y = random.randint(-5,-3)
+        # walk left
+        elif id == 8:
+            self.taille = 1
+            rand = random.randint(100, 200)
+            self.color=pygame.Color(rand,rand,rand)
+            self.v_x = 1
+            self.v_y = random.randint(-5,-3)
+        # Walk right
+        elif id == 9:
+            self.taille = 1
+            rand = random.randint(100, 200)
+            self.color=pygame.Color(rand,rand,rand)
+            self.v_x = -1
+            self.v_y = random.randint(-3,-1)
         img = pygame.Surface((self.taille, self.taille))
         img.fill(self.color)
         self.changer_image(img)
@@ -85,7 +99,7 @@ class Particule(element.Element):
 
     def update(self):
         self.move_el(self.v_x, self.v_y)
-        if self.id != 6 and self.id != 7:
+        if not self.id in [6,7,8,9]:
             self.v_y += 1
         else:
             self.taille += 1

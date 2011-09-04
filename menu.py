@@ -333,8 +333,9 @@ def cine(app, id):
     app.perso.sens = True
     while 1:
         fps = int(1/(time() - prev))
-        while fps > const.fps: 
+        while fps > 30: 
             fps = int(1/(time() - prev))
+        prev = time()
         # Evenement
         input.update_event(app)
         if input.key[K_RETURN]:
