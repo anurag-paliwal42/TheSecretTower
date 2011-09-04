@@ -50,7 +50,7 @@ class Mob(Element):
             self.atk = 1
             self.vitesse = 2
         if id == 3:
-            self.vie = 300
+            self.vie = 200
             self.atk = 2
             self.vitesse = 2
 

@@ -525,6 +525,7 @@ def jeu(app, map, perso):
 
         if perso.map != app.partie[1]:
             if app.partie[0] != "Gen" and app.partie[0] != "Multi":
+                app.save_partie()
                 save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
             return 1
         if app.partie[1] == 19:
@@ -533,9 +534,6 @@ def jeu(app, map, perso):
                 return 5
 
 
-    if app.partie[0] != "Gen" and app.partie[0] != "Multi":
-        app.save_partie()
-        save_map("save/"+app.partie[0]+"/map"+str(app.partie[1]), map)
     return 0
 
 def set_shadow(shadow, map, perso):

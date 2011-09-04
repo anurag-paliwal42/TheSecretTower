@@ -309,11 +309,11 @@ def cine(app, id):
     pos_txt = (0,0)
 
     if id==1:
-        txt = "dfgdgdfgdgdf\ngfdgfdfgfg\nfdgfdgfdgfgdfg\n"
+        txt = "\"Once upon a time, a hidden \ntower where the beautiful \nprincess Ericia was held \nprisonner.\nMany knights had ventured\ninto this castle but none\nreturned...\nAre you the adventurer who \nwill rescue the princess ?\""
         app.perso.move_el(-app.perso.x+10, -app.perso.y+500)
         pos_txt = (80,200)
     elif id == 2:
-        txt = "\n\nThank you for playing !\nPlease, send me your feedback !\n\n-Ptishell (programer)\npierre.surply@gmail.com"
+        txt = "\"And so you became king of the\nSecret Tower.\nThe monsters who live in this\ntower are now your slaves.\nNow you can taste the pleasures\nof power and wealth, but you\nhaven't found love...\"\n\nThank you for playing !\nPlease, send me your feedback !\n\n-Ptishell (programer)\npierre.surply@gmail.com"
         pos_txt = (80,50)
         bloc_stone = bloc.Stone(1)
         bloc_stone.move_el(0,500)
@@ -332,9 +332,15 @@ def cine(app, id):
     app.perso.isingrav = False
     app.perso.sens = True
     while 1:
-        fps = int(1/(time() - prev))
-        while fps > 30: 
+        if (time() - prev) > 0:
             fps = int(1/(time() - prev))
+        else:
+            fps = 1000
+        while fps > 30: 
+            if (time() - prev) > 0:
+                fps = int(1/(time() - prev))
+            else:
+                fps = 1000
         prev = time()
         # Evenement
         input.update_event(app)
