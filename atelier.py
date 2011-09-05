@@ -92,20 +92,20 @@ def load_craft(type):
         item.set_prix(Item(5,2))
         craft.append(item)
 
-        # Epee
-        item = Item(1,1)
-        item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Stone(1))
-        item.set_prix(Stone(1))
-        item.set_prix(Item(5,1))
-        craft.append(item)
-
         # Pioche
         item = Item(3,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
         item.set_prix(Stone(1))
         item.set_prix(Stone(1))
         item.set_prix(Item(5,2))
+        craft.append(item)
+
+        # Epee
+        item = Item(1,1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Stone(1))
+        item.set_prix(Stone(1))
+        item.set_prix(Item(5,1))
         craft.append(item)
 
         # Pelle
@@ -125,18 +125,18 @@ def load_craft(type):
         item.set_prix(Item(5,2))
         craft.append(item)
 
-        # Epee
-        item = Item(6,1)
-        item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(10,2))
-        item.set_prix(Item(5,1))
-        craft.append(item)
-
         # Pioche
         item = Item(8,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
         item.set_prix(Item(10,2))
         item.set_prix(Item(5,2))
+        craft.append(item)
+
+        # Epee
+        item = Item(6,1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Item(10,2))
+        item.set_prix(Item(5,1))
         craft.append(item)
 
         # Pelle
@@ -155,18 +155,18 @@ def load_craft(type):
         item.set_prix(Item(5,2))
         craft.append(item)
 
-        # Epee
-        item = Item(11,1)
-        item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(15,2))
-        item.set_prix(Item(5,1))
-        craft.append(item)
-
         # Pioche
         item = Item(13,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
         item.set_prix(Item(15,2))
         item.set_prix(Item(5,2))
+        craft.append(item)
+
+        # Epee
+        item = Item(11,1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Item(15,2))
+        item.set_prix(Item(5,1))
         craft.append(item)
 
         # Pelle
@@ -185,18 +185,18 @@ def load_craft(type):
         item.set_prix(Item(5,2))
         craft.append(item)
 
-        # Epee
-        item = Item(16,1)
-        item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(20,2))
-        item.set_prix(Item(5,1))
-        craft.append(item)
-
         # Pioche
         item = Item(18,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
         item.set_prix(Item(20,2))
         item.set_prix(Item(5,2))
+        craft.append(item)
+
+        # Epee
+        item = Item(16,1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Item(20,2))
+        item.set_prix(Item(5,1))
         craft.append(item)
 
         # Pelle
@@ -215,18 +215,18 @@ def load_craft(type):
         item.set_prix(Item(5,2))
         craft.append(item)
 
-        # Epee
-        item = Item(21,1)
-        item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(25,2))
-        item.set_prix(Item(5,1))
-        craft.append(item)
-
         # Pioche
         item = Item(23,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
         item.set_prix(Item(25,2))
         item.set_prix(Item(5,2))
+        craft.append(item)
+
+        # Epee
+        item = Item(21,1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Item(25,2))
+        item.set_prix(Item(5,1))
         craft.append(item)
 
         # Pelle
@@ -245,18 +245,18 @@ def load_craft(type):
         item.set_prix(Item(5,2))
         craft.append(item)
 
-        # Epee
-        item = Item(26,1)
-        item.element.move_el(-item.element.x+500,-item.element.y+310)
-        item.set_prix(Item(30,2))
-        item.set_prix(Item(5,1))
-        craft.append(item)
-
         # Pioche
         item = Item(28,1)
         item.element.move_el(-item.element.x+500,-item.element.y+310)
         item.set_prix(Item(30,2))
         item.set_prix(Item(5,2))
+        craft.append(item)
+
+        # Epee
+        item = Item(26,1)
+        item.element.move_el(-item.element.x+500,-item.element.y+310)
+        item.set_prix(Item(30,2))
+        item.set_prix(Item(5,1))
         craft.append(item)
 
         # Pelle
