@@ -56,7 +56,7 @@ class Server:
             "www.secrettower.net\n"+\
             "*************************\n"+\
             "Type \"/help\" for help\n"
-        self.world = "phil"
+        self.world = "world"
         self.mobs = True
         
         
